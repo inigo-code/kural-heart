@@ -1,0 +1,86 @@
+{
+ "note": "Prototype text from the design canvas. Unverified. Debug builds only.",
+ "kurals": [
+  {
+   "n": 391,
+   "a": "கற்க கசடறக் கற்பவை கற்றபின்",
+   "b": "நிற்க அதற்குத் தக",
+   "chapterTa": "கல்வி",
+   "chapterEn": "Learning",
+   "pope": "So learn that you may full and faultless learning gain, Then in obedience meet to lessons learnt remain",
+   "meaning": "Learn what is worth learning, and learn it well. Then let your life stand by it."
+  },
+  {
+   "n": 622,
+   "a": "வெள்ளத் தனைய இடும்பை அறிவுடையான்",
+   "b": "உள்ளத்தின் உள்ளக் கெடும்",
+   "chapterTa": "இடுக்கண் அழியாமை",
+   "chapterEn": "Facing trouble",
+   "pope": null,
+   "meaning": "Trouble as wide as a flood fades once a clear mind turns and looks at it."
+  },
+  {
+   "n": 783,
+   "a": "நவில்தொறும் நூல்நயம் போலும் பயில்தொறும்",
+   "b": "பண்புடை யாளர் தொடர்பு",
+   "chapterTa": "நட்பு",
+   "chapterEn": "Friendship",
+   "pope": null,
+   "meaning": "The company of good people is like a good book: every return gives you more."
+  },
+  {
+   "n": 108,
+   "a": "நன்றி மறப்பது நன்றன்று நன்றல்லது",
+   "b": "அன்றே மறப்பது நன்று",
+   "chapterTa": "செய்ந்நன்றி அறிதல்",
+   "chapterEn": "Gratitude",
+   "pope": null,
+   "meaning": "Forgetting a kindness is never good. Letting go of a wrong the same day is."
+  },
+  {
+   "n": 151,
+   "a": "அகழ்வாரைத் தாங்கும் நிலம்போலத் தம்மை",
+   "b": "இகழ்வார்ப் பொறுத்தல் தலை",
+   "chapterTa": "பொறையுடைமை",
+   "chapterEn": "Forbearance",
+   "pope": null,
+   "meaning": "The earth carries even those who dig into it. Bearing those who scorn us is the highest strength."
+  },
+  {
+   "n": 34,
+   "a": "மனத்துக்கண் மாசிலன் ஆதல் அனைத்தறன்",
+   "b": "ஆகுல நீர பிற",
+   "chapterTa": "அறன் வலியுறுத்தல்",
+   "chapterEn": "The strength of virtue",
+   "pope": null,
+   "meaning": "A mind kept clean is the whole of virtue. The rest is only noise."
+  },
+  {
+   "n": 619,
+   "a": "தெய்வத்தான் ஆகா தெனினும் முயற்சிதன்",
+   "b": "மெய்வருத்தக் கூலி தரும்",
+   "chapterTa": "ஆள்வினை உடைமை",
+   "chapterEn": "Sustained effort",
+   "pope": null,
+   "meaning": "Even when fate refuses the result, effort still pays the wage of its labour."
+  },
+  {
+   "n": 423,
+   "a": "எப்பொருள் யார்யார்வாய்க் கேட்பினும் அப்பொருள்",
+   "b": "மெய்ப்பொருள் காண்ப தறிவு",
+   "chapterTa": "அறிவுடைமை",
+   "chapterEn": "Wisdom",
+   "pope": null,
+   "meaning": "Whoever says a thing, wisdom is seeing the truth inside it."
+  },
+  {
+   "n": 1266,
+   "a": "வருகமன் கொண்கன் ஒருநாள் பருகுவன்",
+   "b": "பைதல்நோய் எல்லாம் கெட",
+   "chapterTa": "அவர்வயின் விதும்பல்",
+   "chapterEn": "Longing",
+   "pope": null,
+   "meaning": "Let them come, even for one day, and every ache would ease."
+  }
+ ]
+}

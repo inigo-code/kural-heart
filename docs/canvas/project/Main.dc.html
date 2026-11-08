@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<title>Kural Heart prototype</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="olai.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,100..800&amp;family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400&amp;family=Noto+Serif+Tamil:wdth,wght@62.5..100,100..900&amp;family=Tiro+Tamil:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="o {{rootClass}}">
+
+<sc-if value="{{is.splash}}" hint-placeholder-val="{{false}}">
+<div class="splash">
+<svg class="mark" viewBox="0 0 108 108" aria-hidden="true"><defs><linearGradient id="dawnS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD08A"></stop><stop offset="1" stop-color="#E5693F"></stop></linearGradient><clipPath id="tileS"><rect width="108" height="108" rx="24"></rect></clipPath></defs><g clip-path="url(#tileS)"><rect width="108" height="108" fill="url(#dawnS)"></rect><path d="M8 108C8 90 28 80 54 80 80 80 100 90 100 108Z" fill="#FFFFFF"></path><path d="M70 84L57 108" stroke="#E2DDD0" stroke-width="3" stroke-linecap="round"></path><g transform="translate(-34.800 5.700) scale(.74)"><rect x="110" y="86" width="20" height="20" fill="#D17140"></rect><circle cx="120" cy="22" r="13.500" fill="#232329"></circle><rect x="85" y="54" width="12" height="18" rx="6" fill="#D17140"></rect><rect x="143" y="54" width="12" height="18" rx="6" fill="#D17140"></rect><path d="M90 48C90 26 150 26 150 48L150 62 90 62Z" fill="#232329"></path><rect x="93" y="39" width="54" height="51" rx="17" fill="#E08250"></rect><path d="M102 50Q108 46.500 114 50M126 50Q132 46.500 138 50" stroke="#232329" stroke-width="3.200" stroke-linecap="round" fill="none"></path><circle cx="108" cy="57.500" r="3.600" fill="#232329"></circle><circle cx="132" cy="57.500" r="3.600" fill="#232329"></circle><path d="M120 54L120 65Q124 66 125 63" stroke="#B85B2E" stroke-width="2.800" stroke-linecap="round" fill="none"></path><path d="M120 112C100 100 89 89 89 77 89 69 95 64 102 64 109 64 114 68 120 73 126 68 131 64 138 64 145 64 151 69 151 77 151 89 140 100 120 112Z" fill="#232329"></path><path d="M107 79C112 88 128 88 133 79 128 83 112 83 107 79Z" fill="#E08250"></path></g></g></svg>
+<p class="word">Kural Heart</p>
+<p class="tag">{{t.tagline}}</p>
+</div>
+</sc-if>
+
+<sc-if value="{{is.onboard}}" hint-placeholder-val="{{false}}">
+<div class="scr ob">
+<button type="button" class="tbtn skip" onClick="{{goToday}}">{{t.skip}}</button>
+<div class="obstage"><span class="arch"></span><div><dc-import name="Valluvar" pose="{{obPose}}" px="250" hint-size="250px,229px"></dc-import></div></div>
+<sc-if value="{{is.ob1}}" hint-placeholder-val="{{true}}">
+<h1>{{t.ob1}}</h1>
+<p class="lede">{{t.ob1b}}</p>
+<button type="button" class="choice {{leadTaOn}}" onClick="{{setTa}}"><span><span class="a">தமிழ்</span><span class="b">Tamil first, English beneath</span></span><span class="tick"></span></button>
+<button type="button" class="choice {{leadEnOn}}" onClick="{{setEn}}"><span><span class="a">English</span><span class="b">ஆங்கிலம் முதலில், தமிழ் கீழே</span></span><span class="tick"></span></button>
+</sc-if>
+<sc-if value="{{is.ob2}}" hint-placeholder-val="{{false}}">
+<h1>{{t.ob2}}</h1>
+<p class="lede">{{t.ob2b}}</p>
+<p class="bigtime">8:30 pm</p>
+<div class="times"><span class="chip">6:30 am</span><span class="chip">1:00 pm</span><span class="chip on">8:30 pm</span><span class="chip">10:00 pm</span></div>
+</sc-if>
+<sc-if value="{{is.ob3}}" hint-placeholder-val="{{false}}">
+<h1>{{t.ob3}}</h1>
+<ul class="promise">
+<li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM5.600 5.600l12.800 12.800"></path></svg><span>{{t.p1}}</span></li>
+<li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11V8a6 6 0 0 1 12 0v3M5 11h14v9H5z"></path></svg><span>{{t.p2}}</span></li>
+<li><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"></path></svg><span>{{t.p3}}</span></li>
+</ul>
+</sc-if>
+<div class="obacts"><div class="dots" role="img" aria-label="{{obLabel}}"><i class="{{ob1On}}"></i><i class="{{ob2On}}"></i><i class="{{ob3On}}"></i></div><button type="button" class="btn" onClick="{{obNext}}">{{obCta}}</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.today}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="scroll">
+<div class="bar"><div class="hd" style="padding: 0 0 0 12px"><p class="sm">{{dateSm}}</p><h1 class="t-display">{{greeting}}</h1></div><button type="button" class="pill" style="margin: 6px 8px 0 0" onClick="{{openThread}}" aria-label="{{threadLabel}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg>{{streak}}</button></div>
+<div class="card">
+<div class="cpad" style="padding-bottom: 16px">
+<div class="khead"><div class="thumb"><span class="arch"></span><div><dc-import name="Valluvar" pose="sit-read" px="124" hint-size="124px,114px"></dc-import></div></div>
+<div class="kinfo"><p class="kn">{{t.kuralWord}} {{kural.n}}</p><p class="kc"><span class="dot d-{{kural.pal}}"></span>{{kural.palName}} · {{kural.chName}}</p><p class="kx">{{t.dailyKural}}</p></div></div>
+<div class="leafwrap" style="margin-top: 26px">
+<button type="button" class="flipper {{flipCls}}" onClick="{{flip}}" aria-label="{{t.turnLabel}}">
+<div class="leaf"><sc-for list="{{kural.lines}}" as="l" hint-placeholder-count="2"><span class="ln" style="font-size: {{kural.px}}px"><sc-for list="{{l.words}}" as="w" hint-placeholder-count="3"><span class="w" style="--d: {{w.d}}ms">{{w.t}}</span></sc-for></span></sc-for></div>
+<div class="leaf back"><p class="tl">{{kural.tl1}}</p><p class="tl">{{kural.tl2}}</p><p class="pope">{{kural.pope}}</p><p class="by">G.U. Pope, 1886</p></div>
+</button>
+</div>
+<p class="meaning">{{kural.meaning}}</p>
+<div class="kacts">
+<button type="button" class="chip" onClick="{{openWords}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7M17 15l3 3-3 3"></path></svg>{{t.words}}</button>
+<button type="button" class="chip" onClick="{{flip}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.300L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.300L4 15M4 20v-5h5"></path></svg>{{t.turn}}</button>
+<button type="button" class="ib" style="margin-left: auto; width: 36px; height: 36px; background: var(--surface2)" aria-label="{{t.share}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 13v7h14v-7"></path></svg></button>
+</div>
+</div>
+</div>
+<div class="qcard">
+<div class="lbl"><span>{{t.todayQ}}</span><span>{{t.mins}}</span></div>
+<div class="lens" role="group" aria-label="{{t.lensLabel}}"><sc-for list="{{lenses}}" as="x" hint-placeholder-count="3"><button type="button" class="{{x.cls}}" onClick="{{x.pick}}">{{x.name}}</button></sc-for></div>
+<p class="q">{{question}}</p>
+<button type="button" class="btn inv" onClick="{{openWrite}}">{{ctaLabel}}</button>
+</div>
+<div class="sect"><h2>{{t.feel}}</h2><button type="button" class="tbtn" style="height: 36px; padding: 0 4px" onClick="{{openFeel}}">{{t.allFeelings}}</button></div>
+<div class="bento"><sc-for list="{{bento}}" as="m" hint-placeholder-count="4"><button type="button" class="btile" onClick="{{m.pick}}"><span class="dot d-{{m.id}}"></span><span><span class="a">{{m.a}}</span><span class="b">{{m.b}}</span></span></button></sc-for></div>
+<div style="height: 24px"></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.words}}" hint-placeholder-val="{{false}}">
+<button type="button" class="scrim" aria-label="{{t.close}}" onClick="{{closeSheet}}"></button>
+<div class="sheet" role="dialog" aria-label="{{t.wordsTitle}}">
+<div class="handle"></div>
+<div class="shead"><div class="txt"><h2>{{t.wordsTitle}}</h2><p class="sub">{{t.wordsSub}}</p></div><div class="sv"><dc-import name="Valluvar" pose="teach" px="112" hint-size="112px,103px"></dc-import></div></div>
+<p class="wline">{{t.line1}}</p>
+<div class="words"><sc-for list="{{gloss1}}" as="g" hint-placeholder-count="4"><div class="wrow"><span class="tw">{{g.w}}</span><span class="gl">{{g.m}}</span></div></sc-for></div>
+<p class="wline">{{t.line2}}</p>
+<div class="words"><sc-for list="{{gloss2}}" as="g" hint-placeholder-count="3"><div class="wrow"><span class="tw">{{g.w}}</span><span class="gl">{{g.m}}</span></div></sc-for></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.thread}}" hint-placeholder-val="{{false}}">
+<button type="button" class="scrim" aria-label="{{t.close}}" onClick="{{closeSheet}}"></button>
+<div class="sheet" role="dialog" aria-label="{{threadLabel}}">
+<div class="handle"></div>
+<div class="shead"><div class="txt"><div class="big"><b>{{streak}}</b><span>{{t.threadDays}}</span></div></div><div class="sv"><dc-import name="Valluvar" pose="{{threadPose}}" px="112" hint-size="112px,103px"></dc-import></div></div>
+<svg class="cord" viewBox="0 0 300 64" role="img" aria-label="{{weekLabel}}">
+<path d="M2 34C40 24 70 44 106 34S172 24 208 34 270 44 298 32" stroke="#B89660" stroke-width="2.500" fill="none" stroke-linecap="round"></path>
+<sc-for list="{{knots}}" as="k" hint-placeholder-count="7"><g transform="{{k.tf}}"><circle class="{{k.cls}}" r="{{k.r}}"></circle></g></sc-for>
+</svg>
+<div class="cordlab"><sc-for list="{{days}}" as="d" hint-placeholder-count="7"><span class="{{d.cls}}">{{d.l}}</span></sc-for></div>
+<p class="sub" style="margin-top: 14px">{{t.restNote}}</p>
+<div class="rowcard" style="margin-top: 16px; border-radius: 18px; background: var(--surface2); padding: 0 16px"><button type="button" class="srow" style="padding: 8px 0" onClick="{{goJourney}}"><span class="l">{{t.longest}}</span><span class="v">{{t.seeJourney}}</span><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.feel}}" hint-placeholder-val="{{false}}">
+<button type="button" class="scrim" aria-label="{{t.close}}" onClick="{{closeSheet}}"></button>
+<div class="sheet" role="dialog" aria-label="{{t.feel}}">
+<div class="handle"></div>
+<div class="shead"><div class="txt"><h2>{{t.feel}}</h2><p class="sub">{{t.feelSub}}</p></div><div class="sv"><dc-import name="Valluvar" pose="think" px="112" hint-size="112px,103px"></dc-import></div></div>
+<div class="bento" style="margin: 16px 0 0"><sc-for list="{{moods}}" as="m" hint-placeholder-count="8"><button type="button" class="btile" style="background: var(--surface2); box-shadow: none" onClick="{{m.pick}}"><span class="dot d-{{m.id}}"></span><span><span class="a">{{m.a}}</span><span class="b">{{m.b}}</span></span></button></sc-for></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.mood}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="scroll" style="padding-bottom: 24px">
+<div class="bar compact"><button type="button" class="ib" aria-label="{{t.back}}" onClick="{{goToday}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button><div class="grow"></div></div>
+<div class="mtop"><span class="dot d-{{moodNow.id}}"></span><span class="t-label" style="font-size: 15px">{{moodNow.a}}</span></div>
+<h1 class="t-head" style="padding: 8px 20px 0">{{t.forNow}}</h1>
+<div class="card"><div class="cpad">
+<div class="ktag"><span class="dot d-{{mk.pal}}"></span><span>{{mk.palName}} · {{mk.chName}}</span><span class="n">{{t.kuralWord}} {{mk.n}}</span></div>
+<div class="leafwrap" style="margin-top: 26px"><div class="leaf"><sc-for list="{{mk.lines}}" as="l" hint-placeholder-count="2"><span class="ln" style="font-size: {{mk.px}}px">{{l.text}}</span></sc-for></div></div>
+<p class="meaning" style="animation-delay: .2s">{{mk.meaning}}</p>
+</div></div>
+<div class="qcard" style="animation-delay: .3s"><div class="lbl"><span>{{t.todayQ}}</span></div><p class="q">{{mk.q}}</p><button type="button" class="btn inv" onClick="{{openWriteMood}}">{{t.write}}</button></div>
+<button type="button" class="tbtn full" style="margin-top: 8px" onClick="{{another}}"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.300L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.300L4 15M4 20v-5h5"></path></svg>{{t.another}}</button>
+<sc-if value="{{moodHeavy}}" hint-placeholder-val="{{false}}"><p class="t-meta" style="padding: 8px 24px 0; text-align: center">{{t.heavy}}</p></sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.write}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="bar compact"><button type="button" class="ib" aria-label="{{t.close}}" onClick="{{goToday}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button><div class="grow" style="text-align: center"><p class="t-label" style="color: var(--ink3); font-weight: 500">{{dateShort}}</p><sc-if value="{{hasText}}" hint-placeholder-val="{{true}}"><p class="t-meta" style="font-size: 12px">{{t.draft}}</p></sc-if></div><button type="button" class="savebtn" style="margin-right: 8px" onClick="{{save}}">{{t.save}}</button></div>
+<sc-if value="{{hasWk}}" hint-placeholder-val="{{true}}">
+<button type="button" class="kpill" onClick="{{toggleCard}}" aria-expanded="{{cardOpen}}"><span class="n">{{t.kuralWord}} {{wk.n}}</span><span class="t">{{wk.a}}</span><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<sc-if value="{{cardOpen}}" hint-placeholder-val="{{false}}"><div class="leafwrap" style="margin: 26px 16px 0"><div class="leaf"><sc-for list="{{wk.lines}}" as="l" hint-placeholder-count="2"><span class="ln" style="font-size: {{wk.px}}px">{{l.text}}</span></sc-for></div></div></sc-if>
+<div class="wlens"><sc-for list="{{lenses}}" as="x" hint-placeholder-count="3"><button type="button" class="chip sm {{x.wcls}}" onClick="{{x.pick}}">{{x.name}}</button></sc-for></div>
+<p class="wq">{{wq}}</p>
+</sc-if>
+<textarea class="editor" aria-label="{{t.writeHere}}" placeholder="{{t.writeHere}}" value="{{draft}}" onChange="{{onDraft}}"></textarea>
+<div class="wtools">
+<div class="buddy"><dc-import name="Valluvar" pose="write" px="96" typing="{{hasText}}" hint-size="96px,88px"></dc-import></div>
+<button type="button" class="chip" onClick="{{cycleMood}}"><span class="dot d-{{writeMoodId}}"></span>{{writeMoodLabel}}</button>
+<button type="button" class="ib" aria-label="{{t.kbTitle}}" onClick="{{openKb}}"><span class="tamil">அ</span></button>
+<span class="count">{{wordsLabel}}</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{kbSheet}}" hint-placeholder-val="{{false}}">
+<button type="button" class="scrim" aria-label="{{t.close}}" onClick="{{closeKb}}"></button>
+<div class="sheet" role="dialog" aria-label="{{t.kbTitle}}">
+<div class="handle"></div>
+<div class="shead"><div class="txt"><h2>{{t.kbTitle}}</h2><p class="sub">{{t.kbBody}}</p></div><div class="sv"><dc-import name="Valluvar" pose="teach" px="112" hint-size="112px,103px"></dc-import></div></div>
+<ol class="steps"><li><b>1</b><span>{{t.kb1}}</span></li><li><b>2</b><span>{{t.kb2}}</span></li><li><b>3</b><span>{{t.kb3}}</span></li></ol>
+<div style="display: grid; gap: 4px; margin-top: 18px"><button type="button" class="btn" onClick="{{closeKb}}">{{t.kbOpen}}</button><button type="button" class="tbtn full" onClick="{{closeKb}}">{{t.kbLater}}</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.seal}}" hint-placeholder-val="{{false}}">
+<div class="moment">
+<span class="glow" aria-hidden="true"></span>
+<dc-import name="Valluvar" pose="cheer" px="250" once="{{yes}}" hint-size="250px,229px"></dc-import>
+<p class="t-display">{{t.savedMsg}}</p>
+<p class="count" role="status" aria-label="{{savedLabel}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg><span class="roll" aria-hidden="true"><i>11</i><i>12</i></span><span aria-hidden="true">{{t.threadDays}}</span></p>
+<svg class="cord" viewBox="0 0 300 64" aria-hidden="true">
+<path d="M2 34C40 24 70 44 106 34S172 24 208 34 270 44 298 32" stroke="#B89660" stroke-width="2.500" fill="none" stroke-linecap="round"></path>
+<sc-for list="{{knots}}" as="k" hint-placeholder-count="7"><g transform="{{k.tf}}"><circle class="{{k.cls}}" r="{{k.r}}"></circle></g></sc-for>
+</svg>
+</div>
+</sc-if>
+
+<sc-if value="{{is.award}}" hint-placeholder-val="{{false}}">
+<div class="moment award">
+<span class="rays" aria-hidden="true"></span>
+<span class="glow" aria-hidden="true"></span>
+<div class="awardstage"><dc-import name="Valluvar" pose="award" px="270" hint-size="270px,248px"></dc-import><div class="held"><dc-import name="Seal" glyph="{{award.glyph}}" num="{{award.num}}" tone="{{award.tone}}" earned="{{yes}}" shine="{{yes}}" px="82" hint-size="82px,93px"></dc-import></div></div>
+<p class="t-display">{{award.name}}</p>
+<p class="alt">{{award.alt}}</p>
+<p class="why">{{award.why}}</p>
+<div style="height: 118px"></div>
+<div class="acts"><button type="button" class="btn" onClick="{{afterAward}}">{{t.next}}</button><button type="button" class="tbtn full">{{t.shareSeal}}</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.journal}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="scroll">
+<div class="bar"><div class="hd" style="padding: 0 0 0 12px"><p class="sm">{{pagesLabel}}</p><h1 class="t-display">{{t.journal}}</h1></div><div style="display: flex"><button type="button" class="ib" aria-label="{{t.calView}}" onClick="{{toggleCal}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v14H5zM5 10h14M9 3v4M15 3v4"></path></svg></button></div></div>
+<sc-if value="{{showList}}" hint-placeholder-val="{{true}}">
+<sc-if value="{{showFab}}" hint-placeholder-val="{{true}}"><div class="search"><svg class="ic s" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM16 16l4.500 4.500"></path></svg><input type="text" aria-label="{{t.search}}" placeholder="{{t.searchPh}}" value="{{query}}" onChange="{{onQuery}}"></div></sc-if>
+<sc-if value="{{showOtd}}" hint-placeholder-val="{{true}}">
+<button type="button" class="otd" onClick="{{openOtd}}"><span class="when">{{t.otdWhen}}</span><span class="ex">{{otd.ex}}</span><div class="leafwrap" style="margin-top: 22px"><div class="leaf mini"><span class="ln" style="font-size: 15px">{{otd.a}}</span><span class="ln" style="font-size: 15px">{{otd.b}}</span></div></div></button>
+<div class="rhythm" role="img" aria-label="{{weekLabel}}"><sc-for list="{{days}}" as="d" hint-placeholder-count="7"><span class="rd {{d.cls}}"><span class="m"><sc-if value="{{d.heart}}" hint-placeholder-val="{{true}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="h" d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg></sc-if><sc-if value="{{d.rest}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="r" d="M4 18C4 10 10 5 20 4 20 13 14 19 6 19ZM6 19 14 11"></path></svg></sc-if></span><span class="t">{{d.l}}</span></span></sc-for></div>
+</sc-if>
+<sc-for list="{{entries}}" as="e" hint-placeholder-count="4">
+<button type="button" class="entry" style="--d: {{e.d}}ms" onClick="{{e.open}}"><span class="meta"><span class="day">{{e.day}}</span><span class="k"><span class="dot d-{{e.pal}}"></span>{{e.ref}}</span></span><span class="tx">{{e.text}}</span><span class="meta" style="margin-top: 10px"><span class="dot d-{{e.mood}}"></span>{{e.moodLabel}} · {{e.time}}</span></button>
+</sc-for>
+<sc-if value="{{noResults}}" hint-placeholder-val="{{false}}"><div class="empty"><dc-import name="Valluvar" pose="listen" px="190" hint-size="190px,174px"></dc-import><h2>{{t.noResults}}</h2><p>{{t.noResultsSub}}</p></div></sc-if>
+<sc-if value="{{showEmpty}}" hint-placeholder-val="{{false}}"><div class="empty" style="padding-top: 40px"><dc-import name="Valluvar" pose="sit-wave" px="230" hint-size="230px,211px"></dc-import><h2>{{t.empty}}</h2><p>{{t.emptySub}}</p><button type="button" class="btn auto" onClick="{{openWrite}}">{{t.firstPage}}</button></div></sc-if>
+</sc-if>
+<sc-if value="{{showCal}}" hint-placeholder-val="{{false}}">
+<div class="jcard"><h3>{{t.month}}</h3>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 10px"><sc-for list="{{wds}}" as="d" hint-placeholder-count="7"><span class="t-meta" style="text-align: center; font-size: 12px; font-weight: 600">{{d}}</span></sc-for></div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 6px"><sc-for list="{{calDays}}" as="c" hint-placeholder-count="30"><span class="rd {{c.cls}}" style="height: 46px; justify-content: center; gap: 2px"><span class="t">{{c.n}}</span><sc-if value="{{c.heart}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width: 10px; height: 10px; fill: var(--heart)"><path d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg></sc-if></span></sc-for></div>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{showFab}}" hint-placeholder-val="{{true}}"><button type="button" class="fab" aria-label="{{t.newPage}}" onClick="{{freeWrite}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{is.entry}}" hint-placeholder-val="{{false}}">
+<div class="scr pg">
+<div class="bar compact"><button type="button" class="ib" aria-label="{{t.back}}" onClick="{{goJournal}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button><div class="grow"></div><button type="button" class="ib" aria-label="{{t.shareText}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 13v7h14v-7"></path></svg></button><button type="button" class="ib" aria-label="{{t.edit}}" onClick="{{openWrite}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19ZM14 7l3 3"></path></svg></button><button type="button" class="ib" aria-label="{{t.del}}" onClick="{{del}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"></path></svg></button></div>
+<div class="scroll">
+<h1 class="t-head">{{en.title}}</h1>
+<div class="meta"><span class="chip sm"><span class="dot d-{{en.mood}}"></span>{{en.moodLabel}}</span><span class="chip sm"><span class="dot d-{{en.pal}}"></span>{{en.ref}}</span></div>
+<div class="leafwrap" style="margin-top: 30px"><div class="leaf mini"><span class="ln" style="font-size: 16px">{{en.a}}</span><span class="ln" style="font-size: 16px">{{en.b}}</span></div></div>
+<p class="body">{{en.text}}</p>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.journey}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="scroll">
+<div class="bar"><div class="hd" style="padding: 0 0 0 12px"><p class="sm">{{t.journeySm}}</p><h1 class="t-display">{{t.journey}}</h1></div></div>
+<div class="card"><div class="stage" style="margin: 0; border-radius: 0; height: 176px"><span class="arch" style="width: 170px; height: 170px; margin-left: -85px; border-radius: 85px 85px 0 0"></span><div><dc-import name="Valluvar" pose="walk" px="190" hint-size="190px,174px"></dc-import></div></div>
+<div class="cpad"><div class="big"><b>{{streak}}</b><span>{{t.threadDays}}</span></div>
+<svg class="cord" viewBox="0 0 300 64" role="img" aria-label="{{weekLabel}}">
+<path d="M2 34C40 24 70 44 106 34S172 24 208 34 270 44 298 32" stroke="#B89660" stroke-width="2.500" fill="none" stroke-linecap="round"></path>
+<sc-for list="{{knots}}" as="k" hint-placeholder-count="7"><g transform="{{k.tf}}"><circle class="{{k.cls}}" r="{{k.r}}"></circle></g></sc-for>
+</svg>
+<p class="t-meta">{{t.restShort}}</p></div></div>
+<div class="jcard"><h3>{{t.chapters}}</h3><p class="t-meta">{{t.chaptersSub}}</p>
+<div class="mwrap"><div class="mid"><div class="mandala" style="--done: {{doneDeg}}"></div><div class="lab"><b>9</b><span>{{t.of133}}</span></div></div>
+<div class="pillars" style="flex: 1 1 auto; margin: 0"><sc-for list="{{pillars}}" as="p" hint-placeholder-count="3"><div class="prow"><div class="top"><b style="font-weight: 600">{{p.name}}</b><span>{{p.n}}</span></div><div class="track"><i style="width: {{p.w}}; background: {{p.c}}"></i></div></div></sc-for></div></div>
+</div>
+<div class="jcard"><div style="display: flex; align-items: baseline; justify-content: space-between"><h3>{{t.seals}}</h3><button type="button" class="tbtn" style="height: 36px; padding: 0 4px" onClick="{{goSeals}}">{{sealsCount}}</button></div>
+<div class="sealrow"><sc-for list="{{sealPreview}}" as="s" hint-placeholder-count="4"><div class="sitem {{s.cls}}" style="width: 25%"><dc-import name="Seal" glyph="{{s.glyph}}" num="{{s.num}}" tone="{{s.tone}}" earned="{{s.earned}}" ahead="{{s.ahead}}" px="64" hint-size="64px,73px"></dc-import><p class="n" style="font-size: 13px">{{s.name}}</p></div></sc-for></div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.seals}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="bar compact"><button type="button" class="ib" aria-label="{{t.back}}" onClick="{{goJourney}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button><div class="grow"></div></div>
+<div class="scroll" style="padding-bottom: 24px">
+<div class="hd"><p class="sm">{{sealsCount}}</p><h1 class="t-display">{{t.seals}}</h1></div>
+<div class="sgrid"><sc-for list="{{sealList}}" as="s" hint-placeholder-count="9"><div class="sitem {{s.cls}}"><dc-import name="Seal" glyph="{{s.glyph}}" num="{{s.num}}" tone="{{s.tone}}" earned="{{s.earned}}" ahead="{{s.ahead}}" px="88" hint-size="88px,100px"></dc-import><p class="n">{{s.name}}</p><p class="c">{{s.cond}}</p></div></sc-for></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.settings}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="scroll">
+<div class="bar"><div class="hd" style="padding: 0 0 0 12px"><h1 class="t-display">{{t.settings}}</h1></div></div>
+<div class="group"><p class="gh">{{t.sLook}}</p><div class="gcard">
+<div class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h9M8.500 3v2M6 5c0 5 3 8 7 9M11 5c0 4-3 8-7 9M13 20l4-10 4 10M14.500 17h5"></path></svg><span class="l">{{t.sLang}}</span><div class="seg"><button type="button" class="{{segTa}}" onClick="{{setTa}}">த</button><button type="button" class="{{segEn}}" onClick="{{setEn}}">En</button></div></div>
+<div class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"></path></svg><span class="l">{{t.sTheme}}</span><span class="v">{{t.sThemeV}}</span></div>
+<div class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h4l2-5 2 10 2-5h4"></path></svg><span class="l">{{t.sMotion}}</span><span class="sw"></span></div>
+</div></div>
+<div class="group"><p class="gh">{{t.sDaily}}</p><div class="gcard">
+<div class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4ZM10 20h4"></path></svg><span class="l">{{t.sRem}}</span><span class="v">8:30 pm</span><span class="sw on"></span></div>
+</div></div>
+<div class="group"><p class="gh">{{t.sPrivate}}</p><div class="gcard">
+<div class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11V8a6 6 0 0 1 12 0v3M5 11h14v9H5z"></path></svg><span class="l">{{t.sLock}}</span><span class="sw"></span></div>
+<button type="button" class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.500-9.970A6 6 0 0 1 18 9a4.500 4.500 0 0 1-.500 9ZM12 11v6M9.500 13.500 12 11l2.500 2.500"></path></svg><span class="l">{{t.sBackup}}</span><span class="v">{{t.notSet}}</span></button>
+<button type="button" class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"></path></svg><span class="l">{{t.sText}}</span></button>
+<button type="button" class="srow danger"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="color: inherit"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"></path></svg><span class="l">{{t.sWipe}}</span></button>
+</div></div>
+<div class="group"><p class="gh">{{t.sAbout}}</p><div class="gcard">
+<button type="button" class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4ZM9 9h6M9 13h4"></path></svg><span class="l">{{t.sSources}}</span></button>
+<button type="button" class="srow"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg><span class="l">{{t.sAboutApp}}</span><span class="v">Heart Apps</span></button>
+</div></div>
+<div style="height: 24px"></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.tabs}}" hint-placeholder-val="{{false}}">
+<nav class="nav" aria-label="{{t.navLabel}}">
+<button type="button" class="{{tabToday}}" onClick="{{goToday}}"><span class="ind"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.500 12a4 4 0 0 1 4-4h9a4 4 0 0 1 0 8h-9a4 4 0 0 1-4-4ZM10.500 10.800h6M10.500 13.300h3.500M7.300 12h.010"></path></svg></span>{{t.today}}</button>
+<button type="button" class="{{tabJournal}}" onClick="{{goJournal}}"><span class="ind"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h11.500a2.500 2.500 0 0 1 0 5H6a2.500 2.500 0 0 1 0-5ZM6 14h11.500a2.500 2.500 0 0 1 0 5H6a2.500 2.500 0 0 1 0-5ZM7.500 2.500v19"></path></svg></span>{{t.journal}}</button>
+<button type="button" class="{{tabJourney}}" onClick="{{goJourney}}"><span class="ind"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18c3-1 4-4 7-4s4 3 7 2 2-6 2-6M4 18h.010M20 10h.010M12 3l1.200 2.500L16 6l-2 2 .500 2.800L12 9.500 9.500 10.800 10 8 8 6l2.800-.500Z"></path></svg></span>{{t.journey}}</button>
+<button type="button" class="{{tabSettings}}" onClick="{{goSettings}}"><span class="ind"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.200 3.800a2.300 2.300 0 0 1 3.200 3.200L9 18.400 4.500 19.500 5.600 15ZM15 6l3 3M5.600 15l3.400 3.400"></path></svg></span>{{t.settings}}</button>
+</nav>
+</sc-if>
+
+<sc-if value="{{snack}}" hint-placeholder-val="{{false}}">
+<div class="snack" role="status"><span>{{t.deleted}}</span><button type="button" onClick="{{undo}}">{{t.undo}}</button></div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","default":"splash","options":["splash","onboard","today","words","thread","feel","mood","write","seal","award","journal","calendar","entry","journey","seals","settings"]},"period":{"editor":"enum","default":"maalai","options":["vaigarai","kaalai","nanpagal","erpadu","maalai","yaamam"]},"theme":{"editor":"enum","default":"auto","options":["auto","ivory","midnight"]},"lead":{"editor":"enum","default":"en","options":["en","ta"]},"written":{"editor":"boolean","default":false},"frozen":{"editor":"boolean","default":false},"empty":{"editor":"boolean","default":false},"obStep":{"editor":"int","default":1},"query":{"editor":"text","default":""},"moodId":{"editor":null},"kbOpen":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+/* Content. Tamil kural text here is sample data only; in the app it comes from the prompt pack. Glosses, lenses and Tamil copy are drafts for review. */
+var K = {
+  391:{n:391,ch:['கல்வி','Learning'],a:'கற்க கசடறக் கற்பவை கற்றபின்',b:'நிற்க அதற்குத் தக',tl:['Karka Kasatarak Karpavai Katrapin','Nirka Adharkuth Thaka'],pope:'So learn that you may full and faultless learning gain, Then in obedience meet to lessons learnt remain',
+    en:'Learn what is worth learning, and learn it well. Then let your life stand by it.',ta:'கற்க வேண்டியதைக் குறையின்றிக் கற்றுக்கொள்க. கற்ற பின் அதன்படி வாழ்க.',
+    qe:'What have you learned lately that you have not yet lived by?',qt:'அண்மையில் கற்ற எதை இன்னும் வாழ்வில் கடைப்பிடிக்கவில்லை?',
+    se:'What did you learn lately that you could share with someone this week?',st:'அண்மையில் கற்றதில் எதை இந்த வாரம் ஒருவரிடம் பகிர்ந்துகொள்ளலாம்?',
+    ae:'What one small step tomorrow would put that lesson into practice?',at:'அந்தப் பாடத்தை நாளை நடைமுறைப்படுத்த ஒரு சிறிய அடி எது?',
+    gl:[['கற்க','Learn','கற்றுக்கொள்க'],['கசடற','without a flaw','குற்றம் நீங்க'],['கற்பவை','what ought to be learned','கற்க வேண்டியவை'],['கற்றபின்','after learning it','கற்ற பிறகு'],['நிற்க','stand firm, abide','நிலைத்து நில்'],['அதற்குத்','by it','அதற்கு'],['தக','as befits it','தகுந்தபடி']]},
+  622:{n:622,ch:['இடுக்கண் அழியாமை','Facing trouble'],a:'வெள்ளத் தனைய இடும்பை அறிவுடையான்',b:'உள்ளத்தின் உள்ளக் கெடும்',en:'Trouble as wide as a flood fades once a clear mind turns and looks at it.',ta:'வெள்ளம் போன்ற துன்பமும், அறிவுடையவர் உள்ளத்தில் எண்ணி எதிர்கொண்டால் மறையும்.',qe:'What is weighing on you most? Name it plainly here.',qt:'உங்களை அதிகம் கவலைப்படுத்துவது எது? அதை நேரடியாக எழுதுங்கள்.'},
+  783:{n:783,ch:['நட்பு','Friendship'],a:'நவில்தொறும் நூல்நயம் போலும் பயில்தொறும்',b:'பண்புடை யாளர் தொடர்பு',en:'The company of good people is like a good book: every return gives you more.',ta:'நல்ல நூலைப் போல, பண்புடையவர் நட்பும் பழகப் பழக இனிக்கும்.',qe:'Who has been a good book to you? What would you tell them?',qt:'உங்களுக்கு நல்ல நூல் போல இருந்தவர் யார்? அவரிடம் என்ன சொல்ல விரும்புகிறீர்கள்?'},
+  108:{n:108,ch:['செய்ந்நன்றி அறிதல்','Gratitude'],a:'நன்றி மறப்பது நன்றன்று நன்றல்லது',b:'அன்றே மறப்பது நன்று',en:'Forgetting a kindness is never good. Letting go of a wrong the same day is.',ta:'பிறர் செய்த நன்மையை மறப்பது நல்லதல்ல. தீமையை அன்றே மறப்பது நல்லது.',qe:'Whose kindness deserves remembering today?',qt:'இன்று நினைவில் கொள்ள வேண்டிய நன்மை யாருடையது?'},
+  151:{n:151,ch:['பொறையுடைமை','Forbearance'],a:'அகழ்வாரைத் தாங்கும் நிலம்போலத் தம்மை',b:'இகழ்வார்ப் பொறுத்தல் தலை',en:'The earth carries even those who dig into it. Bearing those who scorn us is the highest strength.',ta:'தோண்டுபவரையும் நிலம் தாங்குவது போல, இகழ்பவரையும் பொறுப்பதே சிறந்தது.',qe:'What is this anger holding? You can put it down here first.',qt:'இந்தச் சினத்திற்குள் என்ன இருக்கிறது? முதலில் இங்கே இறக்கி வையுங்கள்.'},
+  34:{n:34,ch:['அறன் வலியுறுத்தல்','The strength of virtue'],a:'மனத்துக்கண் மாசிலன் ஆதல் அனைத்தறன்',b:'ஆகுல நீர பிற',en:'A mind kept clean is the whole of virtue. The rest is only noise.',ta:'மனத்தில் குற்றம் இல்லாமல் இருப்பதே அறம். மற்றவை வெறும் ஆரவாரம்.',qe:'What feels clear and settled in you right now?',qt:'இப்போது உங்கள் மனத்தில் தெளிவாக இருப்பது எது?'},
+  619:{n:619,ch:['ஆள்வினை உடைமை','Sustained effort'],a:'தெய்வத்தான் ஆகா தெனினும் முயற்சிதன்',b:'மெய்வருத்தக் கூலி தரும்',en:'Even when fate refuses the result, effort still pays the wage of its labour.',ta:'தெய்வத்தால் ஆகாவிட்டாலும், முயற்சி உழைப்புக்கேற்ற கூலியைத் தரும்.',qe:'What effort is worth making, whatever the result?',qt:'பலன் எதுவானாலும், எந்த முயற்சி உங்களுக்கு மதிப்புள்ளது?'},
+  423:{n:423,ch:['அறிவுடைமை','Wisdom'],a:'எப்பொருள் யார்யார்வாய்க் கேட்பினும் அப்பொருள்',b:'மெய்ப்பொருள் காண்ப தறிவு',en:'Whoever says a thing, wisdom is seeing the truth inside it.',ta:'யார் எதைச் சொன்னாலும், அதன் உண்மைப் பொருளைக் காண்பதே அறிவு.',qe:'What have you heard that you have not yet weighed for yourself?',qt:'கேட்டதில் எதை நீங்களே இன்னும் ஆராயவில்லை?'},
+  1266:{n:1266,ch:['அவர்வயின் விதும்பல்','Longing'],a:'வருகமன் கொண்கன் ஒருநாள் பருகுவன்',b:'பைதல்நோய் எல்லாம் கெட',en:'Let them come, even for one day, and every ache would ease.',ta:'ஒருநாள் வந்தாலும் போதும். துயரெல்லாம் தீரும்.',qe:'Who are you missing? What would that one day hold?',qt:'யாரை நினைத்து ஏங்குகிறீர்கள்? அந்த ஒரு நாளில் என்ன நடக்கும்?'}
+};
+var PAL = {aram:['அறத்துப்பால்','Virtue'],porul:['பொருட்பால்','Wealth'],inbam:['காமத்துப்பால்','Love']};
+function palOf(n){ return n <= 380 ? 'aram' : n <= 1080 ? 'porul' : 'inbam'; }
+var MOODS = [
+  {id:'unsure',en:'Seeking clarity',ta:'தெளிவு',se:'Need some direction',st:'வழி தேவை',pool:[423,391]},
+  {id:'anxious',en:'Anxious',ta:'கவலை',se:'A lot on my mind',st:'மனம் நிறைய',pool:[622,619]},
+  {id:'grateful',en:'Grateful',ta:'நன்றி',se:'Full of thanks',st:'நன்றி நிறைந்து',pool:[108,34]},
+  {id:'calm',en:'Calm',ta:'அமைதி',se:'Settled and steady',st:'நிதானமாக',pool:[34,391]},
+  {id:'angry',en:'Angry',ta:'சினம்',se:'Something stung',st:'ஏதோ உறுத்துகிறது',pool:[151,34]},
+  {id:'lonely',en:'Lonely',ta:'தனிமை',se:'Missing company',st:'துணை தேவை',pool:[783,108]},
+  {id:'missing',en:'Missing someone',ta:'ஏக்கம்',se:'Someone far away',st:'தொலைவில் ஒருவர்',pool:[1266,783]},
+  {id:'driven',en:'Driven',ta:'முயற்சி',se:'Ready to work',st:'உழைக்கத் தயார்',pool:[619,391]}
+];
+var SEALS = [
+  {glyph:'௧',tone:'clay',num:'1',ta:'முதல் ஏடு',en:'First leaf',ce:'Your first saved page',ct:'சேமித்த முதல் பக்கம்',earned:true},
+  {glyph:'அ',tone:'indigo',ta:'தமிழில்',en:'In Tamil',ce:'A page written in Tamil',ct:'தமிழில் எழுதிய பக்கம்',earned:true},
+  {glyph:'௭',tone:'rose',num:'7',ta:'ஏழு நாள் நூல்',en:'Seven-day thread',ce:'7 days on your thread',ct:'நூலில் 7 நாள்கள்',earned:true},
+  {glyph:'௰',tone:'clay',num:'10',ta:'அதிகாரம்',en:'A chapter',ce:'10 pages',ct:'10 பக்கங்கள்',earned:false,chapter:true,
+    we:'Ten pages saved. A chapter of the Kural holds ten couplets, and your journal now holds a chapter of its own.',wt:'பத்துப் பக்கங்கள் சேமித்துவிட்டீர்கள். குறளின் ஓர் அதிகாரத்தில் பத்துக் குறள்கள். உங்கள் நாட்குறிப்பிலும் இப்போது ஓர் அதிகாரம்.'},
+  {glyph:'௬',tone:'green',num:'6',ta:'ஆறு பொழுது',en:'All six times',ce:'A page in each part of the day, 4 of 6',ct:'ஒவ்வொரு பொழுதிலும் ஒரு பக்கம், 6-இல் 4',earned:false},
+  {glyph:'௩',tone:'green',num:'3',ta:'முப்பால்',en:'All three parts',ce:'Aram, Porul and Inbam, 2 of 3',ct:'அறம், பொருள், இன்பம், 3-இல் 2',earned:false},
+  {glyph:'௩௰',tone:'rose',num:'30',ta:'முப்பது நாள் நூல்',en:'Thirty-day thread',ce:'30 days on your thread',ct:'நூலில் 30 நாள்கள்',earned:false},
+  {glyph:'௱',tone:'clay',num:'100',ta:'நூறு ஏடுகள்',en:'A hundred leaves',ce:'100 pages',ct:'100 பக்கங்கள்',earned:false},
+  {glyph:'௩௱௬௰௫',tone:'clay',num:'365',ta:'ஓர் ஆண்டு',en:'A year with Valluvar',ce:'365 pages',ct:'365 பக்கங்கள்',earned:false}
+];
+var PERIODS = {vaigarai:['வைகறை','Before dawn','வைகறை வணக்கம்','Good early morning'],kaalai:['காலை','Morning','காலை வணக்கம்','Good morning'],nanpagal:['நண்பகல்','Midday','வணக்கம்','Good afternoon'],erpadu:['எற்பாடு','Late afternoon','மாலை வணக்கம்','Good afternoon'],maalai:['மாலை','Evening','மாலை வணக்கம்','Good evening'],yaamam:['யாமம்','Deep night','இரவு வணக்கம்','Good night']};
+var ENTRIES = [
+  {id:'e1',day:['Friday, 6 November','வெள்ளி, 6 நவம்பர்'],time:'9:42 pm',mood:'grateful',k:108,text:'அம்மா இன்று நீண்ட நேரம் பேசினார். அவர் குரல் கேட்டதும் நாள் முழுவதும் இருந்த பரபரப்பு அடங்கியது. இதை மறக்கக் கூடாது.'},
+  {id:'e2',day:['Wednesday, 4 November','புதன், 4 நவம்பர்'],time:'8:15 pm',mood:'angry',k:151,text:'The meeting went badly and I carried it home with me. Written down here it is smaller than it felt on the way back. I can speak to them tomorrow.'},
+  {id:'e3',day:['Tuesday, 3 November','செவ்வாய், 3 நவம்பர்'],time:'10:05 pm',mood:'unsure',k:423,text:'I keep rereading the offer. With both sides on one page, the second one looks clearer than I expected.'},
+  {id:'e4',day:['Monday, 2 November','திங்கள், 2 நவம்பர்'],time:'9:10 pm',mood:'driven',k:619,text:'பல நாள்களாகத் தள்ளிப்போட்ட பாடத்தை இன்று முடித்தேன். கடினமாக இருந்தது, ஆனாலும் தொடங்கியதே பெரிய விஷயம்.'}
+];
+var S = {
+  en:{tagline:'Journal with Valluvar',skip:'Skip',ob1:'Kural Heart',ob1b:'One couplet a day, and a quiet page to answer it. Which language should lead?',ob2:'When shall a couplet find you?',ob2b:'One gentle reminder a day. Change it or turn it off any time.',ob3:'Your words stay on this phone.',
+    p1:'Kural Heart has no internet permission. It cannot go online on its own.',p2:'No account. Your journal is encrypted on this device.',p3:'Backups are encrypted and go only where you choose, such as your Google Drive.',next:'Continue',begin:'Begin',
+    kuralWord:'Kural',dailyKural:'Today’s kural · Chapter 40',words:'Word by word',turn:'Turn the leaf',share:'Share',turnLabel:'Turn the leaf for the transliteration and G.U. Pope’s translation',todayQ:'Today’s question',mins:'About 3 minutes',lensLabel:'Lens',lens:['Mind','Speech','Action'],
+    write:'Write about this',keep:'Keep writing',feel:'How is your heart?',allFeelings:'All feelings',feelSub:'Choose a feeling and Valluvar finds a couplet for it.',forNow:'A couplet for right now',another:'Show another couplet',heavy:'If today feels too heavy, support lines are in Settings.',
+    close:'Close',back:'Back',wordsTitle:'Word by word',wordsSub:'Each word of the couplet with its plain meaning.',line1:'First line, four words',line2:'Second line, three words',
+    threadDays:'days on your thread',restNote:'Two rest days a week are kept for you, so a busy day never breaks your thread.',restShort:'Rest days are kept for you, two a week.',longest:'Longest thread: 21 days',seeJourney:'Journey',
+    draft:'Draft saved',writeHere:'Write here, in any language.',save:'Save',addFeeling:'Add a feeling',words1:'word',wordsN:'words',kbTitle:'Write in Tamil',kbBody:'Kural Heart works with any Tamil keyboard on your phone.',kb1:'Open your keyboard settings',kb2:'In Gboard, go to Languages and add Tamil',kb3:'Tap the globe key to switch. You can also type in English letters and pick the Tamil word.',kbOpen:'Open keyboard settings',kbLater:'Not now',
+    savedMsg:'Saved',shareSeal:'Share this seal',journal:'Journal',pagesCount:'14 pages',calView:'Calendar',search:'Search',searchPh:'Search your pages or a kural number',otdWhen:'A year ago today · Monday, 9 November 2025',noResults:'Nothing matches that yet',noResultsSub:'Try a different word, or a kural number.',empty:'Your first page is waiting',emptySub:'Everything you write is kept here, newest first, on this phone only.',firstPage:'Write your first page',month:'November 2026',newPage:'New page',
+    shareText:'Share text',edit:'Edit',del:'Delete',deleted:'Page deleted',undo:'Undo',journey:'Journey',journeySm:'With Valluvar since 28 October',chapters:'Chapters you have written on',chaptersSub:'Of the Kural’s 133 chapters',of133:'of 133',seals:'Seals',
+    settings:'Settings',sLook:'Look and language',sLang:'Lead language',sTheme:'Theme',sThemeV:'Follow the day',sMotion:'Reduce motion',sDaily:'Daily couplet',sRem:'Reminder',sPrivate:'Privacy and data',sLock:'App lock',sBackup:'Backup and sync',notSet:'Not set up',sText:'Export my pages as text',sWipe:'Delete all data',sAbout:'About',sSources:'Sources and credits',sAboutApp:'About Kural Heart',today:'Today',navLabel:'Main',weekPre:'In the last 7 days you wrote on ',weekPost:' days'},
+  ta:{tagline:'குறளுடன் நாட்குறிப்பு',skip:'தவிர்',ob1:'Kural Heart',ob1b:'நாளுக்கு ஒரு குறள், அதற்குப் பதில் எழுத ஓர் அமைதியான பக்கம். எந்த மொழி முதலில் வர வேண்டும்?',ob2:'குறள் எப்போது உங்களைத் தேடி வரட்டும்?',ob2b:'நாளுக்கு ஒரு மென்மையான நினைவூட்டல். எப்போது வேண்டுமானாலும் மாற்றலாம், நிறுத்தலாம்.',ob3:'உங்கள் எழுத்து இந்த அலைபேசியிலேயே இருக்கும்.',
+    p1:'இந்தச் செயலிக்கு இணைய அனுமதி இல்லை. தானாக இணையத்திற்குச் செல்ல இயலாது.',p2:'கணக்கு தேவையில்லை. நாட்குறிப்பு இந்த அலைபேசியில் மறையாக்கம் செய்யப்படுகிறது.',p3:'காப்புப் பிரதி மறையாக்கம் செய்யப்பட்டு, நீங்கள் தேர்ந்தெடுக்கும் இடத்திற்கு மட்டும் செல்லும்.',next:'தொடர்க',begin:'தொடங்குக',
+    kuralWord:'குறள்',dailyKural:'இன்றைய குறள் · அதிகாரம் 40',words:'சொற்பொருள்',turn:'திருப்பு',share:'பகிர்',turnLabel:'ஒலிபெயர்ப்பும் போப் மொழிபெயர்ப்பும் காண ஏட்டைத் திருப்புங்கள்',todayQ:'இன்றைய கேள்வி',mins:'சுமார் 3 நிமிடம்',lensLabel:'பார்வை',lens:['மனம்','சொல்','செயல்'],
+    write:'இதைப் பற்றி எழுதுங்கள்',keep:'தொடர்ந்து எழுதுங்கள்',feel:'உங்கள் மனம் எப்படி?',allFeelings:'எல்லா உணர்வுகளும்',feelSub:'ஓர் உணர்வைத் தேர்ந்தெடுங்கள், வள்ளுவர் அதற்கொரு குறள் தருவார்.',forNow:'இப்போதைக்கு ஒரு குறள்',another:'வேறொரு குறள்',heavy:'இன்று மிகவும் கனமாக இருந்தால், உதவி எண்கள் அமைப்புகளில் உள்ளன.',
+    close:'மூடு',back:'பின்செல்',wordsTitle:'சொல்லுக்குச் சொல்',wordsSub:'குறளின் ஒவ்வொரு சொல்லும் அதன் எளிய பொருளும்.',line1:'முதல் அடி, நான்கு சீர்',line2:'இரண்டாம் அடி, மூன்று சீர்',
+    threadDays:'நாள்கள் உங்கள் நூலில்',restNote:'வாரத்திற்கு இரண்டு ஓய்வு நாள்கள் உங்களுக்காக வைக்கப்படுகின்றன. வேலை மிகுந்த ஒரு நாள் உங்கள் நூலை அறுக்காது.',restShort:'வாரம் இரண்டு ஓய்வு நாள்கள் உங்களுக்காக.',longest:'நீண்ட நூல்: 21 நாள்கள்',seeJourney:'பயணம்',
+    draft:'வரைவு சேமிக்கப்பட்டது',writeHere:'எந்த மொழியிலும் இங்கே எழுதுங்கள்.',save:'சேமி',addFeeling:'உணர்வைச் சேர்',words1:'சொல்',wordsN:'சொற்கள்',kbTitle:'தமிழில் எழுத',kbBody:'உங்கள் அலைபேசியில் உள்ள எந்தத் தமிழ் விசைப்பலகையிலும் எழுதலாம்.',kb1:'விசைப்பலகை அமைப்புகளைத் திறங்கள்',kb2:'Gboard-இல் Languages சென்று தமிழைச் சேருங்கள்',kb3:'பூமி உருண்டை விசையால் மாறுங்கள். ஆங்கில எழுத்துகளில் தட்டச்சு செய்து தமிழ்ச் சொல்லையும் தேர்ந்தெடுக்கலாம்.',kbOpen:'விசைப்பலகை அமைப்புகளைத் திற',kbLater:'இப்போது வேண்டாம்',
+    savedMsg:'சேமிக்கப்பட்டது',shareSeal:'இந்த முத்திரையைப் பகிர்',journal:'நாட்குறிப்பு',pagesCount:'14 பக்கங்கள்',calView:'நாள்காட்டி',search:'தேடு',searchPh:'பக்கங்களில் அல்லது குறள் எண்ணைத் தேடுங்கள்',otdWhen:'ஓராண்டுக்கு முன் இதே நாள் · திங்கள், 9 நவம்பர் 2025',noResults:'இன்னும் எதுவும் பொருந்தவில்லை',noResultsSub:'வேறு சொல்லையோ குறள் எண்ணையோ முயலுங்கள்.',empty:'உங்கள் முதல் ஏடு காத்திருக்கிறது',emptySub:'நீங்கள் எழுதுவது அனைத்தும் இந்த அலைபேசியில் மட்டும் இங்கே சேமிக்கப்படும்.',firstPage:'முதல் பக்கத்தை எழுதுங்கள்',month:'நவம்பர் 2026',newPage:'புதிய பக்கம்',
+    shareText:'உரையைப் பகிர்',edit:'திருத்து',del:'நீக்கு',deleted:'பக்கம் நீக்கப்பட்டது',undo:'மீட்டமை',journey:'பயணம்',journeySm:'அக்டோபர் 28 முதல் வள்ளுவருடன்',chapters:'நீங்கள் எழுதிய அதிகாரங்கள்',chaptersSub:'குறளின் 133 அதிகாரங்களில்',of133:'133-இல்',seals:'முத்திரைகள்',
+    settings:'அமைப்புகள்',sLook:'தோற்றமும் மொழியும்',sLang:'முதன்மை மொழி',sTheme:'தோற்றம்',sThemeV:'நாளைப் பின்தொடர்',sMotion:'அசைவைக் குறை',sDaily:'தினசரிக் குறள்',sRem:'நினைவூட்டல்',sPrivate:'தனியுரிமையும் தரவும்',sLock:'செயலிப் பூட்டு',sBackup:'காப்புப் பிரதியும் ஒத்திசைவும்',notSet:'அமைக்கப்படவில்லை',sText:'பக்கங்களை உரையாக ஏற்றுமதி செய்',sWipe:'எல்லாத் தரவையும் நீக்கு',sAbout:'பற்றி',sSources:'மூலங்களும் நன்றியும்',sAboutApp:'Kural Heart பற்றி',today:'இன்று',navLabel:'முதன்மை',weekPre:'கடந்த 7 நாள்களில் எழுதிய நாள்கள்: ',weekPost:''}
+};
+var cv = null;
+function width(text, stretch) {
+  try {
+    if (!cv) cv = document.createElement('canvas');
+    var c = cv.getContext('2d');
+    c.font = '560 100px "Anek Tamil"';
+    if ('fontStretch' in c) c.fontStretch = stretch || 'condensed';
+    var w = c.measureText(text).width;
+    if (w > 0) return w / 100;
+  } catch (e) {}
+  return text.length * .5;
+}
+/* The couplet rule: always exactly two lines, each line of the kural on its own line, one size that fits the wider. */
+function layout(k, avail, cap) {
+  cap = cap || 25;
+  var s = Math.min(cap, avail / width(k.a), avail / width(k.b));
+  var d = 200;
+  var lines = [k.a, k.b].map(function (txt, i) {
+    if (i === 1) d += 120;
+    var words = txt.split(' ').filter(Boolean).map(function (t) { var o = { t: t, d: d }; d += 60; return o; });
+    return { text: txt, words: words };
+  });
+  return { px: Math.floor(s * 10) / 10, lines: lines };
+}
+function view(k, lead, avail) {
+  var l = layout(k, avail), ix = lead === 'ta' ? 0 : 1, pal = palOf(k.n);
+  return { n: k.n, a: k.a, b: k.b, px: l.px, lines: l.lines, pal: pal, palName: PAL[pal][ix], chName: k.ch[ix],
+    tl1: (k.tl || [])[0], tl2: (k.tl || [])[1], pope: k.pope, meaning: lead === 'ta' ? k.ta : k.en, q: lead === 'ta' ? k.qt : k.qe };
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    var st = p.start || 'splash';
+    this.state = { screen: st === 'calendar' ? 'journal' : st, lead: null, written: !!p.written, ob: Number(p.obStep) || 1, obWave: false, turned: false, mood: p.moodId || 'anxious', poolAt: 0, lens: 0,
+      draft: st === 'write' ? 'This week I finished the course I kept putting off. Writing it down, I can see that learning only counts once I use it. Tomorrow I will teach the first lesson to someone at home.' : '',
+      writeMood: st === 'write' ? 'driven' : null, writeK: 391, cardOpen: false, cal: st === 'calendar', query: p.query || '', entry: 'e1', snack: false, removed: [], kbSheet: !!p.kbOpen };
+    this.go = this.go.bind(this);
+  }
+  componentDidMount() {
+    var self = this;
+    if (document.fonts && document.fonts.load) {
+      Promise.all([document.fonts.load('560 100px "Anek Tamil"', 'கற்க')]).then(function () { self.forceUpdate(); }).catch(function () {});
+    }
+    if (this.state.screen === 'splash' && !this.props.frozen) this.t = setTimeout(function () { self.go('onboard'); }, 1800);
+    this.t3 = setTimeout(function () { self.setState({ obWave: true }); }, 2400);
+  }
+  componentDidUpdate(pp, ps) {
+    var self = this;
+    if (ps.screen !== 'onboard' && this.state.screen === 'onboard') { clearTimeout(this.t3); this.t3 = setTimeout(function () { self.setState({ obWave: true }); }, 2000); }
+  }
+  componentWillUnmount() { clearTimeout(this.t); clearTimeout(this.t2); clearTimeout(this.t3); }
+  go(s, extra) { this.setState(Object.assign({ screen: s, turned: false, snack: false }, extra || {})); }
+  renderVals() {
+    var self = this, st = this.state, pr = this.props;
+    var lead = st.lead || pr.lead || 'en', t = S[lead], ix = lead === 'ta' ? 1 : 0;
+    var periodId = pr.period || 'maalai', P = PERIODS[periodId];
+    var night = pr.theme === 'midnight' || ((!pr.theme || pr.theme === 'auto') && (periodId === 'maalai' || periodId === 'yaamam' || periodId === 'vaigarai'));
+    var scr = st.screen, over = scr === 'words' || scr === 'thread' || scr === 'feel';
+    var is = { splash: scr === 'splash', onboard: scr === 'onboard', today: scr === 'today' || over, words: scr === 'words', thread: scr === 'thread', feel: scr === 'feel', mood: scr === 'mood', write: scr === 'write',
+      seal: scr === 'seal', award: scr === 'award', journal: scr === 'journal', entry: scr === 'entry', journey: scr === 'journey', seals: scr === 'seals', settings: scr === 'settings',
+      tabs: scr === 'today' || over || scr === 'journal' || scr === 'journey' || scr === 'settings', ob1: st.ob === 1, ob2: st.ob === 2, ob3: st.ob === 3 };
+    var savedToday = st.written || scr === 'seal' || scr === 'award';
+    var streak = savedToday ? 12 : 11;
+    var k = K[391], kural = view(k, lead, 330);
+    var lensQ = [[k.qe, k.qt], [k.se, k.st], [k.ae, k.at]];
+    var lenses = t.lens.map(function (name, i) { return { name: name, cls: st.lens === i ? 'on' : '', wcls: st.lens === i ? 'on' : '', pick: function () { self.setState({ lens: i }); } }; });
+    var mood = MOODS.filter(function (m) { return m.id === st.mood; })[0] || MOODS[1];
+    var mkId = mood.pool[st.poolAt % mood.pool.length];
+    var lab = function (m) { return lead === 'ta' ? m.ta : m.en; };
+    var moods = MOODS.map(function (m) { return { id: m.id, a: lab(m), b: lead === 'ta' ? m.st : m.se, pick: function () { self.go('mood', { mood: m.id, poolAt: 0 }); } }; });
+    /* the last seven days, ending today (Monday 9 November) */
+    var dl = lead === 'ta' ? ['செ', 'பு', 'வி', 'வெ', 'ச', 'ஞா', 'தி'] : ['T', 'W', 'T', 'F', 'S', 'S', 'M'];
+    var kind = ['w', 'w', 'r', 'w', 'w', 'r', savedToday ? 'w' : 'f'];
+    var days = dl.map(function (l, i) { return { l: l, heart: kind[i] === 'w', rest: kind[i] === 'r', cls: i === 6 ? 'today' : '' }; });
+    var knots = kind.map(function (kd, i) { var x = Math.round((21.43 + i * 42.86) * 10) / 10, y = [31, 37, 35, 30, 35, 37, 32][i]; return { tf: 'translate(' + x + ' ' + y + ')', cls: kd === 'w' ? (i === 6 ? 'tk' : 'k') : kd === 'r' ? 'rk' : 'fk', r: kd === 'w' ? 8 : kd === 'r' ? 6 : 4 }; });
+    var q = st.query.trim().toLowerCase();
+    var live = pr.empty ? [] : ENTRIES.filter(function (e) { return st.removed.indexOf(e.id) < 0 && (!q || e.text.toLowerCase().indexOf(q) >= 0 || String(e.k) === q); });
+    var entries = live.map(function (e, i) { var kk = K[e.k], m = MOODS.filter(function (x) { return x.id === e.mood; })[0]; return { mood: e.mood, moodLabel: lab(m), pal: palOf(kk.n), ref: t.kuralWord + ' ' + kk.n, day: e.day[ix], time: e.time, text: e.text, d: i * 50, open: function () { self.go('entry', { entry: e.id }); } }; });
+    var cur = ENTRIES.filter(function (e) { return e.id === st.entry; })[0] || ENTRIES[0];
+    var ck = K[cur.k], cm = MOODS.filter(function (x) { return x.id === cur.mood; })[0];
+    var calDays = [];
+    for (var b = 0; b < 6; b++) calDays.push({ n: '', cls: '', heart: false });
+    var calHas = { 2: 1, 3: 1, 4: 1, 6: 1, 7: 1 }; if (savedToday) calHas[9] = 1;
+    for (var dd = 1; dd <= 30; dd++) calDays.push({ n: dd, cls: dd === 9 ? 'today' : '', heart: !!calHas[dd] });
+    var sealList = SEALS.map(function (s) { var got = s.earned || (s.chapter && savedToday); return { glyph: s.glyph, num: s.num || '', tone: s.tone, earned: got, ahead: !got, cls: got ? '' : 'ahead', name: lead === 'ta' ? s.ta : s.en, cond: lead === 'ta' ? s.ct : s.ce }; });
+    var gotCount = sealList.filter(function (s) { return s.earned; }).length;
+    var ch = SEALS[3];
+    var written = st.draft.trim() ? st.draft.trim().split(/\s+/).length : 0;
+    var wmood = MOODS.filter(function (m) { return m.id === st.writeMood; })[0];
+    var wk = st.writeK ? view(K[st.writeK], lead, 330) : null;
+    var wq = st.writeK === 391 ? lensQ[st.lens][ix ? 1 : 0] : (wk ? wk.q : '');
+    var scrName = over ? 'today' : scr;
+    var gl = k.gl.map(function (g) { return { w: g[0], m: lead === 'ta' ? g[2] : g[1] }; });
+    return {
+      t: t, is: is, yes: true, rootClass: (night ? 'night' : '') + (lead === 'ta' ? ' ta' : '') + (pr.frozen ? ' frozen' : ''),
+      dateSm: lead === 'ta' ? 'ஐப்பசி 23 · திங்கள், 9 நவம்பர்' : 'Monday, 9 November · ' + P[1], dateShort: lead === 'ta' ? 'திங்கள், 9 நவம்பர்' : 'Monday, 9 November',
+      greeting: lead === 'ta' ? P[2] : P[3], streak: streak, threadLabel: streak + ' ' + t.threadDays, savedLabel: '12 ' + t.threadDays,
+      kural: kural, flipCls: st.turned ? 'turned' : '', lenses: lenses, question: lensQ[st.lens][ix ? 1 : 0], ctaLabel: st.written ? t.keep : t.write,
+      bento: moods.slice(0, 4), moods: moods, gloss1: gl.slice(0, 4), gloss2: gl.slice(4),
+      threadPose: kind[6] === 'r' ? 'rest' : 'sit-read', days: days, knots: knots, weekLabel: t.weekPre + kind.filter(function (x) { return x === 'w'; }).length + t.weekPost,
+      moodNow: { id: mood.id, a: lab(mood) }, mk: view(K[mkId], lead, 314), moodHeavy: mood.id === 'anxious' || mood.id === 'lonely',
+      wk: wk || {}, hasWk: !!wk, cardOpen: st.cardOpen, wq: wq, draft: st.draft, hasText: written > 0, wordsLabel: written + ' ' + (written === 1 ? t.words1 : t.wordsN),
+      writeMoodId: wmood ? wmood.id : 'none', writeMoodLabel: wmood ? lab(wmood) : t.addFeeling, kbSheet: st.kbSheet,
+      award: { glyph: ch.glyph, num: ch.num, tone: ch.tone, name: lead === 'ta' ? ch.ta : ch.en, alt: lead === 'ta' ? ch.en : ch.ta, why: lead === 'ta' ? ch.wt : ch.we },
+      pagesLabel: pr.empty ? (lead === 'ta' ? 'இன்னும் பக்கங்கள் இல்லை' : 'No pages yet') : t.pagesCount, entries: entries, showList: !st.cal, showCal: st.cal, showOtd: !pr.empty && !q, showEmpty: !!pr.empty && !st.cal, noResults: !pr.empty && entries.length === 0, showFab: !pr.empty, query: st.query,
+      otd: { ex: lead === 'ta' ? 'அப்பாவுடன் கல்வி அதிகாரத்தை முதல்முறையாகப் படித்தேன். பாதிக் குறள்கள் இன்னும் அவருக்கு மனப்பாடம்.' : 'Read the chapter on learning with Appa for the first time. He still knows half of it by heart.', a: k.a, b: k.b },
+      wds: lead === 'ta' ? ['ஞா', 'தி', 'செ', 'பு', 'வி', 'வெ', 'ச'] : ['S', 'M', 'T', 'W', 'T', 'F', 'S'], calDays: calDays,
+      en: { title: cur.day[ix], text: cur.text, mood: cur.mood, moodLabel: lab(cm), pal: palOf(ck.n), ref: t.kuralWord + ' ' + ck.n + ' · ' + ck.ch[ix], a: ck.a, b: ck.b },
+      doneDeg: Math.round(9 / 133 * 360) + 'deg',
+      pillars: [{ name: PAL.aram[ix ? 0 : 1], n: '2', w: '29%', c: 'var(--aram)' }, { name: PAL.porul[ix ? 0 : 1], n: '5', w: '71%', c: 'var(--porul)' }, { name: PAL.inbam[ix ? 0 : 1], n: '0', w: '0%', c: 'var(--inbam)' }],
+      sealList: sealList, sealPreview: sealList.slice(0, 4), sealsCount: lead === 'ta' ? '9-இல் ' + gotCount : gotCount + ' of 9',
+      obPose: st.ob === 1 ? (st.obWave ? 'wave' : 'walk') : st.ob === 2 ? 'listen' : 'write',
+      leadTaOn: lead === 'ta' ? 'on' : '', leadEnOn: lead === 'en' ? 'on' : '', segTa: lead === 'ta' ? 'on' : '', segEn: lead === 'en' ? 'on' : '',
+      ob1On: st.ob === 1 ? 'on' : '', ob2On: st.ob === 2 ? 'on' : '', ob3On: st.ob === 3 ? 'on' : '', obLabel: st.ob + ' / 3', obCta: st.ob === 3 ? t.begin : t.next,
+      tabToday: scrName === 'today' ? 'on' : '', tabJournal: scrName === 'journal' ? 'on' : '', tabJourney: scrName === 'journey' ? 'on' : '', tabSettings: scrName === 'settings' ? 'on' : '', snack: st.snack,
+      setTa: function () { self.setState({ lead: 'ta' }); }, setEn: function () { self.setState({ lead: 'en' }); },
+      obNext: function () { if (st.ob < 3) self.setState({ ob: st.ob + 1 }); else self.go('today'); },
+      goToday: function () { self.go('today'); }, goJournal: function () { self.go('journal'); }, goJourney: function () { self.go('journey'); }, goSettings: function () { self.go('settings'); }, goSeals: function () { self.go('seals'); },
+      openThread: function () { self.setState({ screen: 'thread' }); }, openWords: function () { self.setState({ screen: 'words' }); }, openFeel: function () { self.setState({ screen: 'feel' }); }, closeSheet: function () { self.setState({ screen: 'today' }); },
+      flip: function () { self.setState({ turned: !st.turned }); },
+      openWrite: function () { self.go('write', { writeK: 391 }); }, openWriteMood: function () { self.go('write', { writeK: mkId, writeMood: mood.id }); }, freeWrite: function () { self.go('write', { writeK: 0, writeMood: null }); },
+      another: function () { self.setState({ poolAt: st.poolAt + 1 }); }, onDraft: function (e) { self.setState({ draft: e.target.value }); }, toggleCard: function () { self.setState({ cardOpen: !st.cardOpen }); },
+      cycleMood: function () { var i = MOODS.findIndex(function (m) { return m.id === st.writeMood; }); self.setState({ writeMood: MOODS[(i + 1) % MOODS.length].id }); },
+      openKb: function () { self.setState({ kbSheet: true }); }, closeKb: function () { self.setState({ kbSheet: false }); },
+      save: function () { var first = !st.written; self.go('seal'); self.t2 = setTimeout(function () { if (first) self.go('award', { written: true }); else self.go('today', { written: true }); }, 2600); },
+      afterAward: function () { self.go('today', { written: true }); },
+      toggleCal: function () { self.setState({ cal: !st.cal }); }, onQuery: function (e) { self.setState({ query: e.target.value }); },
+      openOtd: function () { self.go('entry', { entry: 'e3' }); },
+      del: function () { self.go('journal', { removed: st.removed.concat([st.entry]), snack: true }); self.setState({ snack: true }); }, undo: function () { self.setState({ removed: st.removed.filter(function (x) { return x !== st.entry; }), snack: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

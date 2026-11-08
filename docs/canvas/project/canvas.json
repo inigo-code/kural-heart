@@ -1,0 +1,416 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-08T17:23:45Z"
+  },
+  "title": "Kural Heart v6",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Prototype, plays the whole app",
+      "is_interactive": true
+    },
+    "Onboard.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Onboarding, Valluvar walks in and waves"
+    },
+    "Today.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Today, ivory"
+    },
+    "TodayNight.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Today, Midnight, Tamil first"
+    },
+    "Words.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Word by word"
+    },
+    "Thread.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Your thread"
+    },
+    "Feeling.dc.html": {
+      "x": 2820,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "How is your heart?"
+    },
+    "Mood.dc.html": {
+      "x": 3290,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A couplet for right now"
+    },
+    "Write.dc.html": {
+      "x": 3760,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Write, Valluvar scribes as you type"
+    },
+    "Keyboard.dc.html": {
+      "x": 4230,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Writing in Tamil"
+    },
+    "Saved.dc.html": {
+      "x": 4700,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Save moment"
+    },
+    "Award.dc.html": {
+      "x": 5170,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A new seal"
+    },
+    "Journal.dc.html": {
+      "x": 5640,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Journal, On this day"
+    },
+    "Empty.dc.html": {
+      "x": 6110,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Journal, empty"
+    },
+    "Entry.dc.html": {
+      "x": 6580,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A page"
+    },
+    "Journey.dc.html": {
+      "x": 7050,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Journey"
+    },
+    "Seals.dc.html": {
+      "x": 7520,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "All seals, Midnight"
+    },
+    "Settings.dc.html": {
+      "x": 7990,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Settings"
+    },
+    "Cast.dc.html": {
+      "x": 0,
+      "y": 1290,
+      "w": 1600,
+      "h": 1240,
+      "title": "Valluvar: 14 poses, 10 expressions"
+    },
+    "Logo.dc.html": {
+      "x": 1680,
+      "y": 1290,
+      "w": 1440,
+      "h": 900,
+      "title": "The mark"
+    },
+    "Widget.dc.html": {
+      "x": 3200,
+      "y": 1290,
+      "w": 1440,
+      "h": 900,
+      "title": "Home-screen widgets"
+    },
+    "Valluvar.dc.html": {
+      "x": 4720,
+      "y": 1290,
+      "w": 200,
+      "h": 260,
+      "title": "Valluvar component"
+    },
+    "Seal.dc.html": {
+      "x": 5000,
+      "y": 1290,
+      "w": 120,
+      "h": 120,
+      "title": "Seal medallion"
+    },
+    "Onboard2.dc.html": {
+      "x": 0,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Onboarding 2, when a couplet should find you"
+    },
+    "Onboard3.dc.html": {
+      "x": 470,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Onboarding 3, your words stay on this phone"
+    },
+    "Lock.dc.html": {
+      "x": 940,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Lock screen, Valluvar resting"
+    },
+    "Backup.dc.html": {
+      "x": 1410,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Backup, a folder you choose"
+    },
+    "Passphrase.dc.html": {
+      "x": 1880,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Backup passphrase"
+    },
+    "Restore.dc.html": {
+      "x": 2350,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Restoring, Midnight"
+    },
+    "Conflict.dc.html": {
+      "x": 2820,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "One page, two versions"
+    },
+    "Calendar.dc.html": {
+      "x": 3290,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Journal, calendar"
+    },
+    "Search.dc.html": {
+      "x": 3760,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Journal, search"
+    },
+    "Share.dc.html": {
+      "x": 4230,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Share a couplet"
+    },
+    "About.dc.html": {
+      "x": 4700,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "About, with Heart Apps"
+    },
+    "Sources.dc.html": {
+      "x": 5170,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Sources and credits"
+    },
+    "DeleteAll.dc.html": {
+      "x": 5640,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Delete everything"
+    },
+    "Reminders.dc.html": {
+      "x": 6110,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Notifications refused"
+    },
+    "HeavyDays.dc.html": {
+      "x": 6580,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Heavy days, support lines"
+    },
+    "LargeText.dc.html": {
+      "x": 7050,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Largest system font"
+    },
+    "JournalTa.dc.html": {
+      "x": 7520,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Journal, Midnight, Tamil first"
+    },
+    "WriteTa.dc.html": {
+      "x": 7990,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Write, Tamil first"
+    },
+    "JourneyNight.dc.html": {
+      "x": 8460,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Journey, Midnight"
+    },
+    "SettingsTa.dc.html": {
+      "x": 8930,
+      "y": 2900,
+      "w": 390,
+      "h": 844,
+      "title": "Settings, Tamil first"
+    },
+    "Brand.dc.html": {
+      "x": 0,
+      "y": 4344,
+      "w": 1440,
+      "h": 640,
+      "title": "Notification glyph, splash, store icon"
+    },
+    "Feature.dc.html": {
+      "x": 1520,
+      "y": 4344,
+      "w": 1024,
+      "h": 500,
+      "title": "Play feature graphic, 1024 by 500"
+    },
+    "Store.dc.html": {
+      "x": 2624,
+      "y": 4344,
+      "w": 1440,
+      "h": 1560,
+      "title": "Play Store screenshots, English and Tamil"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Onboard.dc.html",
+    "Today.dc.html",
+    "TodayNight.dc.html",
+    "Words.dc.html",
+    "Thread.dc.html",
+    "Feeling.dc.html",
+    "Mood.dc.html",
+    "Write.dc.html",
+    "Keyboard.dc.html",
+    "Saved.dc.html",
+    "Award.dc.html",
+    "Journal.dc.html",
+    "Empty.dc.html",
+    "Entry.dc.html",
+    "Journey.dc.html",
+    "Seals.dc.html",
+    "Settings.dc.html",
+    "Cast.dc.html",
+    "Logo.dc.html",
+    "Widget.dc.html",
+    "Valluvar.dc.html",
+    "Seal.dc.html",
+    "Onboard2.dc.html",
+    "Onboard3.dc.html",
+    "Lock.dc.html",
+    "Backup.dc.html",
+    "Passphrase.dc.html",
+    "Restore.dc.html",
+    "Conflict.dc.html",
+    "Calendar.dc.html",
+    "Search.dc.html",
+    "Share.dc.html",
+    "About.dc.html",
+    "Sources.dc.html",
+    "DeleteAll.dc.html",
+    "Reminders.dc.html",
+    "HeavyDays.dc.html",
+    "LargeText.dc.html",
+    "JournalTa.dc.html",
+    "WriteTa.dc.html",
+    "JourneyNight.dc.html",
+    "SettingsTa.dc.html",
+    "Brand.dc.html",
+    "Feature.dc.html",
+    "Store.dc.html"
+  ],
+  "notes": {
+    "rowapp": {
+      "x": 0,
+      "y": -300,
+      "text": "Kural Heart v6: an editorial journal with Valluvar",
+      "kind": "title1",
+      "maxW": 8380
+    },
+    "rowcast": {
+      "x": 0,
+      "y": 990,
+      "text": "Valluvar, the mark and widgets",
+      "kind": "title1",
+      "maxW": 5120
+    },
+    "rowmore": {
+      "x": 0,
+      "y": 2600,
+      "text": "More pages: lock, backup, about, share and the hard moments",
+      "kind": "title1",
+      "maxW": 9400
+    },
+    "rowstore": {
+      "x": 0,
+      "y": 4044,
+      "text": "Brand and store",
+      "kind": "title1",
+      "maxW": 4064
+    }
+  },
+  "designSystems": []
+}

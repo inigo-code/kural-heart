@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pages</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="olai.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,100..800&amp;family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400&amp;family=Noto+Serif+Tamil:wdth,wght@62.5..100,100..900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+/* Pages beyond the core loop: lock, backup, about, sources, share, and the hard moments. Same Olai tokens as Main. */
+.pp{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:36px}
+.pp .tb{display:flex;align-items:center;gap:8px;height:56px;padding:0 8px}
+.pp .tb .ib{width:48px;height:48px;display:grid;place-items:center;border-radius:24px;color:var(--ink)}
+.pp .tb h1{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.25}
+.pp .ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pp .pbody{flex:1;overflow:hidden;padding:0 20px}
+.pp .plede{font-size:16px;line-height:1.6;color:var(--ink2);margin-top:8px}
+.pp .pmeta{font-size:13px;line-height:1.45;color:var(--ink3)}
+.pp .over{font-size:13px;font-weight:600;color:var(--ink3);margin:24px 4px 8px}
+.pp .box{border-radius:24px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.pp .row{display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 16px;font-size:16px;line-height:1.35}
+.pp .row+.row{box-shadow:0 -1px 0 var(--line)}
+.pp .row .tx{flex:1;min-width:0}
+.pp .row .tx small{display:block;font-size:13px;color:var(--ink3);margin-top:2px}
+.pp .radio{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--ink3);flex:none}
+.pp .radio.on{box-shadow:inset 0 0 0 2px var(--primary),inset 0 0 0 6px var(--surface),inset 0 0 0 11px var(--primary)}
+.pp .tog{width:52px;height:32px;border-radius:16px;background:var(--primary);position:relative;flex:none}
+.pp .tog::after{content:"";position:absolute;right:4px;top:4px;width:24px;height:24px;border-radius:12px;background:var(--onprimary)}
+.pp .tog.off{background:var(--surface3);box-shadow:inset 0 0 0 2px var(--ink3)}
+.pp .tog.off::after{left:6px;right:auto;top:8px;width:16px;height:16px;background:var(--ink3)}
+.pp .note{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:20px;background:var(--surface2);font-size:14px;line-height:1.5;color:var(--ink2)}
+.pp .note .ic{color:var(--aram);margin-top:1px}
+.pp .field{display:flex;align-items:center;gap:10px;height:56px;padding:0 8px 0 16px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 2px var(--primary);font-size:18px;letter-spacing:.2em;color:var(--ink)}
+.pp .field.idle{box-shadow:inset 0 0 0 1px var(--ink3)}
+.pp .field .ph{letter-spacing:0;color:var(--ink3);font-size:16px}
+.pp .field .eye{margin-left:auto;width:44px;height:44px;display:grid;place-items:center;color:var(--ink2)}
+.pp .flabel{font-size:13px;font-weight:600;color:var(--primary);margin:18px 4px 6px}
+.pp .flabel.idle{color:var(--ink3)}
+.pp .meter{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:10px 4px 0}
+.pp .meter i{height:4px;border-radius:2px;background:var(--aram)}
+.pp .meter i.off{background:var(--surface3)}
+.pp .check{display:flex;gap:12px;align-items:center;margin-top:18px;font-size:15px;color:var(--ink)}
+.pp .check b{width:20px;height:20px;border-radius:5px;background:var(--primary);display:grid;place-items:center;flex:none}
+.pp .check b svg{width:14px;height:14px;stroke:var(--onprimary);stroke-width:2.6;fill:none}
+.pp .foot{padding:12px 20px 28px}
+.pp .tbtn{display:flex;align-items:center;justify-content:center;height:48px;width:100%;font-size:15px;font-weight:600;color:var(--primary);margin-top:6px}
+.pp .stagec{display:flex;flex-direction:column;align-items:center;text-align:center}
+.pp .arch2{position:relative;width:250px;height:250px;display:grid;place-items:end center}
+.pp .arch2::before{content:"";position:absolute;inset:18px 18px 0;border-radius:110px 110px 20px 20px;background:var(--surface2)}
+.pp .arch2>div{position:relative}
+.pp h2.hero{font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.22;margin-top:20px}
+.pp .prog{height:8px;border-radius:4px;background:var(--surface3);overflow:hidden;width:100%;margin-top:24px}
+.pp .prog i{display:block;height:100%;width:62%;border-radius:4px;background:var(--primary)}
+.pp .ver{border-radius:20px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);padding:14px 16px;margin-top:12px}
+.pp .ver.pick{box-shadow:inset 0 0 0 2px var(--primary)}
+.pp .ver .who{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink3)}
+.pp .ver .who .ic{width:18px;height:18px}
+.pp .ver p{font-size:15px;line-height:1.55;color:var(--ink);margin-top:6px}
+.pp .ver mark{background:var(--primary-soft);color:var(--onsoft);border-radius:4px;padding:0 2px}
+.pp .tile{width:88px;height:88px;border-radius:22px;overflow:hidden;box-shadow:0 14px 28px -16px rgba(60,30,10,.6);flex:none}
+.pp .apps .row .mk{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none}
+.pp .apps .row .mk svg{width:22px;height:22px}
+.pp.src p{font-size:15px;line-height:1.55;color:var(--ink)}
+.pp.src p+p{margin-top:8px}
+.pp.src .row{align-items:flex-start;padding:14px 16px}
+.pp.src .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:8px;margin-top:6px}
+.pp.src .tag.ok{background:var(--aram-soft);color:var(--aram)}
+.pp.src .tag.wait{background:var(--primary-soft);color:var(--onsoft)}
+/* share */
+.pp .sharecard{margin:8px auto 0;width:300px;height:375px;border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(180deg,#F6F2EA,#EFE4CF);box-shadow:0 22px 40px -24px rgba(40,25,10,.55),inset 0 0 0 1px var(--line);display:flex;flex-direction:column;align-items:center;padding:26px 22px 18px}
+.pp .sharecard .leaf{width:100%;min-height:0;padding:22px 10px 12px}
+.pp .sharecard .leaf .ln{font-size:17px;text-align:center}
+.pp .sharecard .mine{font-family:"Literata",serif;font-style:italic;font-size:15px;line-height:1.5;color:#3B2F25;text-align:center;margin-top:16px}
+.pp .sharecard .by{margin-top:auto;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#6A5A4A}
+.pp .sharecard .by i{width:18px;height:18px;border-radius:5px;overflow:hidden;display:block}
+.pp .segs{display:grid;grid-template-columns:1fr 1fr;height:44px;border-radius:22px;box-shadow:inset 0 0 0 1px var(--ink3);overflow:hidden;margin:18px 0 0}
+.pp .segs span{display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;color:var(--ink2)}
+.pp .segs span.on{background:var(--primary-soft);color:var(--onsoft)}
+.pp .segs span+span{box-shadow:-1px 0 0 var(--ink3)}
+/* dialogs */
+.pp .dim{position:absolute;inset:0;background:rgba(20,14,10,.5)}
+.pp .dialog{position:absolute;left:24px;right:24px;top:210px;border-radius:28px;background:var(--surface);padding:24px 24px 16px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.pp .dialog .di{width:24px;height:24px;color:var(--heart);margin:0 auto}
+.pp .dialog h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.3;text-align:center;margin-top:14px}
+.pp .dialog p{font-size:15px;line-height:1.55;color:var(--ink2);margin-top:12px}
+.pp .dialog .field{margin-top:16px;font-size:16px;letter-spacing:.06em}
+.pp .dialog .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.pp .dialog .acts span{height:44px;padding:0 16px;display:flex;align-items:center;font-size:15px;font-weight:600;color:var(--primary);border-radius:22px}
+.pp .dialog .acts span.danger{background:var(--heart);color:#fff}
+.pp .ghost{opacity:.9}
+/* heavy days */
+.pp .heavy{border-radius:24px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);padding:18px 16px 8px;margin-top:12px}
+.pp .heavy h3{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.3}
+.pp .heavy p{font-size:15px;line-height:1.55;color:var(--ink2);margin-top:6px}
+.pp .line{display:flex;align-items:center;gap:12px;min-height:60px;margin-top:10px;padding:8px 12px;border-radius:16px;border:1.5px dashed var(--ink3)}
+.pp .line .ph{flex:1;font-size:15px;color:var(--ink3);line-height:1.35}
+.pp .line .ph b{display:block;color:var(--ink2);font-weight:600}
+.pp .line .call{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;background:var(--surface2);color:var(--ink3)}
+.pp .moodbar{display:flex;gap:8px;margin-top:8px}
+/* large text */
+.pp.large .greet{font-family:var(--serif);font-weight:500;font-size:44px;line-height:1.15;margin-top:8px}
+.pp.large .leaf .ln{font-size:27px;white-space:normal;line-height:1.45;text-align:center}
+.pp.large .btn{height:64px;font-size:21px;border-radius:32px}
+.pp.large .navb{position:absolute;left:0;right:0;bottom:0;height:88px;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);box-shadow:0 -1px 0 var(--line)}
+.pp.large .navb span{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:12px;color:var(--ink3);font-size:20px;font-weight:600}
+.pp.large .navb .ind{width:64px;height:36px;border-radius:18px;display:grid;place-items:center}
+.pp.large .navb .on{color:var(--ink)}
+.pp.large .navb .on .ind{background:var(--primary-soft);color:var(--onsoft)}
+.pp .rule{font-size:12.5px;line-height:1.45;color:var(--ink3);border-left:3px solid var(--primary);padding:6px 10px;margin-top:12px;background:var(--surface2);border-radius:0 10px 10px 0}
+</style>
+</helmet>
+<div class="o {{rootCls}}">
+
+<sc-if value="{{is.lock}}" hint-placeholder-val="{{true}}">
+<div class="pp">
+<div class="pbody stagec" style="padding-top: 92px">
+<div class="arch2"><div><dc-import name="Valluvar" pose="rest" px="230" hint-size="230px,211px"></dc-import></div></div>
+<h2 class="hero">Kural Heart is locked</h2>
+<p class="plede" style="max-width: 290px">Your pages stay on this phone. Unlock to carry on.</p>
+</div>
+<div class="foot">
+<button type="button" class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M7 11a5 5 0 0 1 10 0v2M12 11v6M9.5 14v2.500A4 4 0 0 0 12 20M14.500 14.500V16M5 15a7 7 0 0 1 0-4M19 11a7 7 0 0 1 0 4M8 5.500A7 7 0 0 1 16 5.500"></path></svg>Unlock</button>
+<span class="tbtn">Use device PIN</span>
+<p class="pmeta" style="text-align: center; margin-top: 8px">Locks after one minute away. Change it in Settings.</p>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.backup}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>Backup</h1></div>
+<div class="pbody">
+<div class="shead" style="margin: 0; padding: 0"><div class="txt"><h2>Keep a copy somewhere safe</h2><p class="sub">An encrypted file, in a folder you choose.</p></div><div class="sv"><dc-import name="Valluvar" pose="present" px="112" hint-size="112px,103px"></dc-import></div></div>
+<p class="over">Where should it live?</p>
+<div class="box">
+<div class="row"><span class="radio on"></span><span class="tx">A folder in Google Drive<small>Drive / Kural Heart · through the Drive app</small></span></div>
+<div class="row"><span class="radio"></span><span class="tx">A folder on this phone<small>Copy it to a computer now and then</small></span></div>
+<div class="row"><span class="radio"></span><span class="tx">Don't back up</span></div>
+</div>
+<div class="box" style="margin-top: 12px">
+<div class="row"><span class="tx">Back up every night<small>Last copy: today, 6:42 am · 1.2 MB</small></span><span class="tog"></span></div>
+</div>
+<div class="note" style="margin-top: 12px"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.500-3 8-7 10-4-2-7-5.500-7-10V6Z M9 12l2 2 4-4"></path></svg><span>Kural Heart has no internet permission. Drive does the syncing, and it only ever sees a locked file.</span></div>
+</div>
+<div class="foot"><button type="button" class="btn">Back up now</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.pass}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>Lock your backup</h1></div>
+<div class="pbody">
+<p class="plede" style="margin-top: 0">Your backup is locked with a passphrase only you know. If it is lost, no one can open the backup, not even the person who made this app.</p>
+<p class="flabel">Passphrase</p>
+<div class="field">••••••••••••••••••<span class="eye"><svg class="ic" viewBox="0 0 24 24"><path d="M2.500 12S6 5.500 12 5.500 21.500 12 21.500 12 18 18.500 12 18.500 2.500 12 2.500 12Z M12 14.500a2.500 2.500 0 1 0 0-5 2.500 2.500 0 0 0 0 5Z"></path></svg></span></div>
+<div class="meter"><i></i><i></i><i></i><i class="off"></i></div>
+<p class="pmeta" style="margin: 6px 4px 0">Strong · four words and a number</p>
+<p class="flabel idle">Type it again</p>
+<div class="field idle"><span class="ph">Same passphrase</span></div>
+<div class="note" style="margin-top: 18px"><svg class="ic" viewBox="0 0 24 24" style="color: var(--primary)"><path d="M12 3.500a6 6 0 0 0-3.500 10.900V17h7v-2.600A6 6 0 0 0 12 3.500ZM9.500 20h5"></path></svg><span>A few words you will remember, with a number, beat a short code. Write it on paper and keep it with your important papers.</span></div>
+<div class="check"><b><svg viewBox="0 0 24 24"><path d="M5 12.500l4.500 4.500L19 7.500"></path></svg></b>I have written it down somewhere safe</div>
+</div>
+<div class="foot"><button type="button" class="btn">Turn on backup</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.restore}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="pbody stagec" style="padding-top: 96px">
+<div class="arch2"><div><dc-import name="Valluvar" pose="walk" px="230" hint-size="230px,211px"></dc-import></div></div>
+<h2 class="hero">Bringing your pages home</h2>
+<p class="plede" style="max-width: 300px">Keep Kural Heart open. This takes about a minute.</p>
+<div class="prog" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"><i></i></div>
+<div style="display: flex; justify-content: space-between; width: 100%; margin-top: 10px" class="pmeta"><span>412 of 664 pages</span><span>18 seals</span></div>
+</div>
+<div class="foot"><span class="tbtn">Stop and keep what is here</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.conflict}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></span><h1>One page, two versions</h1></div>
+<div class="pbody">
+<div class="shead" style="margin: 0; padding: 0"><div class="txt"><h2>Which one is yours?</h2><p class="sub">Tuesday's page changed on this phone and in the backup since they last met.</p></div><div class="sv"><dc-import name="Valluvar" pose="think" px="112" hint-size="112px,103px"></dc-import></div></div>
+<div class="ver pick"><div class="who"><svg class="ic" viewBox="0 0 24 24"><path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM11 18h2"></path></svg>This phone · 9:14 pm</div><p>I kept thinking about the flood line. Today was wide as a flood, and <mark>I looked at it, one piece at a time, and it got smaller.</mark></p></div>
+<div class="ver"><div class="who"><svg class="ic" viewBox="0 0 24 24"><path d="M7 18h10.500a4 4 0 0 0 .500-8 6 6 0 0 0-11.600-1.500A4.500 4.500 0 0 0 7 18Z"></path></svg>Backup · 7:02 pm</div><p>I kept thinking about the flood line. Today was wide as a flood.</p></div>
+<p class="pmeta" style="margin: 12px 4px 0">Nothing is lost whichever you pick. Keeping both saves the backup's version as a second page on the same day.</p>
+</div>
+<div class="foot"><button type="button" class="btn">Keep both</button><button type="button" class="btn tonal" style="margin-top: 10px">Keep this phone's</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.about}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>About</h1></div>
+<div class="pbody">
+<div style="display: flex; gap: 16px; align-items: center; margin-top: 4px">
+<div class="tile"><svg width="88" height="88" viewBox="0 0 108 108" aria-hidden="true"><defs><linearGradient id="dawnAb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD08A"></stop><stop offset="1" stop-color="#E5693F"></stop></linearGradient></defs><rect width="108" height="108" fill="url(#dawnAb)"></rect><path d="M8 108C8 90 28 80 54 80 80 80 100 90 100 108Z" fill="#FFFFFF"></path><g transform="translate(-34.800 5.700) scale(.74)"><rect x="110" y="86" width="20" height="20" fill="#D17140"></rect><circle cx="120" cy="22" r="13.500" fill="#232329"></circle><rect x="85" y="54" width="12" height="18" rx="6" fill="#D17140"></rect><rect x="143" y="54" width="12" height="18" rx="6" fill="#D17140"></rect><path d="M90 48C90 26 150 26 150 48L150 62 90 62Z" fill="#232329"></path><rect x="93" y="39" width="54" height="51" rx="17" fill="#E08250"></rect><path d="M102 50Q108 46.500 114 50M126 50Q132 46.500 138 50" stroke="#232329" stroke-width="3.200" stroke-linecap="round" fill="none"></path><circle cx="108" cy="57.500" r="3.600" fill="#232329"></circle><circle cx="132" cy="57.500" r="3.600" fill="#232329"></circle><path d="M120 112C100 100 89 89 89 77 89 69 95 64 102 64 109 64 114 68 120 73 126 68 131 64 138 64 145 64 151 69 151 77 151 89 140 100 120 112Z" fill="#232329"></path><path d="M107 79C112 88 128 88 133 79 128 83 112 83 107 79Z" fill="#E08250"></path></g></svg></div>
+<div><p class="t-head" style="font-size: 26px">Kural Heart</p><p class="pmeta">Version 1.0 · made by Inigo</p></div>
+</div>
+<p class="plede">A private journal with Thiruvalluvar. One couplet a day, and a quiet page to answer it. No account, no ads, no internet.</p>
+<p class="over">Part of Heart Apps</p>
+<div class="box apps">
+<div class="row"><span class="mk" style="background: #F6E2D7"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-9.500A4 4 0 0 1 12 8a4 4 0 0 1 7 2.500C19 15.600 12 20 12 20Z" fill="#B4492A"></path></svg></span><span class="tx">Prompt Heart<small>Notes for your prompts · Android</small></span></div>
+<div class="row"><span class="mk" style="background: #E2E6F2"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-9.500A4 4 0 0 1 12 8a4 4 0 0 1 7 2.500C19 15.600 12 20 12 20Z" fill="#3A4E86"></path></svg></span><span class="tx">Watch Heart<small>A diary for films and anime · Android</small></span></div>
+<div class="row"><span class="mk" style="background: #E1EDE6"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-9.500A4 4 0 0 1 12 8a4 4 0 0 1 7 2.500C19 15.600 12 20 12 20Z" fill="#2F6B53"></path></svg></span><span class="tx">Frame Heart, Still Heart, Rush Heart<small>Picture and media tools · Windows</small></span></div>
+<div class="row"><span class="tx" style="color: var(--primary); font-weight: 600">inigo-code.github.io</span><svg class="ic" viewBox="0 0 24 24" style="color: var(--primary)"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg></div>
+</div>
+<div class="box" style="margin-top: 12px">
+<div class="row"><span class="tx">Sources and credits</span><svg class="ic" viewBox="0 0 24 24" style="color: var(--ink3)"><path d="M9 5l7 7-7 7"></path></svg></div>
+<div class="row"><span class="tx">Licences</span><svg class="ic" viewBox="0 0 24 24" style="color: var(--ink3)"><path d="M9 5l7 7-7 7"></path></svg></div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.sources}}" hint-placeholder-val="{{false}}">
+<div class="pp src">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>Sources and credits</h1></div>
+<div class="pbody">
+<p class="plede" style="margin-top: 0">Every couplet in Kural Heart comes from one checked text. Here is where each part comes from.</p>
+<div class="box" style="margin-top: 16px">
+<div class="row"><span class="tx"><p><b>The couplets in Tamil</b></p><p class="pmeta">Project Madurai's e-text, checked line by line against Tamil Wikisource. Differences were settled by hand.</p><span class="tag wait">Owner review before release</span></span></div>
+<div class="row"><span class="tx"><p><b>English verse</b></p><p class="pmeta">G. U. Pope, 1886, and V. V. S. Aiyar, 1916. Both in the public domain.</p><span class="tag ok">Public domain</span></span></div>
+<div class="row"><span class="tx"><p><b>Meanings, questions and word notes</b></p><p class="pmeta">Written for Kural Heart in plain English and Tamil, and read by a Tamil scholar.</p><span class="tag wait">Reviewer to be named</span></span></div>
+<div class="row"><span class="tx"><p><b>Type</b></p><p class="pmeta">Anek Tamil, Noto Serif Tamil and Literata, under the SIL Open Font License.</p></span></div>
+<div class="row"><span class="tx"><p><b>Valluvar</b></p><p class="pmeta">Drawn for Kural Heart. White robes, no marks: a teacher for everyone.</p></span></div>
+</div>
+<span class="tbtn" style="justify-content: flex-start; padding-left: 4px">Report a mistake in a couplet</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.share}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></span><h1>Share this couplet</h1></div>
+<div class="pbody">
+<div class="sharecard">
+<div class="leaf"><span class="ln">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="ln">நிற்க அதற்குத் தக</span><p class="by" style="text-align: center">கல்வி · Learning · 391</p></div>
+<p class="mine">“Learn what is worth learning, and learn it well. Then let your life stand by it.”</p>
+<div style="margin-top: auto"><dc-import name="Valluvar" pose="read" px="132" still="{{yes}}" hint-size="132px,121px"></dc-import></div><p class="by" style="margin-top: 4px"><i><svg width="18" height="18" viewBox="0 0 108 108"><rect width="108" height="108" fill="#E5693F"></rect><path d="M54 92C34 80 23 69 23 57 23 49 29 44 36 44 43 44 48 48 54 53 60 48 65 44 72 44 79 44 85 49 85 57 85 69 74 80 54 92Z" fill="#232329"></path></svg></i>Kural Heart</p>
+</div>
+<div class="segs"><span class="on">Post · 4:5</span><span>Story · 9:16</span></div>
+<div class="box" style="margin-top: 12px">
+<div class="row"><span class="tx">Add my line<small>Off: your journal stays private</small></span><span class="tog off"></span></div>
+</div>
+</div>
+<div class="foot"><button type="button" class="btn">Share</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.deleteall}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb ghost"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>Your data</h1></div>
+<div class="pbody ghost">
+<div class="box"><div class="row"><span class="tx">Export as text</span></div><div class="row"><span class="tx">Backup</span></div><div class="row"><span class="tx" style="color: var(--heart)">Delete everything</span></div></div>
+</div>
+<div class="dim"></div>
+<div class="dialog" role="alertdialog" aria-labelledby="dah">
+<svg class="ic di" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"></path></svg>
+<h2 id="dah">Delete every page?</h2>
+<p>This removes all 664 pages, your thread and your 18 seals from this phone. It cannot be undone here. Backup files in your folder are not touched.</p>
+<p class="flabel" style="margin-top: 14px">Type DELETE to confirm</p>
+<div class="field" style="margin-top: 0">DELE</div>
+<div class="acts"><span>Cancel</span><span class="danger" style="opacity: .38">Delete everything</span></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.notifs}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>Reminders</h1></div>
+<div class="pbody stagec" style="padding-top: 40px">
+<div class="arch2"><div><dc-import name="Valluvar" pose="listen" px="220" hint-size="220px,202px"></dc-import></div></div>
+<h2 class="hero" style="font-size: 25px">Reminders are switched off</h2>
+<p class="plede" style="max-width: 310px">Android has notifications off for Kural Heart, so the morning couplet can't come to you. It will be waiting when you open the app.</p>
+</div>
+<div class="foot"><button type="button" class="btn">Open notification settings</button><span class="tbtn">Keep them off</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.heavy}}" hint-placeholder-val="{{false}}">
+<div class="pp">
+<div class="tb"><span class="ib"><svg class="ic" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"></path></svg></span><h1>How is your heart?</h1></div>
+<div class="pbody">
+<div class="moodbar"><span class="chip">Calm</span><span class="chip">Tired</span><span class="pill">Very heavy</span></div>
+<div class="heavy">
+<h3>You don't have to carry this alone</h3>
+<p>If today is more than a page can hold, talking to someone can help. These lines are free and private.</p>
+<div class="line"><span class="ph"><b>Helpline name</b>Number from the reviewed list for your region</span><span class="call"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1Z"></path></svg></span></div>
+<div class="line"><span class="ph"><b>A person you trust</b>Pick someone from your contacts</span><span class="call"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></span></div>
+<span class="tbtn">Not now, take me to a couplet</span>
+</div>
+<p class="rule">Design rule: no number is ever shown until it comes from a checked list for the reader's country. Until then the line stays empty like this, never invented.</p>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{is.big}}" hint-placeholder-val="{{false}}">
+<div class="pp large">
+<div class="pbody" style="padding-top: 8px">
+<p class="greet">Good evening</p>
+<div class="leaf" style="margin-top: 14px; padding: 26px 14px 16px"><span class="ln">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="ln">நிற்க அதற்குத் தக</span></div>
+<button type="button" class="btn" style="margin-top: 18px">Write</button>
+<p class="rule" style="font-size: 14px">At the largest system font the couplet keeps its size and wraps between words, never inside one. The tab bar shows a label only under the open tab.</p>
+</div>
+<div class="navb">
+<span class="on"><span class="ind"><svg class="ic" viewBox="0 0 24 24"><path d="M3.500 12a4 4 0 0 1 4-4h9a4 4 0 0 1 0 8h-9a4 4 0 0 1-4-4ZM10.500 10.800h6M10.500 13.300h3.500M7.300 12h.010"></path></svg></span>Today</span>
+<span><span class="ind"><svg class="ic" viewBox="0 0 24 24"><path d="M6 5h11.500a2.500 2.500 0 0 1 0 5H6a2.500 2.500 0 0 1 0-5ZM6 14h11.500a2.500 2.500 0 0 1 0 5H6a2.500 2.500 0 0 1 0-5ZM7.500 2.500v19"></path></svg></span></span>
+<span><span class="ind"><svg class="ic" viewBox="0 0 24 24"><path d="M4 18c3-1 4-4 7-4s4 3 7 2 2-6 2-6M12 3l1.200 2.500L16 6l-2 2 .500 2.800L12 9.500 9.500 10.800 10 8 8 6l2.800-.500Z"></path></svg></span></span>
+<span><span class="ind"><svg class="ic" viewBox="0 0 24 24"><path d="M17.200 3.800a2.300 2.300 0 0 1 3.200 3.200L9 18.400 4.500 19.500 5.600 15ZM15 6l3 3"></path></svg></span></span>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"page":{"editor":"enum","default":"lock","options":["lock","backup","pass","restore","conflict","about","sources","share","deleteall","notifs","heavy","big"]},"theme":{"editor":"enum","default":"ivory","options":["ivory","midnight"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props, page = p.page || 'lock', is = {};
+    ['lock', 'backup', 'pass', 'restore', 'conflict', 'about', 'sources', 'share', 'deleteall', 'notifs', 'heavy', 'big'].forEach(function (k) { is[k] = k === page; });
+    return { yes: true, is: is, rootCls: p.theme === 'midnight' ? 'night' : '' };
+  }
+}
+</script>
+</body>
+</html>

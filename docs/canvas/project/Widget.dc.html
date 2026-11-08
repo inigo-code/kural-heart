@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<title>Widgets</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="olai.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,100..800&amp;family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400&amp;family=Noto+Serif+Tamil:wdth,wght@62.5..100,100..900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.wb{--leaf1:#F3E7C6;--leaf2:#E7D4A2;--leafink:#2B1E10;--leafnote:#6A4B22;--gold:#C9A45C;--surface:#FFFDF9;--sans:"Anek Tamil",system-ui,sans-serif;width:1440px;height:900px;box-sizing:border-box;padding:64px 72px;display:flex;gap:44px;background:#EDE6DA;font-family:"Anek Tamil",system-ui,sans-serif;color:#1E1A16}
+.wb h1{font-family:"Literata",serif;font-weight:500;font-size:40px;line-height:1.15;margin:0}
+.wb .lede{font-size:16px;line-height:1.6;color:#564D44;margin:12px 0 0}
+.wb .notes{display:grid;gap:18px;margin-top:28px}
+.wb .notes h2{font-size:15px;font-weight:700;margin:0}
+.wb .notes p{font-size:14px;line-height:1.55;color:#564D44;margin:4px 0 0}
+.home{flex:0 0 440px;height:772px;border-radius:40px;padding:28px 22px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden}
+.home.day{background:linear-gradient(170deg,#C9B79A,#8E7B62 70%,#6F5E49)}
+.home.dusk{background:linear-gradient(170deg,#2B2430,#1A1518 70%,#120F10)}
+.home .clock{font-family:"Literata",serif;font-size:56px;font-weight:400;color:#FFF8EE;line-height:1;margin:8px 4px 6px}
+.home .date{font-size:15px;color:rgba(255,248,238,.8);margin:0 4px 6px}
+.wd{border-radius:28px;background:#FFFDF9;box-shadow:0 14px 30px -18px rgba(0,0,0,.6);padding:16px;box-sizing:border-box;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.dusk .wd{background:#1E1A17;color:#F3ECE2;--surface:#1E1A17}
+.dusk .leaf{filter:brightness(.9)}
+.wd .top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#73695E}
+.dusk .wd .top{color:#A0958A}
+.wd .top b{color:#B4492A;font-weight:700}
+.dusk .wd .top b{color:#E58A62}
+.wd .leaf.mini{margin-top:10px;padding:18px 10px 10px}
+.wd .leaf .ln{font-size:17px;text-align:center}
+.wd .act{margin-top:12px;height:40px;border-radius:20px;background:#B4492A;color:#FFF8F2;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.dusk .wd .act{background:#E58A62;color:#2A140B}
+.wd .num{font-family:"Literata",serif;font-size:44px;font-weight:500;line-height:1}
+.wd .mut{font-size:13px;color:#73695E;line-height:1.35}
+.dusk .wd .mut{color:#A0958A}
+.wd .heart{width:22px;height:22px;fill:#D63B58}
+.wd .slim{display:flex;align-items:center;gap:12px}
+.wd .slim .ln{font-size:15px;font-weight:560;font-stretch:75%;white-space:nowrap}
+.wd .chipw{height:28px;padding:0 12px;border-radius:14px;background:#F6E2D7;color:#7A2E17;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center}
+.dusk .wd .chipw{background:#3A2419;color:#F4C2A8}
+.cap{font-size:13px;color:#564D44;margin:-6px 4px 0}
+</style>
+</helmet>
+<div class="wb">
+<div style="flex: 0 0 360px; display: flex; flex-direction: column">
+<h1>Widgets</h1>
+<p class="lede">Built with Jetpack Glance, redrawn at local midnight and after each save. No network, no polling. Shown on a day home screen and a dusk one.</p>
+<div class="notes">
+<div><h2>Today's couplet · 4 by 2</h2><p>The mini leaf with the kural on two lines, the period and the number. If the lines would set below 15sp at this width, the widget shows the question instead. Leaf opens Today; Write opens Write.</p></div>
+<div><h2>Your thread · 2 by 2</h2><p>Valluvar reading, held still, with the day count. Before today's page it says the question is waiting. It never says a thread is at risk.</p></div>
+<div><h2>On this day · 2 by 2</h2><p>Only that a page from a year ago exists and its kural, never your words: a home screen is seen by anyone holding the phone. With the app lock on, it shows only the kural.</p></div>
+<div><h2>Slim · 4 by 1</h2><p>The first line of the couplet and a Write chip, for crowded home screens.</p></div>
+</div>
+</div>
+
+<div class="home day">
+<p class="clock">7:12</p><p class="date">Monday, 9 November</p>
+<div class="wd" style="height: 212px">
+<div class="top"><span><b>காலை</b> · morning</span><span>391 · Learning</span></div>
+<div class="leaf mini"><span class="ln">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="ln">நிற்க அதற்குத் தக</span></div>
+<div class="act">Write about this</div>
+</div>
+<div style="display: flex; gap: 16px">
+<div class="wd" style="width: 190px; height: 190px">
+<div style="display: flex; justify-content: space-between"><div><div class="num">12</div><div class="mut">days on your thread</div></div><svg class="heart" viewBox="0 0 24 24"><path d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg></div>
+<div style="position: absolute; right: -8px; bottom: -10px"><dc-import name="Valluvar" pose="read" px="112" still="{{yes}}" hint-size="112px,103px"></dc-import></div>
+</div>
+<div class="wd" style="width: 190px; height: 190px">
+<span class="mut">A year ago today</span>
+<p style="font-family: Literata, serif; font-size: 19px; line-height: 1.3; margin: 8px 0 0">You wrote a page on Facing trouble</p>
+<span class="mut" style="margin-top: auto">Kural 622</span>
+</div>
+</div>
+<div class="wd slim" style="height: 72px; padding: 12px 16px; flex-direction: row">
+<span class="ln" style="flex: 1">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="chipw">Write</span>
+</div>
+</div>
+
+<div class="home dusk">
+<p class="clock">8:40</p><p class="date">Monday, 9 November</p>
+<div class="wd" style="height: 212px">
+<div class="top"><span><b>மாலை</b> · evening</span><span>391 · கல்வி</span></div>
+<div class="leaf mini"><span class="ln">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="ln">நிற்க அதற்குத் தக</span></div>
+<div class="act">இதைப் பற்றி எழுது</div>
+</div>
+<div style="display: flex; gap: 16px">
+<div class="wd" style="width: 190px; height: 190px">
+<div style="display: flex; justify-content: space-between"><div><div class="num">13</div><div class="mut">நாள் இழை</div></div><svg class="heart" viewBox="0 0 24 24"><path d="M12 21S3 15.500 3 9.200A5 5 0 0 1 12 6.500 5 5 0 0 1 21 9.200C21 15.500 12 21 12 21Z"></path></svg></div>
+<div style="position: absolute; right: -8px; bottom: -10px"><dc-import name="Valluvar" pose="rest" px="112" still="{{yes}}" hint-size="112px,103px"></dc-import></div>
+</div>
+<div class="wd" style="width: 190px; height: 190px">
+<span class="mut">ஓராண்டுக்கு முன் இன்று</span>
+<p style="font-family: 'Noto Serif Tamil', serif; font-size: 17px; line-height: 1.4; margin: 8px 0 0">இடுக்கண் அழியாமை பற்றி ஒரு பக்கம்</p>
+<span class="mut" style="margin-top: auto">குறள் 622</span>
+</div>
+</div>
+<div class="wd slim" style="height: 72px; padding: 12px 16px; flex-direction: row">
+<span class="ln" style="flex: 1">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="chipw">எழுது</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return { yes: true }; }
+}
+</script>
+</body>
+</html>

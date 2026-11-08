@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Valluvar character sheet</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="olai.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,100..800&amp;family=Literata:opsz,wght@7..72,400..600&amp;family=Noto+Serif+Tamil:wdth,wght@62.5..100,100..900&amp;family=Tiro+Tamil:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="board" style="width: 1600px; height: 1240px; padding: 56px 64px">
+<h1>வள்ளுவர் · Valluvar</h1>
+<p class="lede">Your Valluvar, from the animation studio you shared: white robes, bare forehead, a rounded black beard and topknot. Eleven states, eight faces. Breath, head motion, blinking, the bun and the shawl move on their own rhythms in every state.</p>
+<div class="castgrid" style="grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 24px">
+<sc-for list="{{states}}" as="p" hint-placeholder-count="11">
+<div class="castcell"><div class="st" style="height: 196px; align-items: center"><div><dc-import name="Valluvar" pose="{{p.id}}" px="220" hint-size="220px,202px"></dc-import></div></div><p class="pn">{{p.name}}</p><p class="pu">{{p.use}}</p></div>
+</sc-for>
+</div>
+<p class="sub2">Faces</p>
+<div class="exgrid" style="grid-template-columns: repeat(8, minmax(0, 1fr))">
+<sc-for list="{{faces}}" as="f" hint-placeholder-count="8">
+<div class="excell"><div style="height: 120px; overflow: hidden; display: flex; justify-content: center"><div style="margin-top: -8px"><dc-import name="Valluvar" pose="listening" ex="{{f.id}}" px="180" still="{{yes}}" hint-size="180px,165px"></dc-import></div></div><p>{{f.name}}</p></div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1600,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      yes: true,
+      states: [
+        { id: 'reading', name: 'ஓலை வாசிப்பு · Reading', use: 'Today, the daily kural' },
+        { id: 'writing', name: 'எழுத்தாணி · Writing', use: 'Write, faster as you type' },
+        { id: 'contemplating', name: 'சிந்தனை · Thinking', use: 'How is your heart?' },
+        { id: 'teaching', name: 'உரைத்தல் · Teaching', use: 'Word by word, writing in Tamil' },
+        { id: 'walking', name: 'பயணம் · Walking', use: 'Onboarding, Journey' },
+        { id: 'celebrating', name: 'மகிழ்ச்சி · Joy', use: 'The save moment' },
+        { id: 'presenting', name: 'படையல் · Presenting', use: 'A new seal, sharing' },
+        { id: 'greeting', name: 'வணக்கம் · Greeting', use: 'Welcome, empty journal' },
+        { id: 'listening', name: 'செவிமடுத்தல் · Listening', use: 'Search, quiet moments' },
+        { id: 'resting', name: 'ஓய்வு · Resting', use: 'A rest day on your thread' },
+        { id: 'awarding', name: 'முத்திரை · Awarding', use: 'A new seal, held up with joy' }
+      ],
+      faces: [
+        { id: 'smile', name: 'Smile' }, { id: 'greet', name: 'Greet' }, { id: 'joy', name: 'Joy' }, { id: 'calm', name: 'Calm' },
+        { id: 'thinking', name: 'Thinking' }, { id: 'talk', name: 'Talking' }, { id: 'proud', name: 'Proud' }, { id: 'focused', name: 'Focused' }
+      ]
+    };
+  }
+}
+</script>
+<link rel="stylesheet" href="olai.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,100..800&amp;family=Literata:opsz,wght@7..72,400..600&amp;family=Noto+Serif+Tamil:wdth,wght@62.5..100,100..900&amp;family=Tiro+Tamil:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="board" style="width: 1600px; height: 1240px; padding: 56px 64px">
+<h1>வள்ளுவர் · Valluvar</h1>
+<p class="lede">Your Valluvar, from the animation studio you shared: white robes, bare forehead, a rounded black beard and topknot. Eleven states, eight faces. Breath, head motion, blinking, the bun and the shawl move on their own rhythms in every state.</p>
+<div class="castgrid" style="grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 24px">
+<sc-for list="{{states}}" as="p" hint-placeholder-count="11">
+<div class="castcell"><div class="st" style="height: 196px; align-items: center"><div><dc-import name="Valluvar" pose="{{p.id}}" px="220" hint-size="220px,202px"></dc-import></div></div><p class="pn">{{p.name}}</p><p class="pu">{{p.use}}</p></div>
+</sc-for>
+</div>
+<p class="sub2">Faces</p>
+<div class="exgrid" style="grid-template-columns: repeat(8, minmax(0, 1fr))">
+<sc-for list="{{faces}}" as="f" hint-placeholder-count="8">
+<div class="excell"><div style="height: 120px; overflow: hidden; display: flex; justify-content: center"><div style="margin-top: -8px"><dc-import name="Valluvar" pose="listening" ex="{{f.id}}" px="180" still="{{yes}}" hint-size="180px,165px"></dc-import></div></div><p>{{f.name}}</p></div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1600,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      yes: true,
+      standing: [
+        { id: 'wave', name: 'வணக்கம் · Greeting', use: 'Welcome, a new seal' },
+        { id: 'think', name: 'சிந்தனை · Thinking', use: 'How are you feeling?' },
+        { id: 'teach', name: 'கற்பித்தல் · Teaching', use: 'Writing in Tamil, word meanings' },
+        { id: 'walk', name: 'பயணம் · Walking', use: 'Your journey, restoring a backup' },
+        { id: 'cheer', name: 'மகிழ்ச்சி · Joy', use: 'The save moment' },
+        { id: 'present', name: 'முத்திரை · Presenting', use: 'A seal is earned' },
+        { id: 'read', name: 'படித்தல் · Reading', use: 'On this day' }
+      ],
+      seated: [
+        { id: 'sit-read', name: 'ஓலை படித்தல் · Reading', use: 'Today, the daily kural' },
+        { id: 'write', name: 'எழுதுதல் · Writing', use: 'Write, scribing as you type' },
+        { id: 'sit-think', name: 'ஆழ்ந்த சிந்தனை · Pondering', use: 'Search, no results' },
+        { id: 'sit-wave', name: 'அழைப்பு · Calling', use: 'Empty journal' },
+        { id: 'sit-cheer', name: 'கொண்டாட்டம் · Cheering', use: 'Thread milestones' },
+        { id: 'sit-teach', name: 'உரை · Explaining', use: 'Turning the leaf' },
+        { id: 'rest', name: 'ஓய்வு · Resting', use: 'A rest day, the lock screen' }
+      ],
+      faces: [
+        { id: 'smile', name: 'Smile' }, { id: 'greet', name: 'Greet' }, { id: 'joy', name: 'Joy' }, { id: 'calm', name: 'Calm' },
+        { id: 'thinking', name: 'Thinking' }, { id: 'talk', name: 'Talking' }, { id: 'proud', name: 'Proud' },
+        { id: 'surprised', name: 'Surprised' }, { id: 'wink', name: 'Wink' }, { id: 'sleepy', name: 'Sleepy' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

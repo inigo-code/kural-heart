@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Feature graphic</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="olai.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wdth,wght@75..125,100..800&amp;family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400&amp;family=Noto+Serif+Tamil:wdth,wght@62.5..100,100..900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.fg{--leaf1:#F3E7C6;--leaf2:#E7D4A2;--leafink:#2B1E10;--leafnote:#6A4B22;--gold:#C9A45C;--surface:#F6F2EA;--sans:"Anek Tamil",system-ui,sans-serif;width:1024px;height:500px;position:relative;overflow:hidden;background:radial-gradient(120% 140% at 78% 40%,#FBEBD8 0%,#F6F2EA 55%);font-family:"Anek Tamil",system-ui,sans-serif;color:#1E1A16}
+.fg .copy{position:absolute;left:72px;top:96px;width:430px}
+.fg h1{font-family:"Literata",serif;font-weight:500;font-size:64px;line-height:1.05;margin:0;letter-spacing:-.01em}
+.fg .ta{font-family:"Noto Serif Tamil",serif;font-size:24px;color:#B4492A;margin:14px 0 0}
+.fg p{font-size:22px;line-height:1.45;color:#564D44;margin:18px 0 0}
+.fg .arch{position:absolute;right:96px;bottom:0;width:360px;height:400px;border-radius:180px 180px 0 0;background:#EFE4D2}
+.fg .v{position:absolute;right:112px;bottom:14px}
+.fg .leafbox{position:absolute;right:330px;bottom:46px;width:300px;transform:rotate(-3deg)}
+.fg .leaf .ln{font-size:18px;text-align:center}
+</style>
+</helmet>
+<div class="fg">
+<div class="arch"></div>
+<div class="v"><dc-import name="Valluvar" pose="present" px="340" still="{{yes}}" hint-size="340px,312px"></dc-import></div>
+<div class="leafbox"><div class="leaf"><span class="ln">கற்க கசடறக் கற்பவை கற்றபின்</span><span class="ln">நிற்க அதற்குத் தக</span></div></div>
+<div class="copy"><h1>Kural Heart</h1><p class="ta">குறளுடன் நாட்குறிப்பு</p><p>One couplet a day, and a quiet page to answer it.</p></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1024,"height":500}}'>
+class Component extends DCLogic {
+  renderVals() { return { yes: true }; }
+}
+</script>
+</body>
+</html>

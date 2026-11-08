@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logo mark</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Tamil:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<svg width="{{px}}" height="{{px}}" viewBox="0 0 108 108" role="img" aria-label="Kural Heart logo" style="display: block">
+<defs>
+<linearGradient id="sunfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD08A"></stop><stop offset="1" stop-color="#E5693F"></stop></linearGradient>
+<clipPath id="tileclip"><rect width="108" height="108" rx="{{radius}}"></rect></clipPath>
+<clipPath id="above"><rect width="108" height="63"></rect></clipPath>
+</defs>
+<g clip-path="url(#tileclip)">
+<sc-if value="{{tile}}" hint-placeholder-val="{{true}}"><rect width="108" height="108" fill="#17131F"></rect></sc-if>
+<sc-if value="{{is.rising}}" hint-placeholder-val="{{true}}">
+<g clip-path="url(#above)"><path fill="url(#sunfill)" d="M54 88C26 68 17 53 17 39 17 27 26 19 37 19 44 19 50 23 54 29 58 23 64 19 71 19 82 19 91 27 91 39 91 53 82 68 54 88Z"></path></g>
+<rect x="15" y="65" width="78" height="9" rx="4.500" fill="#EBD5A3"></rect>
+<rect x="15" y="79" width="58.500" height="9" rx="4.500" fill="#EBD5A3"></rect>
+</sc-if>
+<sc-if value="{{is.leaves}}" hint-placeholder-val="{{false}}">
+<path fill="#EBD5A3" d="M52 90C30 76 12 58 15 37 17 22 37 15 52 32 47 52 47 70 52 90Z"></path>
+<path fill="#E5693F" d="M56 90C78 76 96 58 93 37 91 22 71 15 56 32 61 52 61 70 56 90Z"></path>
+</sc-if>
+<sc-if value="{{is.ku}}" hint-placeholder-val="{{false}}">
+<circle cx="54" cy="54" r="38" fill="url(#sunfill)"></circle>
+<text x="54" y="72" text-anchor="middle" font-family="'Tiro Tamil', serif" font-size="46" fill="#17131F">கு</text>
+</sc-if>
+</g>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","default":"rising","options":["rising","leaves","ku"]},"size":{"editor":"int","default":240},"tile":{"editor":"boolean","default":true},"$preview":{"width":240,"height":240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var k = this.props.kind || 'rising', px = Number(this.props.size || 240);
+    return { px: px, tile: this.props.tile !== false, radius: this.props.tile === false ? 0 : 24, is: { rising: k === 'rising', leaves: k === 'leaves', ku: k === 'ku' } };
+  }
+}
+</script>
+</body>
+</html>
