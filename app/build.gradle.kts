@@ -13,8 +13,8 @@ android {
         applicationId = "com.inigocode.kuralheart"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.0.1"
+        versionCode = 9
+        versionName = "0.9.0"
     }
 
     buildTypes {
@@ -22,6 +22,13 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        // The release build, signed with this computer's Android debug key so it can be installed for testing.
+        // Play builds are signed with the owner's own upload key, which never lives in this repository.
+        create("preview") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
         }
     }
 
@@ -44,6 +51,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.fragment)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
@@ -52,6 +61,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
     testImplementation(libs.junit)
+    // Android's org.json is a stub in JVM tests; the pack tests need the real parser.
+    testImplementation(libs.org.json)
 }
 
 /*

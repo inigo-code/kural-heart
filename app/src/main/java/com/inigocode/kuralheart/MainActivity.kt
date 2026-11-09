@@ -1,21 +1,52 @@
 package com.inigocode.kuralheart
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.inigocode.kuralheart.workbench.Workbench
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.fragment.app.FragmentActivity
+import com.inigocode.kuralheart.system.TodayWidget
+import com.inigocode.kuralheart.ui.KuralApp
 
-/**
- * Milestone 0: the workbench that proves the foundations (type, the leaf, Valluvar, folder backup)
- * before any product screen is built on them.
- */
-class MainActivity : ComponentActivity() {
+/** A FragmentActivity because the app lock uses the system's biometric prompt. */
+class MainActivity : FragmentActivity() {
+    /** Set when opened from a notification or widget's Write button. Bumped so repeat taps register. */
+    val writeRequest = mutableIntStateOf(0)
+    /** True while the app lock should show. Set when the app goes to the background with the lock on. */
+    val locked = mutableStateOf(true)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        // "tab" picks the opening bench, for screenshots and timing: adb shell am start -n ... --es tab Valluvar
-        val start = intent.getStringExtra("tab")
-        setContent { Workbench(start) }
+        handle(intent)
+        setContent { KuralApp(this) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handle(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        TodayWidget.refresh(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations && !pickingFile) locked.value = true
+    }
+
+    /** The system file and folder pickers send us to the background; that shouldn't lock the app. */
+    var pickingFile = false
+
+    private fun handle(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_WRITE, false) == true) writeRequest.intValue++
+    }
+
+    companion object {
+        const val EXTRA_WRITE = "write"
     }
 }

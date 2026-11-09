@@ -3,4 +3,8 @@
     <color name="ivory">#F6F2EA</color>
     <color name="dawn_top">#FFD08A</color>
     <color name="dawn_bottom">#E5693F</color>
+    <color name="w_surface">#FFFDF9</color>
+    <color name="w_primary">#B4492A</color>
+    <color name="w_on_primary">#FFF8F2</color>
+    <color name="w_ink3">#73695E</color>
 </resources>

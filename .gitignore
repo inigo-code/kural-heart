@@ -12,3 +12,7 @@ captures/
 *.keystore
 *.jks
 keystore.properties
+# Built APKs handed out for testing
+dist/
+# The tk120404 dataset has no licence: it is a cross-check witness only, never committed or shipped
+tools/content/sources/tk120404.json

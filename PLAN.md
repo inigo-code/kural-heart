@@ -920,6 +920,36 @@ Still open for milestone 0:
 - The workbench's specimen couplets are copied from the canvas prototype into a debug-only asset, marked
   unverified, and never ship. Real couplets arrive with the milestone 1 pack.
 
+### Version 0.9.0, the whole app, 9 November
+
+The owner asked for the full app at once, so milestones 1 to 9 were built in one pass instead of one at a time.
+
+- **Couplet pack** (`tools/content/build_pack.py`): all 1,330 couplets from Project Madurai's plain e-text 0001, each
+  line voted against e-text 0017 and the tk120404 dataset. 1,306 agree, 12 were settled by vote, and 12 lines where all
+  three differ were chosen by hand in `choices.json`. Four mistyped couplet numbers in the source were corrected by
+  position. English is Aiyar (1916, Standard Ebooks, CC0). Pope is not in the app yet. `report.md` lists every line
+  that needs the owner.
+- **Questions**: one per chapter for the 90 pool chapters, plus Mind, Speech and Action lens prompts, in English and
+  Tamil. All drafts, marked so on the Sources page.
+- **App**: onboarding (language, reminder time, privacy), Today (greeting by the six times of day, leaf with turn to
+  Aiyar, three lenses), Write (autosaving draft, feelings, Tamil keyboard help, Valluvar writing), save moment and seal
+  award, Journal (list, search, calendar, On this day, page, edit, delete with undo, share text), Journey (thread with
+  rest days, 133 chapter beads, nine seals with progress), How is your heart (mood couplets, heavy-days card with no
+  invented numbers), share card (post and story images), Settings (language, theme, reduce motion, reminder and time,
+  reminders-refused state, app lock, backup, text export, delete everything with typed confirmation, About, Sources),
+  backup and restore (passphrase, folder, nightly, merge keeping both versions on conflict), daily reminder with the
+  heart-beard glyph, Today widget, Android 12 splash.
+- **Storage**: SQLite with each page's text and mood sealed by an Android Keystore AES-GCM key. Backups: PBKDF2
+  (210,000 rounds) and AES-GCM, a 520-byte file for one page, unreadable without the passphrase.
+- **Checked on the emulator**: onboarding, Today, writing and autosave (a draft survived the emulator crashing), the
+  First leaf seal, Journal, search and its empty state, Journey, Settings, Tamil with Midnight, 200 percent font,
+  feelings, share, backup, and restore onto a fresh install. 16 unit tests pass. The preview build opens in about a
+  second.
+- **Not yet checked**: the widget on a home screen, the reminder actually firing, the app lock prompt, nightly backup,
+  a Google Drive folder, and anything on a real phone.
+- **Still the owner's**: review the 12 chosen lines and the Tamil text, the draft questions, seal names and UI Tamil;
+  the Play upload key and listing.
+
 ### Canvas additions, 9 November
 
 New boards: onboarding pages 2 and 3, lock, backup, passphrase, restore, sync conflict, calendar, search,
