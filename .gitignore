@@ -1,20 +1,25 @@
-.gradle/
-build/
-app/build/
-local.properties
-.idea/
-*.iml
-.kotlin/
-captures/
-.impeccable/questions/
-.impeccable/mocks/
-.claude/launch.json
-*.keystore
-*.jks
-keystore.properties
-# Built APKs handed out for testing
+# Expo
+node_modules/
+.expo/
 dist/
-# The tk120404 dataset has no licence: it is a cross-check witness only, never committed or shipped
-tools/content/sources/tk120404.json
-# Python caches
+web-build/
+expo-env.d.ts
+# Generated native projects (Continuous Native Generation): configure them in app.json and plugins/
+/android
+/ios
+# Keys and local config
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+credentials.json
+.env*.local
+# Tools
 __pycache__/
+.impeccable/questions
+.impeccable/mocks
+.claude/launch.json
+# The tk120404 dataset has no licence: a cross-check witness only, never committed or shipped
+tools/content/sources/tk120404.json

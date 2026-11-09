@@ -2,9 +2,9 @@
 
 Built 2026-11-09. 1,330 couplets, 133 chapters.
 
-- Two or three witnesses agree: 1306
+- Two or three witnesses agree: 1305
 - Settled by vote against the record: 12
-- All three differ, a witness chosen in tools/content/choices.json, needs the owner: 12
+- All three differ, a witness chosen in tools/content/choices.json, needs the owner: 13
 
 | Kural | Line | Shipped | Record (etext 0001) | Etext 0017 | Dataset |
 | --- | --- | --- | --- | --- | --- |
@@ -15,6 +15,7 @@ Built 2026-11-09. 1,330 couplets, 133 chapters.
 | 254 | 1 | அருளல்லது யாதெனில் கொல்லாமை கோறல் | ருளல்லது யாதெனின் கொல்லாமை கோறல் | அருளல்லது யாதெனில் கொல்லாமை கோறல் | அருளல்ல தியாதெனிற் கொல்லாமை கோறல் |
 | 288 | 1 | அளவறிந்தார் நெஞ்சத் தறம்போல நிற்கும் | அளவறாந்தார் நெஞ்சத் தறம்போல நிற்கும் | அளவறிந்தார் நெஞ்சத் தறம்போல் நிற்கும் | அளவறிந்தார் நெஞ்சத் தறம்போல நிற்கும் |
 | 360 | 1 | காமம் வெகுளி மயக்கம் இவை மூன்றன் | காமம் வெகுளி மயக்கம் இநவ்முன்றன் | காமம் வெகுளி மயக்கம் இவை மூன்றன் | காமம் வெகுளி மயக்கம் இவ்மூன்றன் |
+| 599 | 2 | வெரூஉம் புலிதாக் குறின். | ஦வ்ருஉம் புலிதாக் குறின் | வெரூஉம் புலிதாக் குறின். | ஦வ்ருஉம் புலிதாக் குறின். |
 | 650 | 1 | இணரூழ்த்தும் நாறா மலரனையர் கற்றது | இண்ருழ்த்தும் நாறா மலரனையர் கற்றது | இணரூழ்த்தும் நாறா மலரனையர் கற்றது | இணருழ்த்தும் நாறா மலரனையர் கற்றது |
 | 666 | 1 | எண்ணிய எண்ணியாங்கு எய்துப எண்ணியார் | எண்ணிய எண்ணியாங்கு எய்து எண்ணியார் | எண்ணிய எண்ணியாங்கு எய்துப எண்ணியார் | எண்ணிய எண்ணியாங்கு எய்துவர் எண்ணியார் |
 | 812 | 1 | உறின்நட்டு அறின்ஒரூஉம் ஒப்பிலார் கேண்மை | உறின்நட்டு அறின்ஙருஉம் ஒப்பிலார் கேண்மை | உறின்நட்டு அறின்ஒரூஉம் ஒப்பிலார் கேண்மை | உறின்நட்டு அறினொருஉம் ஒப்பிலார் கேண்மை |
@@ -24,3 +25,11 @@ Built 2026-11-09. 1,330 couplets, 133 chapters.
 Agreement means at least two witnesses match, which can still share an error if one copied the other.
 
 Printed numbers corrected by position in the record: 72 (printed 71), 753 (printed 752), 781 (printed 7811), 1293 (printed 2983)
+
+## Tamil explanation (Mu. Va.)
+
+1329 of 1,330 couplets have Mu. Varadarasanar's explanation. The rest show the English.
+
+- chapter 69: 9 explanations; none shipped for couplets [2]
+
+The text is the Wikisource transcription of the 1969 scan, kept as it is. It has a few transcription slips (a doubled word at kural 1, for example) that are worth a proofreader's eye.

@@ -13,10 +13,14 @@ Until this is done, turning on Drive sync in the app says: "Google sign-in isn't
 5. **Audience**: while testing, add your Google account as a test user. Publish the app when it goes to Play.
 6. **Clients › Create client › Android**, once for each signing key:
    - Package name: `com.inigocode.kuralheart`
-   - SHA-1 of this computer's debug key (debug and preview builds):
-     `97:BD:7F:3D:6B:EA:72:53:52:22:70:F1:CC:7C:D3:47:1D:07:39:25`
-   - Later, the SHA-1 of the Play app signing key (Play Console › Test and release › App integrity) and of your upload key.
+   - SHA-1 of the key that signs local builds (`android/app/debug.keystore`, which `npx expo prebuild` writes; it is
+     React Native's shared debug key, so it is fine for testing only):
+     `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`
+   - The SHA-1 of the EAS build key: `npx eas-cli credentials -p android` shows it (after the first EAS build).
+   - Later, the SHA-1 of the Play app signing key (Play Console › Test and release › App integrity).
 
 No client ID goes into the app's code: Android matches the app by its package name and signing key.
 
-To print the fingerprints again: `./gradlew signingReport`.
+To print a local key's fingerprint again: `keytool -list -v -keystore android/app/debug.keystore -storepass android`.
+
+The 0.10.0 Kotlin builds used this computer's own debug key (SHA-1 `97:BD:7F:3D:6B:EA:72:53:52:22:70:F1:CC:7C:D3:47:1D:07:39:25`); that client can be deleted once nobody runs 0.10.0.

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Shared through FileProvider: share cards, downloaded updates for the installer, and camera shots in progress. -->
-<paths>
-    <cache-path name="share" path="share/" />
-    <cache-path name="updates" path="updates/" />
-    <cache-path name="camera" path="camera/" />
-</paths>

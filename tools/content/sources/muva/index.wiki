@@ -1,0 +1,40 @@
+{{:MediaWiki:Proofreadpage_index_template
+|Type=book
+|Title=[[திருக்குறள் தெளிவுரை, மு. வரதராசன்]]
+|Language=ta
+|Author=திருவள்ளுவர்
+|Translator=
+|Illustrator=[[ஆசிரியர்:மு. வரதராசன்|மு. வரதராசனார்]]
+|Editor=
+|Volumes=
+|School=
+|Publisher=திருநெல்வேலி தென்னிந்திய சைவசித்தாந்த நூற் பதிப்புக் கழகம் லிமிடெட்
+|Address=சென்னை 108
+|Year=1969
+|Source=pdf
+|Image=1
+|Number of pages=
+|File size=
+|Category=
+|Progress=V
+|Transclusion=yes
+|Pages=<pagelist 
+1=நூலட்டை
+
+
+/>
+|Remarks=
+|Width=
+|Css=
+|Header=
+|Footer=
+|Key=
+|ISBN=
+|OCLC=
+|LCCN=
+|BNF_ARK=
+|ARC=
+|wikidata_item=
+}}
+[[பகுப்பு:எல்லா பக்கங்களும் இருக்கும் மின்னூல்கள்]]
+[[பகுப்பு:திருக்குறள் அட்டவணைகள்]]

@@ -1,0 +1,34 @@
+{{header
+ | title      = திருக்குறள் தெளிவுரை, மு. வரதராசன்
+ | author     = திருவள்ளுவர்
+ | translator = 
+ | section    = அறத்துப்பால்
+ | previous   = 
+ | next       = [[/அதிகாரவகராதி/]]
+ | year       = 1969
+ | notes      = உரை: [[ஆசிரியர்:மு. வரதராசன்|மு. வரதராசன்]]
+}}{{featured download}}<br><br><br>
+
+
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="1" to="1" />
+{{page break|label=}}
+
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="2" to="2" />
+{{page break|label=}}
+
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="3" to="3" />
+
+
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="4" to="4" />
+
+
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="5" to="5" />
+{{page break|label=}}
+
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="6" to="6" />
+{{page break|label=}}
+<pages index="திருக்குறள் தெளிவுரை, மு. வ.pdf" from="7" to="7" />
+
+[[பகுப்பு:அகரமுதலான வரிசையில் படைப்புகள்]]
+[[பகுப்பு:திருக்குறள்]]
+[[பகுப்பு:Transclusion completed]]

@@ -8,6 +8,8 @@ Sources (tools/content/sources, downloaded 9 Nov 2026):
                    or committed. To rebuild, download raw.githubusercontent.com/tk120404/thirukkural/master/thirukkural.json
                    into tools/content/sources/ first.
   se_aiyar.xhtml   Standard Ebooks' V. V. S. Aiyar translation (public domain, CC0). The English shipped.
+  muva/            Mu. Varadarasanar's Tamil explanation (Thirukkural Thelivurai), a Tamil Nadu nationalised book
+                   released CC0, from Tamil Wikisource. Shipped as each couplet's Tamil explanation; see muva.py.
 
 Each line of each couplet is compared across the three Tamil witnesses after removing spacing and
 punctuation (editions split and join words differently). The record's text ships when another witness
@@ -24,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "tools/content/sources"
-OUT = ROOT / "app/src/main/assets/kural/pack.json"
+OUT = ROOT / "assets/kural/pack.json"
 REPORT = ROOT / "tools/content/report.md"
 QUESTIONS = ROOT / "tools/content/questions.json"
 CHOICES = {k: v for k, v in json.loads((ROOT / "tools/content/choices.json").read_text(encoding="utf-8")).items()
@@ -45,6 +47,15 @@ def text_lines(path):
 def tidy(line):
     line = re.sub(r"\s+", " ", line).strip()
     return line
+
+
+# Assigned Tamil code points. A line holding anything else in the Tamil block (U+0BA6 turns up in place of a vowel
+# sign in both Project Madurai etexts at 599) is a broken transcription and can't win a vote.
+VALID_TAMIL = re.compile("[ஂ-ஃஅ-ஊஎ-ஐஒ-கங-சஜஞ-டண-தந-பம-ஹா-ூெ-ைொ-்ௐௗ௦-௺]")
+
+
+def broken(line):
+    return any("஀" <= ch <= "௿" and not VALID_TAMIL.match(ch) for ch in line)
 
 
 def key(line):
@@ -120,8 +131,9 @@ def parse_aiyar():
     for sec in re.finditer(r'<section[^>]*id="chapter-(\d+)"[^>]*>(.*?)</section>', s, re.S):
         c = int(sec.group(1))
         body = sec.group(2)
-        t = re.search(r'<p epub:type="title">(.*?)</p>', body, re.S)
-        titles[c] = clean_en(t.group(1)) if t else ""
+        # The title may carry other attributes first (chapter 131's is marked as French) and a footnote marker.
+        t = re.search(r'<p[^>]*epub:type="title"[^>]*>(.*?)</p>', body, re.S)
+        titles[c] = clean_en(re.sub(r'<a[^>]*epub:type="noteref"[^>]*>.*?</a>', "", t.group(1), flags=re.S)) if t else ""
         n = (c - 1) * 10
         for li in re.findall(r"<li[^>]*>(.*?)</li>", body, re.S):
             n += 1
@@ -229,6 +241,13 @@ def distance(a, b):
     return prev[-1]
 
 
+def parse_muva(kurals, chapter_names):
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import muva  # noqa: E402
+
+    return muva.parse(kurals, chapter_names, distance)
+
+
 def part_of(chapter):
     return "aram" if chapter <= 38 else "porul" if chapter <= 108 else "inbam"
 
@@ -254,7 +273,8 @@ def main():
         lines, status = [], "agree"
         for li in range(2):
             r, p, t = record[n][li], pm17[n][li], tk[n][li]
-            kr, kp, kt = key(r), key(p), key(t)
+            # A broken line gets a key no other line can match.
+            kr, kp, kt = (key(x) if not broken(x) else f"broken:{w}" for w, x in (("r", r), ("p", p), ("t", t)))
             if kr == kp or kr == kt:
                 lines.append(r)
             elif kp == kt:
@@ -263,10 +283,10 @@ def main():
             else:
                 # All three differ, usually by one garbled letter in one witness. Ship the version that sits
                 # closest to the other two, and list the line for the owner.
-                cands = [(r, kr), (p, kp), (t, kt)]
+                cands = [c for c in [(r, kr), (p, kp), (t, kt)] if not c[1].startswith("broken:")] or [(r, kr), (p, kp), (t, kt)]
                 pick = CHOICES.get(f"{n}:{li + 1}")
                 if pick:
-                    best = cands[["record", "pm17", "dataset"].index(pick)]
+                    best = [(r, kr), (p, kp), (t, kt)][["record", "pm17", "dataset"].index(pick)]
                 else:
                     best = min(cands, key=lambda c: sum(distance(c[1], o[1]) for o in cands))
                 lines.append(best[0])
@@ -274,9 +294,17 @@ def main():
                 review.append((n, li + 1, best[0], r, p, t))
         stats[status] += 1
         c = (n - 1) // 10 + 1
-        lines = [ln.rstrip(" .?") for ln in lines]  # editions differ on closing stops; ship none
+        # Editions differ on closing stops; ship none. Footnote digits (927, 1293) are not part of the verse.
+        lines = [re.sub(r"[\s.?\d]+$", "", ln) for ln in lines]
         pa, pb, pp = (tidy_en(x) for x in pope[n])
         kurals.append({"n": n, "c": c, "a": lines[0], "b": lines[1], "en": aiyar[n], "pa": pa, "pb": pb, "pp": pp, "check": status})
+
+    # Mu. Va.'s Tamil explanation, kept in step with the couplets just chosen.
+    muva_text, muva_problems = parse_muva({k["n"]: (k["a"], k["b"]) for k in kurals}, ch_ta)
+    if len(muva_text) < 1300:
+        sys.exit(f"Mu. Va.: only {len(muva_text)} explanations parsed: " + "; ".join(muva_problems))
+    for k in kurals:
+        k["ta"] = muva_text.get(k["n"], "")
 
     chapters = [{"n": c, "ta": ch_ta[c], "en": titles[c], "part": part_of(c)} for c in range(1, 134)]
     questions = {k: v for k, v in json.loads(QUESTIONS.read_text(encoding="utf-8")).items() if not k.startswith("_")}
@@ -291,6 +319,7 @@ def main():
             "tamil": "Project Madurai etext 0001, voted against etext 0017 and a second dataset",
             "english": "V. V. S. Aiyar, 1916, from Standard Ebooks (public domain)",
             "pope": "G. U. Pope, 1886, verse and prose, from Project Madurai etext 0153 (public domain)",
+            "tamil_explanation": "Mu. Varadarasanar, Thirukkural Thelivurai, 1969, from Tamil Wikisource (nationalised, CC0)",
         },
         "chapters": chapters,
         "kurals": kurals,
@@ -307,6 +336,11 @@ def main():
     rep += [f"| {n} | {li} | {sh} | {r} | {p} | {t} |" for n, li, sh, r, p, t in review]
     rep += ["", "Agreement means at least two witnesses match, which can still share an error if one copied the other.", "", "Printed numbers corrected by position in the record: "
             + ", ".join(f"{n} (printed {was})" for n, was in NUMBER_FIXES)]
+    rep += ["", "## Tamil explanation (Mu. Va.)", "",
+            f"{len(muva_text)} of 1,330 couplets have Mu. Varadarasanar's explanation. The rest show the English.", ""]
+    rep += [f"- {p}" for p in muva_problems]
+    rep += ["", "The text is the Wikisource transcription of the 1969 scan, kept as it is. It has a few transcription "
+            "slips (a doubled word at kural 1, for example) that are worth a proofreader's eye."]
     REPORT.write_text("\n".join(rep) + "\n", encoding="utf-8")
     print(stats, "->", OUT.relative_to(ROOT), f"({OUT.stat().st_size // 1024} KB)")
 

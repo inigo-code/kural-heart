@@ -1,0 +1,536 @@
+import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { KeyboardAvoidingView, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { clock, longDate } from '@/lib/dates';
+import { LENS, chapterOf, english, questionFor } from '@/lib/pack';
+import type { Kural, Part } from '@/lib/pack';
+import { photoUri } from '@/lib/photos';
+import { useSettings } from '@/lib/settings';
+import type { Entry, Weather } from '@/lib/types';
+import { Valluvar } from '@/valluvar/Valluvar';
+import type { ValluvarState } from '@/valluvar/Valluvar';
+
+import { MayilBorder, SikkuThreshold } from './kolam';
+import { CoupletText, Leaf, LeafNote, Pronounce } from './leaf';
+import { Icon, T, TextLink, timeLabel } from './parts';
+import type { IconName } from './parts';
+import { F, alpha } from './theme';
+import type { Colors } from './theme';
+import { useUI } from './ui';
+
+export const MOODS = [
+  // Each feeling has its own emoji and colour (a day and a night step), so it reads at a glance.
+  { id: 'calm', en: 'Calm', ta: 'அமைதி', emoji: '😌', day: '#2E8B6E', night: '#5CC4A0' },
+  { id: 'grateful', en: 'Grateful', ta: 'நன்றி', emoji: '🙏', day: '#B07D12', night: '#E2B33C' },
+  { id: 'driven', en: 'Driven', ta: 'முயற்சி', emoji: '💪', day: '#C2502C', night: '#F08A5D' },
+  { id: 'unsure', en: 'Seeking clarity', ta: 'தெளிவு', emoji: '🤔', day: '#3B6FC2', night: '#7CA3F0' },
+  { id: 'anxious', en: 'Anxious', ta: 'கவலை', emoji: '😟', day: '#8A5BC2', night: '#B48AE8' },
+  { id: 'angry', en: 'Angry', ta: 'சினம்', emoji: '😤', day: '#C23A3A', night: '#F07070' },
+  { id: 'lonely', en: 'Lonely', ta: 'தனிமை', emoji: '😔', day: '#5A6F8A', night: '#9DB0C8' },
+  { id: 'missing', en: 'Missing someone', ta: 'ஏக்கம்', emoji: '💭', day: '#C2457A', night: '#F08AB4' },
+  { id: 'heavy', en: 'Very heavy', ta: 'மிகக் கனம்', emoji: '🌧️', day: '#4B5480', night: '#8E97C8' },
+] as const;
+
+export type Mood = (typeof MOODS)[number];
+
+export const moodTint = (m: Mood, c: Colors) => (c.isNight ? m.night : m.day);
+
+/** A feeling to pick: its emoji, its name, and its own colour (filled when chosen). */
+export function MoodChip({ m, on, onPress }: { m: Mood; on: boolean; onPress: () => void }) {
+  const { c, tamil } = useUI();
+  const tint = moodTint(m, c);
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected: on }}
+      accessibilityLabel={tamil ? m.ta : m.en}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        minHeight: 40,
+        borderRadius: 18,
+        paddingLeft: 10,
+        paddingRight: 14,
+        paddingVertical: 7,
+        borderWidth: 1.5,
+        borderColor: on ? tint : alpha(tint, 0.35),
+        backgroundColor: on ? tint : alpha(tint, pressed ? 0.24 : 0.12),
+      })}>
+      <Text allowFontScaling={false} style={{ fontSize: 18, lineHeight: 24 }}>
+        {m.emoji}
+      </Text>
+      <T v="label" color={on ? (c.isNight ? '#1E1A16' : '#FFFFFF') : c.ink} numberOfLines={1}>
+        {tamil ? m.ta : m.en}
+      </T>
+    </Pressable>
+  );
+}
+
+export const moodLabel = (id: string | null, tamil: boolean) => {
+  const m = MOODS.find((x) => x.id === id);
+  return m ? `${m.emoji} ${tamil ? m.ta : m.en}` : null;
+};
+
+export const WEATHER_NAMES: [Weather['kind'], string, string][] = [
+  ['sun', 'Sunny', 'வெயில்'],
+  ['partly', 'Partly cloudy', 'சிறிது மேகம்'],
+  ['cloud', 'Cloudy', 'மேகமூட்டம்'],
+  ['rain', 'Rain', 'மழை'],
+  ['storm', 'Storm', 'இடிமழை'],
+  ['fog', 'Mist', 'பனிமூட்டம்'],
+  ['wind', 'Windy', 'காற்று'],
+  ['snow', 'Cold', 'குளிர்'],
+];
+
+export function weatherLabel(w: Weather, tamil: boolean): string {
+  const n = WEATHER_NAMES.find((x) => x[0] === w.kind);
+  const name = n ? (tamil ? n[2] : n[1]) : w.kind;
+  return w.temp != null ? `${name} · ${Math.round(w.temp)}°` : name;
+}
+
+export const partColor = (p: Part, c: Colors) => (p === 'aram' ? c.aram : p === 'porul' ? c.porul : c.inbam);
+
+export function translator(which: string): string {
+  return which === 'pope' ? 'G. U. Pope, 1886' : which === 'popeprose' ? 'G. U. Pope, 1886, prose' : 'V. V. S. Aiyar, 1916';
+}
+
+/** The question for a lens: Mind uses the chapter's own question, Speech and Action the shared lens prompts. */
+export function questionText(k: Kural, lens: number, tamil: boolean): string {
+  const q = lens === 1 ? LENS.speech : lens === 2 ? LENS.action : questionFor(k);
+  return tamil ? q.ta : q.en;
+}
+
+/** "Chapter 40 · கல்வி · Learning · Kural 391", or the Tamil form. */
+export function kuralRef(k: Kural, tamil: boolean): string {
+  const ch = chapterOf(k);
+  return tamil ? `அதிகாரம் ${ch.n} · ${ch.ta} · குறள் ${k.n}` : `Chapter ${ch.n} · ${ch.ta} · ${ch.en} · Kural ${k.n}`;
+}
+
+export const timeOf = (e: Entry) => {
+  const d = new Date(e.created);
+  return timeLabel(d.getHours() * 60 + d.getMinutes());
+};
+
+/** The couplet on its leaf. Turned, it shows Pope's verse on the back. */
+export function KuralLeaf({ k, turned, onPress, max }: { k: Kural; turned?: boolean; onPress?: () => void; max?: number }) {
+  const { c, tamil, type, still } = useUI();
+  const ch = chapterOf(k);
+  // Both faces are measured and the leaf keeps the taller one's height, so turning it never moves the page.
+  const [heights, setHeights] = useState<[number, number]>([0, 0]);
+  const measure = (i: 0 | 1) => (e: { nativeEvent: { layout: { height: number } } }) => {
+    const h = Math.ceil(e.nativeEvent.layout.height);
+    setHeights((hs) => (hs[i] === h ? hs : i === 0 ? [h, hs[1]] : [hs[0], h]));
+  };
+  const front = (
+    <>
+      <CoupletText a={k.a} b={k.b} max={max} />
+      <Pronounce a={k.a} b={k.b} />
+      <LeafNote>{tamil ? `அதிகாரம் ${ch.n} · ${ch.ta} · குறள் ${k.n}` : `Chapter ${ch.n} · ${ch.ta} · Kural ${k.n}`}</LeafNote>
+    </>
+  );
+  const back = (
+    <>
+      <Text style={[type.body, { fontFamily: F.serifItalic, color: c.leafInk }]}>{`${k.pa}\n${k.pb}`}</Text>
+      <LeafNote>{`G. U. Pope, 1886 · ${ch.en} · ${k.n}`}</LeafNote>
+    </>
+  );
+  return (
+    <Pressable onPress={onPress} disabled={!onPress} accessibilityRole={onPress ? 'button' : undefined}>
+      <Animated.View layout={still ? undefined : LinearTransition.duration(220)}>
+        <Leaf>
+          <View style={{ alignSelf: 'stretch', minHeight: Math.max(heights[0], heights[1]) }}>
+            <Animated.View key={turned ? 'back' : 'front'} entering={still ? undefined : FadeIn.duration(220)} onLayout={measure(turned ? 1 : 0)} style={{ alignItems: 'flex-start' }}>
+              {turned ? back : front}
+            </Animated.View>
+            {/* The hidden face, laid out unseen, only to know its height. */}
+            <View
+              onLayout={measure(turned ? 0 : 1)}
+              style={{ position: 'absolute', left: 0, right: 0, top: 0, opacity: 0, alignItems: 'flex-start' }}
+              pointerEvents="none"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants">
+              {turned ? front : back}
+            </View>
+          </View>
+        </Leaf>
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+/** The English chosen in Settings, under a couplet. */
+export const MUVA_BY = { en: 'Mu. Varadarasanar, Tamil', ta: 'மு. வரதராசனார் தெளிவுரை' };
+
+/** The couplet's meaning under it: Mu. Va.'s Tamil explanation when Tamil leads, else the chosen English. */
+export function MeaningUnder({ k }: { k: Kural }) {
+  const s = useSettings();
+  const { c, tamil } = useUI();
+  const ta = tamil && !!k.ta;
+  return (
+    <View>
+      <T v="body" color={c.ink2}>
+        {ta ? k.ta : english(k, s.translation)}
+      </T>
+      <T v="labelM" color={c.ink3} style={{ marginTop: 4 }}>
+        {ta ? MUVA_BY.ta : translator(s.translation)}
+      </T>
+    </View>
+  );
+}
+
+/** Valluvar inside the soft arch used on onboarding, lock and empty states. */
+export function ArchValluvar({ state, size = 230, typing, once, nod }: { state: ValluvarState; size?: number; typing?: boolean; once?: boolean; nod?: boolean }) {
+  const { c } = useUI();
+  return (
+    <View style={{ alignItems: 'center' }}>
+    <View style={{ width: size + 20, height: size + 20, alignItems: 'center', justifyContent: 'flex-end' }}>
+      <View
+        style={{
+          position: 'absolute',
+          left: 18,
+          right: 18,
+          top: 18,
+          bottom: 0,
+          backgroundColor: c.surface2,
+          borderTopLeftRadius: size / 2,
+          borderTopRightRadius: size / 2,
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
+        }}
+      />
+      <Valluvar state={state} size={size} typing={typing} once={once} nod={nod} />
+    </View>
+      <SikkuThreshold height={16} style={{ width: size - 16, marginTop: 6 }} />
+    </View>
+  );
+}
+
+export function usePhoto(id: string | null | undefined) {
+  const [got, setGot] = useState<{ id: string; uri: string | null } | null>(null);
+  useEffect(() => {
+    let live = true;
+    if (id) photoUri(id).then((uri) => live && setGot({ id, uri }));
+    return () => {
+      live = false;
+    };
+  }, [id]);
+  return got && got.id === id ? got.uri : null;
+}
+
+export function PhotoThumb({ id, size, round }: { id: string; size: number; round?: boolean }) {
+  const { c } = useUI();
+  const uri = usePhoto(id);
+  return (
+    <View style={{ width: size, height: size, borderRadius: round ? size / 2 : 16, overflow: 'hidden', backgroundColor: c.surface2 }}>
+      {uri ? <Image source={{ uri }} style={{ width: size, height: size }} contentFit="cover" /> : null}
+    </View>
+  );
+}
+
+export function PhotoFull({ id }: { id: string }) {
+  const { c } = useUI();
+  const uri = usePhoto(id);
+  const [ratio, setRatio] = useState(4 / 3);
+  return (
+    <View style={{ width: '100%', aspectRatio: ratio, borderRadius: 18, overflow: 'hidden', backgroundColor: c.surface2 }}>
+      {uri ? <Image source={{ uri }} style={{ flex: 1 }} contentFit="cover" onLoad={(e) => setRatio(e.source.width / e.source.height)} /> : null}
+    </View>
+  );
+}
+
+export function Avatar({ size }: { size: number }) {
+  const s = useSettings();
+  const { c, type } = useUI();
+  return (
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.primarySoft, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      {s.avatar ? (
+        <PhotoThumb id={s.avatar} size={size} round />
+      ) : s.name ? (
+        <Text style={[type.headline, { color: c.onSoft, fontSize: size * 0.42, lineHeight: size * 0.6 }]}>{s.name.slice(0, 1).toUpperCase()}</Text>
+      ) : (
+        <Icon name="user" color={c.onSoft} size={size * 0.45} />
+      )}
+    </View>
+  );
+}
+
+/** One page in a list: its date, couplet number, the first lines and a photo, then its details. */
+/** A small marker on a journal card: a voice note or a video is kept with the page. */
+function MediaMark({ icon, n }: { icon: 'mic' | 'play'; n: number }) {
+  const { c } = useUI();
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, backgroundColor: c.surface2 }}>
+      <Icon name={icon} size={13} color={c.ink2} />
+      {n > 1 ? <T v="small" color={c.ink2}>{String(n)}</T> : null}
+    </View>
+  );
+}
+
+export function EntryCard({ e }: { e: Entry }) {
+  const { c, tamil, L, type } = useUI();
+  const router = useRouter();
+  const ch = chapterOf(e.kural);
+  const bits = [
+    e.starred ? '★' : null,
+    moodLabel(e.mood, tamil),
+    e.weather ? weatherLabel(e.weather, tamil) : null,
+    e.place?.name,
+    timeOf(e),
+    ...e.tags.map((t) => `#${t}`),
+  ].filter(Boolean);
+  return (
+    <Pressable
+      onPress={() => router.push({ pathname: '/page/[id]', params: { id: e.id } })}
+      accessibilityRole="button"
+      style={({ pressed }) => ({ marginHorizontal: 16, marginVertical: 6, borderRadius: 24, backgroundColor: pressed ? c.surface2 : c.surface, padding: 16 })}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Text style={[type.headline, { fontSize: type.headline.fontSize * 0.7, lineHeight: type.headline.lineHeight * 0.7, color: c.ink2, flex: 1 }]} numberOfLines={1}>
+          {longDate(e.date, tamil)}
+        </Text>
+        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: partColor(ch.part, c), marginRight: 6 }} />
+        <T v="label" color={c.ink2}>{`${L.kural} ${e.kural}`}</T>
+      </View>
+      <View style={{ flexDirection: 'row', marginTop: 6, gap: 10 }}>
+        <T v="body" numberOfLines={3} style={{ flex: 1 }}>
+          {plainMarkdown(e.text)}
+        </T>
+        {e.photos[0] ? <PhotoThumb id={e.photos[0]} size={64} /> : null}
+      </View>
+      {bits.length || e.audio.length || e.videos.length ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
+          {e.audio.length ? <MediaMark icon="mic" n={e.audio.length} /> : null}
+          {e.videos.length ? <MediaMark icon="play" n={e.videos.length} /> : null}
+          <T v="labelM" color={c.ink3} numberOfLines={2} style={{ flex: 1 }}>
+            {bits.join(' · ')}
+          </T>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
+
+// --- light Markdown: # heading, - list, - [ ] checklist, > quote, **bold** and _italic_ ---
+
+const INLINE = /\*\*(.+?)\*\*|_(.+?)_/g;
+
+export function plainMarkdown(text: string): string {
+  return text
+    .split('\n')
+    .map((l) => l.replace(/^(# |- \[[ xX]\] |- |\* |> )/, ''))
+    .join('\n')
+    .replace(INLINE, (_m, b: string, i: string) => b || i);
+}
+
+function inline(s: string, key: string, style?: StyleProp<TextStyle>): ReactNode[] {
+  const out: ReactNode[] = [];
+  let at = 0;
+  let n = 0;
+  for (const m of s.matchAll(INLINE)) {
+    if (m.index! > at) out.push(s.slice(at, m.index));
+    if (m[1]) out.push(<Text key={`${key}b${n++}`} style={[style, { fontFamily: F.sansBold }]}>{m[1]}</Text>);
+    else if (m[2]) out.push(<Text key={`${key}i${n++}`} style={[style, { fontStyle: 'italic' }]}>{m[2]}</Text>);
+    at = m.index! + m[0].length;
+  }
+  out.push(s.slice(at));
+  return out;
+}
+
+export function Markdown({ text, style }: { text: string; style: StyleProp<TextStyle> }) {
+  const { c } = useUI();
+  const lines = text.split('\n');
+  return (
+    <Text style={style}>
+      {lines.map((raw, i) => {
+        const nl = i < lines.length - 1 ? '\n' : '';
+        const k = `l${i}`;
+        if (raw.startsWith('# '))
+          return (
+            <Text key={k} style={{ fontFamily: F.serifSemi, fontSize: 24 }}>
+              {inline(raw.slice(2), k)}
+              {nl}
+            </Text>
+          );
+        if (raw.startsWith('- [ ] '))
+          return (
+            <Text key={k}>
+              {'☐  '}
+              {inline(raw.slice(6), k)}
+              {nl}
+            </Text>
+          );
+        if (/^- \[[xX]\] /.test(raw))
+          return (
+            <Text key={k}>
+              <Text style={{ color: c.primary }}>{'☑  '}</Text>
+              {inline(raw.slice(6), k)}
+              {nl}
+            </Text>
+          );
+        if (raw.startsWith('- ') || raw.startsWith('* '))
+          return (
+            <Text key={k}>
+              <Text style={{ color: c.primary }}>{'•  '}</Text>
+              {inline(raw.slice(2), k)}
+              {nl}
+            </Text>
+          );
+        if (raw.startsWith('> '))
+          return (
+            <Text key={k} style={{ fontStyle: 'italic', color: c.ink2 }}>
+              {'“'}
+              {inline(raw.slice(2), k)}
+              {'”'}
+              {nl}
+            </Text>
+          );
+        return (
+          <Text key={k}>
+            {inline(raw, k)}
+            {nl}
+          </Text>
+        );
+      })}
+    </Text>
+  );
+}
+
+// --- inputs and dialogs ---
+
+export function Field({ value, onChangeText, placeholder, secret, style, ...rest }: TextInputProps & { secret?: boolean; style?: StyleProp<TextStyle> }) {
+  const { c, type } = useUI();
+  return (
+    <TextInput
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor={c.ink3}
+      secureTextEntry={secret}
+      autoCorrect={!secret}
+      autoCapitalize={secret ? 'none' : 'sentences'}
+      accessibilityLabel={placeholder}
+      selectionColor={c.primary}
+      cursorColor={c.primary}
+      maxFontSizeMultiplier={1.6}
+      style={[type.body, { color: c.ink, backgroundColor: c.surface, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, minHeight: 56 }, style]}
+      {...rest}
+    />
+  );
+}
+
+/** A centred dialog, like Android's own. */
+export function Dialog({
+  visible,
+  title,
+  children,
+  onClose,
+  actions,
+}: {
+  visible: boolean;
+  title?: string;
+  children?: ReactNode;
+  onClose: () => void;
+  actions?: { label: string; onPress: () => void; color?: string; disabled?: boolean }[];
+}) {
+  const { c } = useUI();
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+        <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: 24 }}>
+          <Pressable onPress={() => {}} style={{ backgroundColor: c.surface, borderRadius: 28, padding: 22, maxHeight: '90%' }}>
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 12 }}>
+              {title ? <T v="headline">{title}</T> : null}
+              {children}
+            </ScrollView>
+            {actions?.length ? (
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', flexWrap: 'wrap', marginTop: 8 }}>
+                {actions.map((a) => (
+                  <TextLink key={a.label} label={a.label} onPress={a.disabled ? () => {} : a.onPress} color={a.disabled ? c.ink3 : a.color} />
+                ))}
+              </View>
+            ) : null}
+          </Pressable>
+        </Pressable>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+/** A sheet that rises from the foot of the screen. */
+export function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: ReactNode }) {
+  const { c } = useUI();
+  const insets = useSafeAreaInsets();
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
+      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+        <Pressable onPress={() => {}} style={{ backgroundColor: c.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '88%', paddingBottom: insets.bottom }}>
+          <View style={{ alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: c.surface3, marginTop: 10 }} />
+          <MayilBorder height={12} style={{ alignSelf: 'center', width: 132, marginTop: 10 }} />
+          <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 24 }}>{children}</ScrollView>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+export function Wrap({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  return <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, style]}>{children}</View>;
+}
+
+export type Action = { icon: IconName; label: string; onPress: () => void; on?: boolean };
+
+/** A couplet's actions as even tiles, three to a row, so every label fits on any phone. */
+export function ActionGrid({ items, style }: { items: Action[]; style?: StyleProp<ViewStyle> }) {
+  const { c } = useUI();
+  return (
+    <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 20 }, style]}>
+      {items.map((a) => (
+        // The rounded tile clips the press ripple; on Android a ripple on the Pressable itself squares the corners.
+        <View key={a.icon + a.label} style={{ flexBasis: '30%', flexGrow: 1, borderRadius: 20, overflow: 'hidden', backgroundColor: a.on ? c.primary : c.surface }}>
+          <Pressable
+            onPress={a.onPress}
+            accessibilityRole="button"
+            accessibilityState={a.on != null ? { selected: a.on } : undefined}
+            android_ripple={{ color: a.on ? alpha(c.onPrimary, 0.18) : c.surface3, foreground: true }}
+            style={{ minHeight: 86, paddingVertical: 12, paddingHorizontal: 8, gap: 8, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name={a.icon} size={22} color={a.on ? c.onPrimary : c.ink2} />
+            {/* Up to three lines, shrinking a little before anything is cut: Tamil labels run longer. */}
+            <T v="labelM" color={a.on ? c.onPrimary : c.ink} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.8} style={{ textAlign: 'center' }}>
+              {a.label}
+            </T>
+          </Pressable>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/** A row of chips that wraps onto the next line, so no chip is ever cut off at the screen's edge. */
+export function HScroll({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  return <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20 }, style]}>{children}</View>;
+}
+
+export function DetailLine({ icon, text }: { icon: Parameters<typeof Icon>[0]['name']; text: string }) {
+  const { c } = useUI();
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3, gap: 10 }}>
+      <Icon name={icon} size={18} color={c.ink3} />
+      <T v="label" color={c.ink2} style={{ flex: 1 }}>
+        {text}
+      </T>
+    </View>
+  );
+}
+
+export function lastLabel(at: number, L: { backupNever: string; backupLast: (s: string) => string }, tamil: boolean): string {
+  if (!at) return L.backupNever;
+  const d = new Date(at);
+  return L.backupLast(`${longDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, tamil)}, ${clock(at)}`);
+}

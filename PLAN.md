@@ -139,6 +139,8 @@ journal. Every change below was rendered and checked on the canvas's own runtime
 Tamil touches stay light on purpose: the palm leaf, Tamil type, the period word, Valluvar and the Tamil
 numerals on seals. No banner lettering, calendar print, silk borders or kolam.
 
+**Changed in 1.0.1 at the owner's request:** subtle, secular Tamil patterns are now in, kept faint and never under text: a pulli kolam band on the tab bar, a sikku kolam threshold under Valluvar's arch, a Kanchipuram mayil-kann silk border on sheets and the Insights card, and an Athangudi tile corner on the Insights card. No temple, gopuram or rudraksham motifs (they read as religious).
+
 ### Version 3, from the owner's review
 
 | Note | What changed |
@@ -196,6 +198,12 @@ Android 8.0 (API 26) and up, phones first.
 Out of v1: accounts, social features, ads, analytics, and AI at runtime.
 
 ## 4. Stack
+
+**Changed 9 November 2026 (owner's decision): Kural Heart is rebuilt in Expo, like Prompt Heart and Watch Heart.**
+Expo SDK 58, React Native 0.88, Expo Router, EAS builds and `eas update` over the air; Skia draws Valluvar, the
+seals and the icons; expo-sqlite holds the journal, sealed with AES-GCM through expo-crypto and a device key in
+expo-secure-store; backups keep the KHB1 format. CLAUDE.md has the layout. The table below is the original native
+plan, kept for its reasoning; the Kotlin app is at the git tag `native-0.10.0`.
 
 Native Android, for Google Play first. This is the first Heart App not built on Expo, so nothing from
 Prompt Heart or Watch Heart's code carries over, and there are no over-the-air updates.
@@ -919,6 +927,23 @@ Still open for milestone 0:
 - The Drive pick on a real phone.
 - The workbench's specimen couplets are copied from the canvas prototype into a debug-only asset, marked
   unverified, and never ship. Real couplets arrive with the milestone 1 pack.
+
+### Version 1.0.0, rebuilt in Expo, 9 November
+
+The owner asked for the app to be "like my other apps": the same stack as Prompt Heart and Watch Heart. Every
+feature of 0.10.0 was ported screen by screen; the couplet pack, Valluvar's art and motions, the strings and the
+backup format carried over unchanged.
+
+- **Updates**: over the air with `eas update` (expo-updates), checked at launch and on every return, with a restart
+  prompt and What's new. The GitHub APK self-updater is gone, and with it any need to install packages.
+- **Moving pages from 0.10.0**: the Kotlin app sealed its journal with an Android Keystore key the new app can't
+  read, and the signing key changed, so: back up in 0.10.0 (Settings, Backup), uninstall it, install 1.0.0, then
+  Restore from that backup file. Photos, seals, the day log and saved couplets come across.
+- **Background**: the nightly backup and Drive sync run through expo-background-task (Android picks the moment)
+  and also when the app opens after a day. Reminders are planned a week ahead each time the app opens; only
+  today's names its couplet, since later days' couplets are chosen when those days are opened.
+- **Not changed**: permissions (coarse location, camera, biometrics, notifications; storage, media, fine location,
+  microphone and the advertising ID are blocked), the Drive app-data folder, the widget, the thread and seals.
 
 ### Version 0.10.0, after the owner's review, 9 November
 
