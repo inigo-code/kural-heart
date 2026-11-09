@@ -1,6 +1,6 @@
 # Kural Heart
 
-A private, offline Android journal with Thiruvalluvar. Read `PRODUCT.md` (who it is for, brand rules) and `PLAN.md` (the build plan, milestones, decisions) before changing anything.
+A private Android journal with Thiruvalluvar, online only for what the person turns on. Read `PRODUCT.md` (who it is for, brand rules) and `PLAN.md` (the build plan, milestones, decisions) before changing anything.
 
 ## Layout
 
@@ -8,6 +8,7 @@ A private, offline Android journal with Thiruvalluvar. Read `PRODUCT.md` (who it
   - `Graph.kt`: the few long-lived objects (prefs, journal, backup, pack) and today's couplet.
   - `data/`: `Pack` (loads the couplet pack), `Daily` (daily pick, mood pick, the six times of day), `Prefs`, `Journal` (SQLite, text sealed with a Keystore AES-GCM key), `Crypto`, `Backup` (passphrase-encrypted file in a folder the person picks), `Progress.kt` (the thread, called `Streak` in code, and the nine seals).
   - `system/`: daily reminder and nightly backup alarms, boot receiver, the Today widget (RemoteViews, never shows journal text).
+  - `ui/Library.kt`: the Kural tab (chapters, search, filters, saved), chapter and couplet pages.
   - `ui/`: `App.kt` (shell, tabs, routes), `Gate.kt` (onboarding, lock), `Today`, `Write`, `JournalScreens`, `Moments` (Journey, seal award, feelings, heavy days), `Share`, `SettingsScreens` (settings, backup, about, sources), `Strings.kt` (English and Tamil text), `Parts.kt` (icons, rows, seal medal).
   - `ui/theme`: Olai tokens (`Ivory`, `Midnight`) and fonts. Colours mirror `docs/canvas/project/olai.css`; change both together.
   - `ui/leaf`: `Leaf` and `CoupletText`. `ui/valluvar`: the renderer; `ValluvarArt.kt` is generated, never edit it.
@@ -22,7 +23,7 @@ A private, offline Android journal with Thiruvalluvar. Read `PRODUCT.md` (who it
 Run from this folder (JDK 17, Android SDK in `%LOCALAPPDATA%\Android\Sdk`, set in `local.properties`):
 
 ```bash
-./gradlew testDebugUnitTest assemblePreview checkReleaseNoInternet
+./gradlew testDebugUnitTest assemblePreview checkReleasePermissions
 ```
 
 ```bash
@@ -39,7 +40,10 @@ Emulator: AVD `KuralHeart_API36` (Pixel 7, Android 16). Start it with `-gpu host
 
 ## Rules
 
-- No network permission, ever. `check<Variant>NoInternet` fails the build if the merged manifest asks for INTERNET or ACCESS_NETWORK_STATE. Do not work around it.
+- Permissions are an allowlist in `app/build.gradle.kts`; `check<Variant>Permissions` fails the build on anything else. The Play build (`release`) may never ask to install packages; self-updating is for website copies only (`BuildConfig.SELF_UPDATE`).
+- The journal leaves the phone only sealed with the passphrase (folder backup, Drive `appDataFolder`). Network code lives in `data/Net.kt`, `Drive.kt`, `Places.kt` and `Updates.kt` only.
+- Google Drive needs the owner's Google Cloud setup: `docs/GOOGLE_DRIVE_SETUP.md`.
+- Every update shows What's new: bump `WhatsNew.ID` in `data/Updates.kt` and write its lines (Heart Apps rule).
 - Kural text comes only from `pack.json`, built by `build_pack.py`. Never type Tamil couplets into code.
 - Text fields that take writing use `TextFieldState`, not the String `value`/`onValueChange` form.
 - Valluvar: white robes, no religious marks, no halo, hands without fingers.

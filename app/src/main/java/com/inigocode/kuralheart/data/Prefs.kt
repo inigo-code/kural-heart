@@ -33,6 +33,30 @@ class Prefs(context: Context) {
     var startedOn by pref("started_on", "")
     var lastLens by pref("last_lens", 0)
 
+    // Profile and customisation
+    var name by pref("name", "")
+    var avatar by pref("avatar", "")
+    var journalTitle by pref("journal_title", "")
+    /** Text size as a percentage of the phone's own size: 90, 100, 115 or 130. */
+    var textScale by pref("text_scale", 100)
+    /** Accent colour: clay, indigo, green or rose. */
+    var accent by pref("accent", "clay")
+    /** How the day's couplet is chosen: "daily" (the welcome week, then the shuffled pool) or "random". */
+    var promptMode by pref("prompt_mode", "daily")
+    /** The English shown under a couplet: aiyar, pope (verse) or popeprose. */
+    var translation by pref("translation", "aiyar")
+    var autoDetails by pref("auto_details", false)
+
+    // Online features, each off until the person turns it on
+    var driveOn by pref("drive_on", false)
+    var lastDriveSync by pref("last_drive_sync", 0L)
+    var updateCheck by pref("update_check", true)
+    var lastUpdateCheck by pref("last_update_check", 0L)
+    var whatsNewSeen by pref("whats_new_seen", 0)
+
+    var saved by intSet("saved_kurals")
+    var read by intSet("read_kurals")
+
     /** A per-install number that shuffles the daily couplets, so two phones don't read in step. */
     val seed: Long
         get() = sp.getLong("seed", 0L).takeIf { it != 0L } ?: Random.nextLong().also { sp.edit { putLong("seed", it) } }
@@ -80,6 +104,8 @@ class Prefs(context: Context) {
         }
     }.also { reload() }
 
+    fun reloadAll() = reload()
+
     fun wipe() {
         sp.edit { clear() }
         reload()
@@ -90,6 +116,19 @@ class Prefs(context: Context) {
     private fun reload() { reloaders.forEach { it() }; sealsVersion++ }
 
     private fun <T> pref(key: String, default: T): Delegate<T> = Delegate(key, default).also { d -> reloaders += { d.load() } }
+    private fun intSet(key: String): IntSetDelegate = IntSetDelegate(key).also { d -> reloaders += { d.load() } }
+
+    inner class IntSetDelegate(private val key: String) {
+        private val state = mutableStateOf(read())
+        private fun read(): Set<Int> = sp.getString(key, "")!!.split(',').mapNotNull { it.toIntOrNull() }.toSet()
+        fun load() { state.value = read() }
+        operator fun getValue(thisRef: Any?, property: Any?): Set<Int> = state.value
+        operator fun setValue(thisRef: Any?, property: Any?, value: Set<Int>) {
+            state.value = value
+            sp.edit { putString(key, value.sorted().joinToString(",")) }
+        }
+    }
+
     private fun <E : Enum<E>> enumPref(key: String, default: E): EnumDelegate<E> = EnumDelegate(key, default).also { d -> reloaders += { d.load() } }
 
     inner class Delegate<T>(private val key: String, private val default: T) {

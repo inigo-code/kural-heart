@@ -86,9 +86,10 @@ fun Leaf(modifier: Modifier = Modifier, mini: Boolean = false, content: @Composa
                 start = 12.dp, end = 12.dp,
                 top = if (mini) 20.dp else 26.dp, bottom = if (mini) 12.dp else 16.dp,
             ),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.CenterStart,
     ) {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, content = content)
+        // Couplets are always set flush left, as they are written on the leaf.
+        Column(Modifier.fillMaxWidth().padding(horizontal = 6.dp), horizontalAlignment = Alignment.Start, content = content)
     }
 }
 
@@ -104,15 +105,15 @@ fun CoupletText(
     first: String,
     second: String,
     modifier: Modifier = Modifier,
-    maxSize: TextUnit = 21.sp,
-    minSize: TextUnit = 14.sp,
+    maxSize: TextUnit = 24.sp,
+    minSize: TextUnit = 15.sp,
     color: Color = Olai.colors.leafInk,
 ) {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current
     BoxWithConstraints(modifier.fillMaxWidth().semantics { contentDescription = "$first $second" }) {
         val widthPx = constraints.maxWidth.toFloat()
-        val base = TextStyle(fontFamily = KuralFonts.Couplet, fontWeight = FontWeight(560), textAlign = TextAlign.Center)
+        val base = TextStyle(fontFamily = KuralFonts.Couplet, fontWeight = FontWeight(560), textAlign = TextAlign.Start)
         val (size, fits) = remember(first, second, widthPx, density) {
             val widest = { sp: Float ->
                 val style = base.copy(fontSize = sp.sp)
@@ -124,7 +125,7 @@ fun CoupletText(
             val s = CoupletFit.fit(widthPx, maxSize.value, minSize.value, widest)
             s to (widest(s) <= widthPx)
         }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
             for (line in listOf(first, second)) {
                 Text(
                     line, style = base.copy(fontSize = size.sp, lineHeight = (size * 1.5f).sp, color = color),
@@ -159,6 +160,6 @@ object CoupletFit {
 fun LeafNote(text: String, modifier: Modifier = Modifier) {
     Text(
         text, modifier.padding(top = 6.dp),
-        style = TextStyle(fontFamily = KuralFonts.Sans, fontSize = 11.5.sp, color = Olai.colors.leafNote),
+        style = TextStyle(fontFamily = KuralFonts.Sans, fontSize = 13.5.sp, color = Olai.colors.leafNote),
     )
 }

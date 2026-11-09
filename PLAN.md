@@ -920,6 +920,32 @@ Still open for milestone 0:
 - The workbench's specimen couplets are copied from the canvas prototype into a debug-only asset, marked
   unverified, and never ship. Real couplets arrive with the milestone 1 pack.
 
+### Version 0.10.0, after the owner's review, 9 November
+
+The owner asked for bigger type, a Kural library, richer pages, a profile, filters, audio, better share images, Drive
+sync and over-the-air updates, and chose to drop the no-internet promise for Drive, weather and updates.
+
+- **Type**: every size up a step, Tamil a further 8 percent, and a text-size setting (90, 100, 115, 130 percent).
+  Couplets are always flush left: on the leaf, in lists, on share images and on the widget.
+- **Kural tab** (fifth tab): all 133 chapters under the three books, search by number or Tamil or English words,
+  filters (book, saved, written about, not read yet), each couplet's page with Aiyar, Pope's verse and Pope's prose,
+  the chapter's question, listen (the phone's text-to-speech, Tamil then English), save, share, and "Make today's
+  couplet". Today gains Listen, Another couplet and Choose from the Kural, and shows the chosen English under the leaf.
+- **Pope**: Project Madurai e-text 0153 parsed into the pack (verse and prose for all 1,330; broken lines rebuilt by
+  script). Modern commentaries stay out (copyright); Parimelazhagar waits for a checked digital text.
+- **Pages**: Markdown formatting bar (bold, italic, heading, list, checklist, quote), editable date and time, weather
+  (Open-Meteo or picked by hand), place (Android geocoder or typed), photos from the gallery or camera (shrunk and
+  sealed with the device key), tags, star. Journal filters: starred, photos, period, feeling, book, tags, order.
+- **Profile and look**: name, photo, journal name, stats; four accent colours; English shown (Aiyar, Pope verse, Pope
+  prose); today's couplet daily or random.
+- **Online**: Google Drive sync to the app-data folder, sealed with the passphrase, nightly and on demand (needs the
+  owner's Google Cloud setup, docs/GOOGLE_DRIVE_SETUP.md); update checks against GitHub releases of
+  inigo-code/kural-heart (repo not created yet) with download and install, only in website builds; What's new after
+  each update. The build's permission check is now an allowlist.
+- **Checked on the emulator**: type, library, search, couplet page, writing with live weather and place (Chennai),
+  Journal filters, Settings, both share images. Not checked: Drive (no OAuth client yet), the update download (no
+  release yet), audio (no Tamil voice on the emulator image), camera.
+
 ### Version 0.9.0, the whole app, 9 November
 
 The owner asked for the full app at once, so milestones 1 to 9 were built in one pass instead of one at a time.

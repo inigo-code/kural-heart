@@ -11,6 +11,7 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
@@ -191,3 +192,21 @@ internal fun parseColor(hex: String): Color {
 
 internal fun StrokeCapOf(s: String) = when (s) { "round" -> StrokeCap.Round; "square" -> StrokeCap.Square; else -> StrokeCap.Butt }
 internal fun StrokeJoinOf(s: String) = when (s) { "round" -> StrokeJoin.Round; "bevel" -> StrokeJoin.Bevel; else -> StrokeJoin.Miter }
+
+/** Valluvar drawn still into a bitmap, for share images. Letters (the Teaching state's) are left out. */
+fun valluvarBitmap(state: ValluvarState, widthPx: Int): android.graphics.Bitmap {
+    val h = (widthPx * ValluvarArt.VIEW_HEIGHT / ValluvarArt.VIEW_WIDTH).toInt()
+    val img = androidx.compose.ui.graphics.ImageBitmap(widthPx, h)
+    val canvas = androidx.compose.ui.graphics.Canvas(img)
+    androidx.compose.ui.graphics.drawscope.CanvasDrawScope().draw(
+        androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr, canvas,
+        androidx.compose.ui.geometry.Size(widthPx.toFloat(), h.toFloat()),
+    ) {
+        val k = size.width / ValluvarArt.VIEW_WIDTH
+        withTransform({ scale(k, k, Offset.Zero) }) {
+            val o = DrawOptions(state, state.defaultFace(), typing = false, once = false, nod = false)
+            for (node in ValluvarModel.root) drawNode(node, o, -1L, 1f) { _, _ -> }
+        }
+    }
+    return img.asAndroidBitmap()
+}

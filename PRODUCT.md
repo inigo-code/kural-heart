@@ -20,7 +20,7 @@ Each day opens with one Thirukkural couplet, a plain meaning and a question to w
 
 ## Positioning
 
-The only journal built on the Thirukkural, with Valluvar himself as a warm companion, and the only one that provably cannot go online: it has no internet permission at all.
+The only journal built on the Thirukkural, with Valluvar himself as a warm companion. It goes online only for what the person turns on (Google Drive sync, the weather on a page, update checks), and the journal only ever leaves the phone locked with their passphrase.
 
 ## Operating Context
 
@@ -28,7 +28,7 @@ Daily ritual: read the couplet, write, save. Moments that matter: the first laun
 
 ## Capabilities and Constraints
 
-- No INTERNET permission. No accounts, ads, analytics or AI at runtime.
+- Online only by choice (decided by the owner, 9 Nov 2026): Drive sync, weather, place names and update checks, each off until turned on. No Kural Heart account, ads, analytics or AI at runtime.
 - Couplets always set on exactly two lines, sized to fit, in Anek Tamil condensed.
 - 1,330 kurals; 120 prompts at launch, 365 later. Tamil kural text only from the source file.
 - Streak is "the thread", with two rest days a week kept automatically, never shown as a loss. Nine seals with Tamil numerals.

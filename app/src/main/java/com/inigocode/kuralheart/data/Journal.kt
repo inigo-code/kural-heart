@@ -18,6 +18,11 @@ import java.time.ZoneId
 import java.util.UUID
 
 /** One journal page. The text and mood are stored sealed (see [Crypto]); the rest is bookkeeping. */
+data class Place(val name: String, val lat: Double?, val lon: Double?)
+
+/** Weather on the page: [kind] is one of sun, partly, cloud, rain, storm, fog, snow, wind. */
+data class Weather(val kind: String, val tempC: Double?)
+
 data class Entry(
     val id: String = UUID.randomUUID().toString(),
     val date: LocalDate,
@@ -28,20 +33,49 @@ data class Entry(
     val period: String,
     val mood: String?,
     val text: String,
+    val tags: List<String> = emptyList(),
+    val starred: Boolean = false,
+    val place: Place? = null,
+    val weather: Weather? = null,
+    /** Ids of photos kept, encrypted, in [Photos]. */
+    val photos: List<String> = emptyList(),
 ) {
     val isTamil: Boolean get() = text.any { it in '஀'..'௿' }
     val wordCount: Int get() = text.split(Regex("\\s+")).count { it.isNotBlank() }
 
-    fun toJson(): JSONObject = JSONObject()
+    fun toJson(): JSONObject = bodyJson()
         .put("id", id).put("date", date.toString()).put("created", created).put("updated", updated)
-        .put("kural", kural).put("lens", lens).put("period", period).put("mood", mood ?: JSONObject.NULL).put("text", text)
+        .put("kural", kural).put("lens", lens).put("period", period)
+
+    /** The private part, sealed on disk: everything the person wrote or attached. */
+    fun bodyJson(): JSONObject = JSONObject()
+        .put("text", text).put("mood", mood ?: JSONObject.NULL)
+        .put("tags", JSONArray(tags)).put("starred", starred)
+        .put("place", place?.let { JSONObject().put("name", it.name).put("lat", it.lat ?: JSONObject.NULL).put("lon", it.lon ?: JSONObject.NULL) } ?: JSONObject.NULL)
+        .put("weather", weather?.let { JSONObject().put("kind", it.kind).put("temp", it.tempC ?: JSONObject.NULL) } ?: JSONObject.NULL)
+        .put("photos", JSONArray(photos))
 
     companion object {
-        fun fromJson(o: JSONObject) = Entry(
-            o.getString("id"), LocalDate.parse(o.getString("date")), o.getLong("created"), o.getLong("updated"),
-            o.getInt("kural"), o.optInt("lens"), o.optString("period"), if (o.isNull("mood")) null else o.optString("mood"),
-            o.getString("text"),
+        fun fromJson(o: JSONObject) = withBody(
+            Entry(
+                o.getString("id"), LocalDate.parse(o.getString("date")), o.getLong("created"), o.getLong("updated"),
+                o.getInt("kural"), o.optInt("lens"), o.optString("period"), null, "",
+            ),
+            o,
         )
+
+        /** Fill the private fields from a sealed body (older pages have only text and mood). */
+        fun withBody(e: Entry, b: JSONObject): Entry {
+            fun strings(key: String) = b.optJSONArray(key)?.let { a -> List(a.length()) { a.getString(it) } } ?: emptyList()
+            val place = b.optJSONObject("place")?.let {
+                Place(it.optString("name"), if (it.isNull("lat")) null else it.optDouble("lat"), if (it.isNull("lon")) null else it.optDouble("lon"))
+            }
+            val weather = b.optJSONObject("weather")?.let { Weather(it.optString("kind"), if (it.isNull("temp")) null else it.optDouble("temp")) }
+            return e.copy(
+                text = b.optString("text"), mood = if (b.isNull("mood")) null else b.optString("mood").ifEmpty { null },
+                tags = strings("tags"), starred = b.optBoolean("starred"), place = place, weather = weather, photos = strings("photos"),
+            )
+        }
     }
 }
 
@@ -72,9 +106,9 @@ class Journal(context: Context) {
         db.readableDatabase.rawQuery("SELECT id, date, created, updated, kural, lens, period, body FROM entries", null).use { c ->
             while (c.moveToNext()) {
                 val body = runCatching { JSONObject(Crypto.open(c.getBlob(7)).decodeToString()) }.getOrNull() ?: continue
-                out += Entry(
-                    c.getString(0), LocalDate.parse(c.getString(1)), c.getLong(2), c.getLong(3), c.getInt(4), c.getInt(5),
-                    c.getString(6), if (body.isNull("mood")) null else body.optString("mood"), body.getString("text"),
+                out += Entry.withBody(
+                    Entry(c.getString(0), LocalDate.parse(c.getString(1)), c.getLong(2), c.getLong(3), c.getInt(4), c.getInt(5), c.getString(6), null, ""),
+                    body,
                 )
             }
         }
@@ -93,7 +127,7 @@ class Journal(context: Context) {
     }
 
     private fun write(e: Entry) {
-        val body = JSONObject().put("text", e.text).put("mood", e.mood ?: JSONObject.NULL).toString().toByteArray()
+        val body = e.bodyJson().toString().toByteArray()
         val v = ContentValues().apply {
             put("id", e.id); put("date", e.date.toString()); put("created", e.created); put("updated", e.updated)
             put("kural", e.kural); put("lens", e.lens); put("period", e.period); put("body", Crypto.seal(body))
@@ -139,8 +173,13 @@ class Journal(context: Context) {
     fun search(q: String): List<Entry> {
         val s = q.trim()
         if (s.isEmpty()) return entries
-        return entries.filter { it.text.contains(s, ignoreCase = true) || it.kural.toString() == s }
+        return entries.filter {
+            it.text.contains(s, ignoreCase = true) || it.kural.toString() == s ||
+                it.tags.any { t -> t.equals(s.removePrefix("#"), ignoreCase = true) } || it.place?.name?.contains(s, ignoreCase = true) == true
+        }
     }
+
+    val allTags: List<String> get() = entries.flatMap { it.tags }.groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.map { it.key }
 
     data class MergeResult(val added: Int, val keptBoth: Int)
 

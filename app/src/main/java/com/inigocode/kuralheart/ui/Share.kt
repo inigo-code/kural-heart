@@ -47,6 +47,8 @@ import com.inigocode.kuralheart.data.Journal
 import com.inigocode.kuralheart.data.Kural
 import com.inigocode.kuralheart.data.Pack
 import com.inigocode.kuralheart.ui.theme.Olai
+import com.inigocode.kuralheart.ui.valluvar.ValluvarState
+import com.inigocode.kuralheart.ui.valluvar.valluvarBitmap
 import java.io.File
 
 @Composable
@@ -60,7 +62,7 @@ fun ShareScreen(state: AppState, kuralN: Int) {
     var story by remember { mutableStateOf(false) }
     var addMine by remember { mutableStateOf(false) }
     val line = if (addMine) mine?.text?.lineSequence()?.firstOrNull()?.take(160) else null
-    val bmp = remember(kuralN, story, line, state.prefs.tamil) { ShareCard.render(ctx, pack, k, line, story, state.prefs.tamil) }
+    val bmp = remember(kuralN, story, line, state.prefs.tamil) { ShareCard.render(ctx, pack, k, line, story, state.prefs.tamil, state.prefs.translation) }
     Column(Modifier.fillMaxSize()) {
         TopBar(l.shareTitle, onBack = { state.pop() }, close = true)
         Box(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 24.dp), contentAlignment = Alignment.Center) {
@@ -89,36 +91,64 @@ fun ShareScreen(state: AppState, kuralN: Int) {
     }
 }
 
-/** Draws the share image with plain Android graphics, so it needs no screen and no network. */
+/**
+ * Draws the share image with plain Android graphics, so it needs no screen and no network.
+ * Story (9:16): a dawn sky over ivory, Valluvar reading, then the leaf. Post (4:5): the leaf first, Valluvar below.
+ * Couplets are always flush left.
+ */
 object ShareCard {
-    fun render(ctx: Context, pack: Pack, k: Kural, mine: String?, story: Boolean, tamil: Boolean): Bitmap {
+    private const val INK = 0xFF1E1A16.toInt()
+    private const val LEAF_INK = 0xFF2B1E10.toInt()
+    private const val NOTE = 0xFF6A4B22.toInt()
+
+    fun render(ctx: Context, pack: Pack, k: Kural, mine: String?, story: Boolean, tamil: Boolean, translation: String = "aiyar"): Bitmap {
         val w = 1080
         val h = if (story) 1920 else 1350
         val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val cv = Canvas(bmp)
         val anek = ResourcesCompat.getFont(ctx, R.font.anek_tamil) ?: Typeface.DEFAULT
+        val literata = ResourcesCompat.getFont(ctx, R.font.literata) ?: Typeface.SERIF
         val literataItalic = ResourcesCompat.getFont(ctx, R.font.literata_italic) ?: Typeface.SERIF
         val serifTamil = ResourcesCompat.getFont(ctx, R.font.noto_serif_tamil) ?: Typeface.SERIF
+        val ch = pack.chapterOf(k)
+        val margin = 96f
 
-        // Ivory ground, warmer at the foot.
-        cv.drawPaint(Paint().apply { shader = LinearGradient(0f, 0f, 0f, h.toFloat(), 0xFFF6F2EA.toInt(), 0xFFEFE4CF.toInt(), Shader.TileMode.CLAMP) })
-
-        val margin = 90f
-        val leafTop = if (story) 360f else 150f
-        // Couplet lines: shrink together until the longer fits the leaf.
-        val couplet = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            typeface = anek; fontVariationSettings = "'wght' 560, 'wdth' 75"; color = 0xFF2B1E10.toInt(); textAlign = Paint.Align.CENTER
+        // Ground: a dawn sky fading into ivory for stories, plain warm ivory for posts.
+        val ground = if (story) {
+            LinearGradient(0f, 0f, 0f, h.toFloat(), intArrayOf(0xFFFFD08A.toInt(), 0xFFF5B98A.toInt(), 0xFFF6F2EA.toInt(), 0xFFEFE4CF.toInt()), floatArrayOf(0f, 0.22f, 0.48f, 1f), Shader.TileMode.CLAMP)
+        } else {
+            LinearGradient(0f, 0f, 0f, h.toFloat(), 0xFFF6F2EA.toInt(), 0xFFEFE4CF.toInt(), Shader.TileMode.CLAMP)
         }
-        var size = 64f
-        val inner = w - 2 * margin - 80f
-        while (size > 34f) {
+        cv.drawPaint(Paint().apply { shader = ground })
+
+        val label = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = serifTamil; textSize = 38f; color = if (story) 0xFF5A2A12.toInt() else NOTE }
+        var y: Float
+        if (story) {
+            cv.drawText("திருக்குறள் · ${if (tamil) "குறள்" else "Kural"} ${k.n}", margin, 150f, label)
+            // Valluvar reading, with a soft arch behind him.
+            val vw = 600
+            val vx = (w - vw) / 2f
+            val arch = RectF(vx + 30, 230f, vx + vw - 30, 230f + vw * 220f / 240f + 20)
+            cv.drawRoundRect(arch, 300f, 300f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x33FFFFFF })
+            cv.drawBitmap(valluvarBitmap(ValluvarState.Reading, vw), vx, 210f, null)
+            y = 230f + vw * 220f / 240f + 70
+        } else {
+            cv.drawText("திருக்குறள் · ${if (tamil) "குறள்" else "Kural"} ${k.n}", margin, 140f, label)
+            y = 200f
+        }
+
+        // The leaf, couplet flush left; both lines shrink together until the longer fits.
+        val couplet = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = anek; fontVariationSettings = "'wght' 560, 'wdth' 75"; color = LEAF_INK }
+        val inner = w - 2 * margin - 100f
+        var size = 68f
+        while (size > 36f) {
             couplet.textSize = size
             if (maxOf(couplet.measureText(k.a), couplet.measureText(k.b)) <= inner) break
             size -= 2f
         }
-        val lineH = size * 1.55f
-        val leafH = 110f + lineH * 2 + 70f
-        val leaf = RectF(margin, leafTop, w - margin, leafTop + leafH)
+        val lineH = size * 1.5f
+        val leafH = 100f + lineH * 2 + 80f
+        val leaf = RectF(margin, y, w - margin, y + leafH)
         cv.drawRoundRect(RectF(leaf).apply { offset(0f, 18f) }, 44f, 44f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x223C280A })
         cv.drawRoundRect(leaf, 44f, 44f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             shader = LinearGradient(0f, leaf.top, 0f, leaf.bottom, 0xFFF3E7C6.toInt(), 0xFFE7D4A2.toInt(), Shader.TileMode.CLAMP)
@@ -126,34 +156,42 @@ object ShareCard {
         val rib = Paint().apply { color = 0x177A5A2E }
         for (f in listOf(0.334f, 0.614f, 0.854f)) cv.drawRect(leaf.left + 6, leaf.top + leafH * f, leaf.right - 6, leaf.top + leafH * f + 3, rib)
         cv.drawRoundRect(leaf, 44f, 44f, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 3f; color = 0x387A5A2E })
-        cv.drawCircle(w / 2f, leaf.top + 42f, 13f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFF6F2EA.toInt() })
-        cv.drawCircle(w / 2f, leaf.top + 42f, 15f, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 4f; color = 0x487A5A2E })
-        val baseY = leaf.top + 110f + size
-        cv.drawText(k.a, w / 2f, baseY, couplet)
-        cv.drawText(k.b, w / 2f, baseY + lineH, couplet)
-        val ch = pack.chapterOf(k)
-        val note = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = anek; textSize = 32f; color = 0xFF6A4B22.toInt(); textAlign = Paint.Align.CENTER }
-        cv.drawText("${ch.ta} · ${if (tamil) "குறள்" else ch.en} · ${k.n}", w / 2f, leaf.bottom - 36f, note)
+        cv.drawCircle(w / 2f, leaf.top + 40f, 13f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFF6F2EA.toInt() })
+        cv.drawCircle(w / 2f, leaf.top + 40f, 15f, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 4f; color = 0x487A5A2E })
+        val textX = leaf.left + 50f
+        val baseY = leaf.top + 100f + size
+        cv.drawText(k.a, textX, baseY, couplet)
+        cv.drawText(k.b, textX, baseY + lineH, couplet)
+        val note = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = anek; textSize = 32f; color = NOTE }
+        cv.drawText("அதிகாரம் ${ch.n} · ${ch.ta} · ${ch.en}", textX, leaf.bottom - 40f, note)
+        y = leaf.bottom + 70f
 
-        // Aiyar's English, or the person's own line if they chose to add it.
-        val quote = mine?.let { "“$it”" } ?: k.en
+        // The English chosen in Settings, or the person's own line if they added it.
+        val english = mine?.let { "“$it”" } ?: translationOf(k, translation)
         val qp = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            typeface = if (mine != null && mine.any { it in '஀'..'௿' }) serifTamil else literataItalic
+            typeface = if (mine != null && mine.any { it in '\u0B80'..'\u0BFF' }) serifTamil else literataItalic
             textSize = if (story) 46f else 42f; color = 0xFF3B2F25.toInt()
         }
-        val layout = StaticLayout.Builder.obtain(quote, 0, quote.length, qp, (w - 2 * margin - 40).toInt())
-            .setAlignment(Layout.Alignment.ALIGN_CENTER).setLineSpacing(0f, 1.3f).setMaxLines(if (story) 9 else 6)
+        val layout = StaticLayout.Builder.obtain(english, 0, english.length, qp, (w - 2 * margin).toInt())
+            .setAlignment(Layout.Alignment.ALIGN_NORMAL).setLineSpacing(0f, 1.3f).setMaxLines(if (story) 8 else 5)
             .setEllipsize(android.text.TextUtils.TruncateAt.END).build()
-        cv.save(); cv.translate(margin + 20, leaf.bottom + 70f); layout.draw(cv); cv.restore()
+        cv.save(); cv.translate(margin, y); layout.draw(cv); cv.restore()
+        y += layout.height + 40f
         if (mine == null) {
-            val by = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = anek; textSize = 28f; color = 0xFF6A5A4A.toInt(); textAlign = Paint.Align.CENTER }
-            cv.drawText("V. V. S. Aiyar", w / 2f, leaf.bottom + 70f + layout.height + 56f, by)
+            val by = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = anek; textSize = 30f; color = 0xFF6A5A4A.toInt() }
+            cv.drawText("— ${translator(translation)}", margin, y, by)
+        }
+
+        // Post: a smaller Valluvar sits at the foot, beside the wordmark.
+        if (!story) {
+            val vw = 330
+            cv.drawBitmap(valluvarBitmap(ValluvarState.Reading, vw), w - margin - vw + 30, h - 330f, null)
         }
 
         // The mark and wordmark at the foot.
         val icon = ResourcesCompat.getDrawable(ctx.resources, R.drawable.splash_icon, null)
         val markSize = 84
-        val mx = w / 2 - 150
+        val mx = margin.toInt()
         val my = h - 170
         cv.save()
         val clip = android.graphics.Path().apply { addRoundRect(RectF(mx.toFloat(), my.toFloat(), (mx + markSize).toFloat(), (my + markSize).toFloat()), 20f, 20f, android.graphics.Path.Direction.CW) }
@@ -161,10 +199,10 @@ object ShareCard {
         icon?.setBounds(mx - markSize / 4, my - markSize / 4, mx + markSize + markSize / 4, my + markSize + markSize / 4)
         icon?.draw(cv)
         cv.restore()
-        val wm = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            typeface = ResourcesCompat.getFont(ctx, R.font.literata) ?: Typeface.SERIF; textSize = 44f; color = 0xFF1E1A16.toInt()
-        }
-        cv.drawText("Kural Heart", (mx + markSize + 24).toFloat(), my + markSize / 2f + 15f, wm)
+        val wm = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = literata; textSize = 44f; color = INK }
+        cv.drawText("Kural Heart", (mx + markSize + 24).toFloat(), my + markSize / 2f + 2f, wm)
+        val sub = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { typeface = anek; textSize = 28f; color = 0xFF6A5A4A.toInt() }
+        cv.drawText("குறளுடன் நாட்குறிப்பு", (mx + markSize + 24).toFloat(), my + markSize / 2f + 42f, sub)
         return bmp
     }
 

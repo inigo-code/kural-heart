@@ -88,6 +88,7 @@ fun Onboarding(state: AppState) {
     }
     fun finish() {
         prefs.onboarded = true
+        prefs.whatsNewSeen = com.inigocode.kuralheart.data.WhatsNew.ID
         if (prefs.startedOn.isEmpty()) prefs.startedOn = Journal.today().toString()
         state.activity.locked.value = false
         Alarms.scheduleAll(state.activity)
@@ -172,9 +173,13 @@ fun Choice(label: String, on: Boolean, modifier: Modifier = Modifier, onClick: (
         modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(24.dp))
             .background(if (on) c.primarySoft else c.surface)
             .border(1.dp, if (on) c.primary else c.line, RoundedCornerShape(24.dp))
-            .clickable(role = Role.RadioButton, onClick = onClick).padding(horizontal = 18.dp, vertical = 12.dp),
+            .clickable(role = Role.RadioButton, onClick = onClick).padding(horizontal = 10.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(label, style = MaterialTheme.typography.labelLarge, color = if (on) c.onSoft else c.ink, textAlign = TextAlign.Center) }
+    ) {
+        // One line, never broken inside a word; long labels shrink slightly instead.
+        Text(label, style = MaterialTheme.typography.labelLarge, color = if (on) c.onSoft else c.ink, textAlign = TextAlign.Center, maxLines = 1, softWrap = false,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Visible)
+    }
 }
 
 @Composable

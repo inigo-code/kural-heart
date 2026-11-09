@@ -35,7 +35,7 @@ object Alarms {
     fun scheduleAll(context: Context) {
         val g = Graph.get(context)
         if (g.prefs.reminderOn) scheduleReminder(context, g.prefs.reminderMinutes) else cancel(context, ACTION_REMIND)
-        if (g.prefs.backupNightly) scheduleBackup(context) else cancel(context, ACTION_BACKUP)
+        if (g.prefs.backupNightly || g.prefs.driveOn) scheduleBackup(context) else cancel(context, ACTION_BACKUP)
     }
 
     fun scheduleReminder(context: Context, minutes: Int) =
@@ -123,11 +123,10 @@ object Alarms {
                     val done = goAsync()
                     CoroutineScope(Dispatchers.IO).launch {
                         val g = Graph.get(context)
-                        runCatching {
-                            if (!g.journal.loaded) g.journal.load()
-                            g.backup.backupNow()
-                        }
-                        if (g.prefs.backupNightly) scheduleBackup(context)
+                        runCatching { if (!g.journal.loaded) g.journal.load() }
+                        if (g.prefs.backupNightly && g.prefs.backupTree.isNotEmpty()) runCatching { g.backup.backupNow() }
+                        if (g.prefs.driveOn) g.drive.syncQuietly()
+                        if (g.prefs.backupNightly || g.prefs.driveOn) scheduleBackup(context)
                         done.finish()
                     }
                 }

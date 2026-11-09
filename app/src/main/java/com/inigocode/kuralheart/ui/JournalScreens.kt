@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.inigocode.kuralheart.data.Entry
 import com.inigocode.kuralheart.data.Journal
 import com.inigocode.kuralheart.data.Part
+import androidx.compose.ui.graphics.asImageBitmap
 import com.inigocode.kuralheart.ui.leaf.CoupletText
 import com.inigocode.kuralheart.ui.leaf.Leaf
 import com.inigocode.kuralheart.ui.leaf.LeafNote
@@ -71,7 +72,9 @@ fun JournalScreen(state: AppState) {
     var query by rememberSaveable { mutableStateOf("") }
     var calendar by rememberSaveable { mutableStateOf(false) }
     val all = state.journal.entries
-    val shown = if (query.isBlank()) all.toList() else state.journal.search(query)
+    val f = state.entryFilter
+    val shown = f.apply(if (query.isBlank()) all.toList() else state.journal.search(query), state.pack)
+    var filtersOpen by rememberSaveable { mutableStateOf(false) }
     val today = Journal.today()
     val yearAgo = all.filter { it.date == today.minusYears(1) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
@@ -80,6 +83,12 @@ fun JournalScreen(state: AppState) {
                 Column(Modifier.weight(1f)) {
                     Text(l.pages(all.size), style = MaterialTheme.typography.labelLarge, color = c.ink3)
                     Text(l.journal, style = MaterialTheme.typography.displaySmall, color = c.ink)
+                }
+                Box {
+                    IconButton(Ico.filter, tr("Filters", "வடிகட்டிகள்"), { filtersOpen = true }, tint = if (f.count > 0) c.primary else c.ink)
+                    if (f.count > 0) Box(Modifier.align(Alignment.TopEnd).padding(6.dp).size(18.dp).clip(CircleShape).background(c.primary), contentAlignment = Alignment.Center) {
+                        Text("${f.count}", style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp), color = c.onPrimary)
+                    }
                 }
                 IconButton(if (calendar) Ico.list else Ico.calendar, if (calendar) l.list else l.calendar, { calendar = !calendar })
             }
@@ -103,6 +112,14 @@ fun JournalScreen(state: AppState) {
                     )
                 }
                 if (query.isNotEmpty()) IconButton(Ico.close, l.close, { query = "" }, tint = c.ink3)
+            }
+        }
+        if (f.count > 0) {
+            item {
+                Row(Modifier.padding(horizontal = 16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(tr("${shown.size} of ${all.size} pages", "${all.size}-இல் ${shown.size} பக்கங்கள்"), style = MaterialTheme.typography.labelLarge, color = c.ink3, modifier = Modifier.weight(1f))
+                    androidx.compose.material3.TextButton({ state.entryFilter = EntryFilter() }) { Text(tr("Clear filters", "வடிகட்டிகளை நீக்கு"), color = c.primary) }
+                }
             }
         }
         if (calendar && query.isBlank()) {
@@ -135,6 +152,7 @@ fun JournalScreen(state: AppState) {
         }
         items(shown, key = { it.id }) { e -> EntryCard(state, e, tamil) }
     }
+    if (filtersOpen) FilterSheet(state) { filtersOpen = false }
 }
 
 @Composable
@@ -154,10 +172,15 @@ fun EntryCard(state: AppState, e: Entry, tamil: Boolean) {
             Text("${l.kural} ${k.n}", style = MaterialTheme.typography.labelLarge, color = c.ink2)
         }
         Spacer(Modifier.height(6.dp))
-        Text(e.text, style = MaterialTheme.typography.bodyLarge, color = c.ink, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        Row {
+            Text(Markdown.plain(e.text), style = MaterialTheme.typography.bodyLarge, color = c.ink, maxLines = 3, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            e.photos.firstOrNull()?.let { Spacer(Modifier.width(10.dp)); PhotoThumb(state, it, 64) }
+        }
         Spacer(Modifier.height(8.dp))
-        val bits = listOfNotNull(moodLabel(e.mood, tamil), timeOf(e))
-        Text(bits.joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = c.ink3)
+        val bits = listOfNotNull(
+            if (e.starred) "★" else null, moodLabel(e.mood, tamil), e.weather?.let { weatherLabel(it, tamil) }, e.place?.name, timeOf(e),
+        ) + e.tags.map { "#$it" }
+        Text(bits.joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = c.ink3, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -248,18 +271,31 @@ fun PageScreen(state: AppState, id: String) {
     val k = state.pack.kural(e.kural)
     val ch = state.pack.chapterOf(k)
     Column(Modifier.fillMaxSize()) {
-        TopBar(dateLine(tamil, e.date), onBack = { state.pop() })
+        TopBar(dateLine(tamil, e.date), onBack = { state.pop() }) {
+            IconButton(Ico.star, tr("Star", "நட்சத்திரம்"), {
+                state.activity.lifecycleScopeLaunch { state.journal.save(e.copy(starred = !e.starred, updated = Journal.now())) }
+            }, tint = if (e.starred) c.gold else c.ink2)
+        }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
-            Leaf(mini = true) {
-                CoupletText(k.a, k.b, maxSize = 17.sp, minSize = 12.sp)
-                LeafNote("${ch.ta} · ${k.n}")
+            Leaf(mini = true, modifier = Modifier.clickable { state.push(Route.KuralView(k.n)) }) {
+                CoupletText(k.a, k.b, maxSize = 19.sp, minSize = 13.sp)
+                LeafNote(tr("Chapter ${ch.n} · ${ch.ta} · Kural ${k.n}", "அதிகாரம் ${ch.n} · ${ch.ta} · குறள் ${k.n}"))
             }
             Spacer(Modifier.height(18.dp))
             Text(questionText(state.pack, k, e.lens, tamil), style = MaterialTheme.typography.labelLarge, color = c.ink3)
             Spacer(Modifier.height(8.dp))
-            Text(e.text, style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp, lineHeight = if (tamil) 31.sp else 29.sp), color = c.ink)
-            Spacer(Modifier.height(12.dp))
-            Text(listOfNotNull(moodLabel(e.mood, tamil), timeOf(e), l.wordsN(e.wordCount)).joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = c.ink3)
+            Text(Markdown.render(e.text, c.ink2, c.primary), style = MaterialTheme.typography.bodyLarge.copy(fontSize = 19.sp, lineHeight = if (tamil) 33.sp else 30.sp), color = c.ink)
+            for (id in e.photos) {
+                Spacer(Modifier.height(12.dp))
+                PhotoFull(state, id)
+            }
+            Spacer(Modifier.height(14.dp))
+            DetailLine(Ico.clock, "${dateLine(tamil, e.date)} · ${timeOf(e)}")
+            e.weather?.let { DetailLine(if (it.kind in setOf("sun", "wind")) Ico.sun else Ico.cloud, weatherLabel(it, tamil)) }
+            e.place?.let { DetailLine(Ico.pin, it.name) }
+            moodLabel(e.mood, tamil)?.let { DetailLine(Ico.heart, it) }
+            if (e.tags.isNotEmpty()) DetailLine(Ico.tag, e.tags.joinToString(" ") { "#$it" })
+            Text(l.wordsN(e.wordCount), style = MaterialTheme.typography.labelMedium, color = c.ink3, modifier = Modifier.padding(top = 6.dp))
             Spacer(Modifier.height(24.dp))
         }
         Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -270,6 +306,94 @@ fun PageScreen(state: AppState, id: String) {
             }
             Spacer(Modifier.weight(1f))
             Chip(l.delete, Ico.trash) { state.pop(); state.deletePage(e.id) }
+        }
+    }
+}
+
+@Composable
+private fun DetailLine(icon: String, text: String) {
+    val c = Olai.colors
+    Row(Modifier.padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, size = 18.dp, tint = c.ink3)
+        Spacer(Modifier.width(10.dp))
+        Text(text, style = MaterialTheme.typography.labelLarge, color = c.ink2)
+    }
+}
+
+@Composable
+private fun PhotoFull(state: AppState, id: String) {
+    val bmp by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, id) { value = state.graph.photos.load(id, 1600) }
+    bmp?.let {
+        androidx.compose.foundation.Image(
+            it.asImageBitmap(), null,
+            Modifier.fillMaxWidth().aspectRatio(it.width.toFloat() / it.height).clip(RoundedCornerShape(18.dp)),
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+        )
+    }
+}
+
+/** What the Journal is filtered by. Lives in [AppState] so it survives switching tabs. */
+data class EntryFilter(
+    val starred: Boolean = false,
+    val photos: Boolean = false,
+    val moods: Set<String> = emptySet(),
+    val tags: Set<String> = emptySet(),
+    val parts: Set<Part> = emptySet(),
+    val within: Int = 0,
+    val oldestFirst: Boolean = false,
+) {
+    val count: Int get() = listOf(starred, photos, moods.isNotEmpty(), tags.isNotEmpty(), parts.isNotEmpty(), within > 0, oldestFirst).count { it }
+
+    fun apply(list: List<Entry>, pack: com.inigocode.kuralheart.data.Pack): List<Entry> {
+        val since = if (within > 0) Journal.today().minusDays(within.toLong() - 1) else null
+        val out = list.filter { e ->
+            (!starred || e.starred) && (!photos || e.photos.isNotEmpty()) &&
+                (moods.isEmpty() || e.mood in moods) && (tags.isEmpty() || e.tags.any { it in tags }) &&
+                (parts.isEmpty() || pack.chapterOf(pack.kural(e.kural)).part in parts) && (since == null || !e.date.isBefore(since))
+        }
+        return if (oldestFirst) out.sortedWith(compareBy<Entry> { it.date }.thenBy { it.created }) else out
+    }
+}
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun FilterSheet(state: AppState, dismiss: () -> Unit) {
+    val c = Olai.colors
+    val tamil = state.prefs.tamil
+    var f by androidx.compose.runtime.remember { mutableStateOf(state.entryFilter) }
+    androidx.compose.material3.ModalBottomSheet(onDismissRequest = { state.entryFilter = f; dismiss() }, containerColor = c.surface) {
+        Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 24.dp).verticalScroll(rememberScrollState())) {
+            Text(tr("Filter your pages", "பக்கங்களை வடிகட்டு"), style = MaterialTheme.typography.headlineSmall, color = c.ink)
+            SectionLabel(tr("Show", "காட்டு"))
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Chip(tr("Starred", "நட்சத்திரமிட்டவை"), Ico.star, f.starred) { f = f.copy(starred = !f.starred) }
+                Chip(tr("With photos", "படங்களுடன்"), Ico.gallery, f.photos) { f = f.copy(photos = !f.photos) }
+                Chip(tr("Oldest first", "பழையவை முதலில்"), on = f.oldestFirst) { f = f.copy(oldestFirst = !f.oldestFirst) }
+            }
+            SectionLabel(tr("When", "எப்போது"))
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for ((d, en, ta) in listOf(Triple(0, "Any time", "எப்போதும்"), Triple(7, "Last 7 days", "கடந்த 7 நாள்கள்"), Triple(30, "Last 30 days", "கடந்த 30 நாள்கள்"), Triple(365, "Last year", "கடந்த ஆண்டு"))) {
+                    Chip(if (tamil) ta else en, on = f.within == d) { f = f.copy(within = d) }
+                }
+            }
+            SectionLabel(tr("Feeling", "உணர்வு"))
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (m in Moods) Chip(if (tamil) m.ta else m.en, on = m.id in f.moods) { f = f.copy(moods = if (m.id in f.moods) f.moods - m.id else f.moods + m.id) }
+            }
+            SectionLabel(tr("Book of the Kural", "குறளின் பால்"))
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (p in Part.entries) Chip(if (tamil) p.ta else p.en, on = p in f.parts) { f = f.copy(parts = if (p in f.parts) f.parts - p else f.parts + p) }
+            }
+            val tags = state.journal.allTags
+            if (tags.isNotEmpty()) {
+                SectionLabel(tr("Tags", "குறிச்சொற்கள்"))
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (t in tags) Chip("#$t", on = t in f.tags) { f = f.copy(tags = if (t in f.tags) f.tags - t else f.tags + t) }
+                }
+            }
+            Spacer(Modifier.height(18.dp))
+            PrimaryButton(tr("Show pages", "பக்கங்களைக் காட்டு")) { state.entryFilter = f; dismiss() }
+            androidx.compose.material3.TextButton({ f = EntryFilter() }, Modifier.fillMaxWidth()) { Text(tr("Clear all", "அனைத்தையும் நீக்கு"), color = c.primary) }
         }
     }
 }

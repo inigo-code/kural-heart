@@ -49,18 +49,23 @@ object KuralFonts {
     val SerifTamil = FontFamily(serifTamil(400), serifTamil(500), serifTamil(600), serifTamil(800))
 }
 
-/** Material type roles at the canvas sizes. Tamil swaps the heading serif and opens the body leading. */
+/**
+ * Material type roles. Sizes are a step above Material's defaults because a journal is read slowly, and Tamil gets
+ * a further lift: Anek Tamil's letters sit smaller than Latin ones at the same size, so Tamil text is set larger
+ * and with more leading. The person's text-size setting scales all of it.
+ */
 fun olaiTypography(tamil: Boolean): Typography {
+    val k = if (tamil) 1.08f else 1f
     val heading = if (tamil) KuralFonts.SerifTamil else KuralFonts.Serif
     val trim = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.None)
-    val body = TextStyle(fontFamily = KuralFonts.Sans, fontSize = 16.sp, lineHeight = if (tamil) 27.5.sp else 25.6.sp, lineHeightStyle = trim)
+    val body = TextStyle(fontFamily = KuralFonts.Sans, fontSize = (17.5f * k).sp, lineHeight = if (tamil) 32.sp else 28.sp, lineHeightStyle = trim)
     return Typography(
-        displaySmall = TextStyle(fontFamily = heading, fontWeight = FontWeight.Medium, fontSize = if (tamil) 27.sp else 32.sp, lineHeight = 1.2.em, letterSpacing = (-0.01).em),
-        headlineSmall = TextStyle(fontFamily = heading, fontWeight = FontWeight.Medium, fontSize = if (tamil) 21.sp else 24.sp, lineHeight = 1.3.em),
-        titleMedium = TextStyle(fontFamily = KuralFonts.Sans, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 1.35.em),
+        displaySmall = TextStyle(fontFamily = heading, fontWeight = FontWeight.Medium, fontSize = if (tamil) 30.sp else 34.sp, lineHeight = 1.25.em, letterSpacing = (-0.01).em),
+        headlineSmall = TextStyle(fontFamily = heading, fontWeight = FontWeight.Medium, fontSize = if (tamil) 23.sp else 25.sp, lineHeight = 1.35.em),
+        titleMedium = TextStyle(fontFamily = KuralFonts.Sans, fontWeight = FontWeight.SemiBold, fontSize = (18f * k).sp, lineHeight = 1.4.em),
         bodyLarge = body,
-        bodyMedium = body.copy(fontSize = 14.5.sp, lineHeight = if (tamil) 25.sp else 22.sp),
-        labelLarge = TextStyle(fontFamily = KuralFonts.Sans, fontWeight = FontWeight.SemiBold, fontSize = 13.5.sp, lineHeight = 1.3.em),
-        labelMedium = TextStyle(fontFamily = KuralFonts.Sans, fontWeight = FontWeight.Medium, fontSize = 12.5.sp, lineHeight = 1.3.em),
+        bodyMedium = body.copy(fontSize = (16f * k).sp, lineHeight = if (tamil) 29.sp else 25.sp),
+        labelLarge = TextStyle(fontFamily = KuralFonts.Sans, fontWeight = FontWeight.SemiBold, fontSize = (15f * k).sp, lineHeight = 1.35.em),
+        labelMedium = TextStyle(fontFamily = KuralFonts.Sans, fontWeight = FontWeight.Medium, fontSize = (14f * k).sp, lineHeight = 1.35.em),
     )
 }

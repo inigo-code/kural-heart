@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Kural Heart requests no network permission at all. The build fails if one appears (see app/build.gradle.kts). -->
+<!-- Every permission here is on the allowlist in app/build.gradle.kts; the build fails on any other. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Online only for Drive sync, weather and update checks, each turned on by the person. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Place and weather for a page, when asked. Coarse: about a neighbourhood. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Lets the app ask the phone's text-to-speech engine to read couplets aloud. -->
+    <queries>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    </queries>
 
     <application
         android:name=".KuralHeartApp"

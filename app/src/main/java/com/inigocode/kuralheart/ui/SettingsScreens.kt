@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,6 +81,7 @@ fun SettingsScreen(state: AppState) {
         ctx.pickingFile = false
         if (uri != null) ctx.lifecycleScopeLaunch { state.graph.backup.exportText(uri, state.pack) }
     }
+    val askLocation = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok -> if (!ok) p.autoDetails = false }
     val askNotify = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
         p.reminderOn = ok
         if (ok) Alarms.scheduleReminder(ctx, p.reminderMinutes)
@@ -87,6 +89,12 @@ fun SettingsScreen(state: AppState) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(12.dp))
         Text(l.settings, style = MaterialTheme.typography.displaySmall, color = c.ink, modifier = Modifier.padding(start = 4.dp))
+        Spacer(Modifier.height(12.dp))
+        ProfileCard(state)
+        state.update?.let { u ->
+            Spacer(Modifier.height(12.dp))
+            UpdateCard(state, u)
+        }
 
         SectionLabel(l.sLook)
         Group {
@@ -96,10 +104,53 @@ fun SettingsScreen(state: AppState) {
                     Choice("தமிழ்", p.tamil) { p.tamil = true; TodayWidget.refresh(ctx) }
                 }
             }
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                androidx.compose.material3.HorizontalDivider(color = c.line, modifier = Modifier.padding(bottom = 12.dp))
+                Text(tr("Text size", "எழுத்து அளவு"), style = MaterialTheme.typography.bodyLarge, color = c.ink)
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for ((pct, label) in listOf(90 to tr("Small", "சிறியது"), 100 to tr("Default", "இயல்பு"), 115 to tr("Large", "பெரியது"), 130 to tr("Larger", "மிகப் பெரியது"))) {
+                        Choice(label, p.textScale == pct, Modifier.weight(1f)) { p.textScale = pct }
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Text(tr("Colour", "வண்ணம்"), style = MaterialTheme.typography.bodyLarge, color = c.ink)
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    for ((id, col, name) in listOf(
+                        Triple("clay", androidx.compose.ui.graphics.Color(0xFFB4492A), tr("Clay", "களிமண்")),
+                        Triple("indigo", androidx.compose.ui.graphics.Color(0xFF3A4E86), tr("Indigo", "நீலம்")),
+                        Triple("green", androidx.compose.ui.graphics.Color(0xFF2F6B53), tr("Leaf green", "இலைப் பச்சை")),
+                        Triple("rose", androidx.compose.ui.graphics.Color(0xFFA8475C), tr("Rose", "ரோஜா")),
+                    )) {
+                        val on = p.accent == id
+                        Box(
+                            Modifier.size(44.dp).clip(androidx.compose.foundation.shape.CircleShape).background(col)
+                                .then(if (on) Modifier.border(3.dp, c.ink, androidx.compose.foundation.shape.CircleShape) else Modifier)
+                                .clickable(role = androidx.compose.ui.semantics.Role.RadioButton) { p.accent = id }
+                                .semantics { contentDescription = name },
+                        )
+                    }
+                }
+            }
             GroupRow(l.sTheme, sub = when (p.theme) { ThemeMode.Auto -> l.themeAuto; ThemeMode.Ivory -> l.themeIvory; ThemeMode.Midnight -> l.themeMidnight }, onClick = {
                 p.theme = ThemeMode.entries[(p.theme.ordinal + 1) % ThemeMode.entries.size]
             })
             GroupRow(l.sMotion, trailing = { Toggle(p.reduceMotion) { p.reduceMotion = it } })
+        }
+
+        SectionLabel(tr("Couplets", "குறள்கள்"))
+        Group {
+            GroupRow(
+                tr("English shown with each couplet", "குறளுடன் காட்டும் ஆங்கிலம்"), sub = translator(p.translation), divider = false,
+                onClick = { p.translation = when (p.translation) { "aiyar" -> "pope"; "pope" -> "popeprose"; else -> "aiyar" } },
+            )
+            GroupRow(
+                tr("Today's couplet", "இன்றைய குறள்"),
+                sub = if (p.promptMode == "random") tr("A random couplet each day", "நாள்தோறும் ஏதேனும் ஒரு குறள்") else tr("The welcome week, then a shuffled order", "வரவேற்பு வாரம், பிறகு கலந்த வரிசை"),
+                onClick = { p.promptMode = if (p.promptMode == "random") "daily" else "random" },
+            )
+            GroupRow(tr("Saved couplets", "சேமித்த குறள்கள்"), sub = "${p.saved.size}", onClick = { state.stack.clear(); state.tab = Tab.Kural })
         }
 
         SectionLabel(l.sDaily)
@@ -141,6 +192,33 @@ fun SettingsScreen(state: AppState) {
             GroupRow(l.sBackup, sub = if (state.graph.backup.hasPassphrase && p.backupTree.isNotEmpty()) lastBackupLabel(p.lastBackup, l) else l.notSet, onClick = { state.push(Route.Backup) })
             GroupRow(l.sText, sub = l.sTextSub, onClick = { ctx.pickingFile = true; exportText.launch("Kural Heart pages.txt") })
             GroupRow(l.sWipe, titleColor = c.heart, onClick = { wipe = true })
+        }
+
+        SectionLabel(tr("Online", "இணையம்"))
+        Group {
+            GroupRow(
+                tr("Add place and weather to new pages", "புதிய பக்கங்களில் இடமும் வானிலையும்"),
+                sub = tr("Uses your rough location; weather from Open-Meteo", "தோராயமான இருப்பிடம்; வானிலை Open-Meteo-விலிருந்து"), divider = false,
+                trailing = { Toggle(p.autoDetails) { on -> p.autoDetails = on; if (on && !com.inigocode.kuralheart.data.Places.hasPermission(ctx)) askLocation.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION) } },
+            )
+            GroupRow(
+                tr("Google Drive sync", "Google Drive ஒத்திசைவு"),
+                sub = if (p.driveOn) lastBackupLabel(p.lastDriveSync, l) else l.notSet, onClick = { state.push(Route.Backup) },
+            )
+            if (com.inigocode.kuralheart.data.Updates.enabled) {
+                GroupRow(tr("Check for new versions", "புதிய பதிப்புகளைத் தேடு"), sub = "${com.inigocode.kuralheart.BuildConfig.VERSION_NAME}", trailing = { Toggle(p.updateCheck) { p.updateCheck = it } })
+                GroupRow(tr("Check now", "இப்போதே தேடு"), onClick = {
+                    ctx.lifecycleScopeLaunch {
+                        val r = runCatching { com.inigocode.kuralheart.data.Updates.latest() }
+                        val rel = r.getOrNull()
+                        when {
+                            r.isFailure -> state.snackbar.showSnackbar(tr2(p.tamil, "Couldn't reach GitHub just now.", "இப்போது GitHub-ஐ அணுக இயலவில்லை."))
+                            rel != null && com.inigocode.kuralheart.data.Updates.isNewer(rel.version) -> state.update = rel
+                            else -> state.snackbar.showSnackbar(tr2(p.tamil, "You have the latest version.", "உங்களிடம் உள்ளதே புதிய பதிப்பு."))
+                        }
+                    }
+                })
+            }
         }
 
         SectionLabel(l.sAbout)
@@ -185,7 +263,7 @@ private fun WipeDialog(state: AppState, dismiss: () -> Unit) {
         confirmButton = {
             TextButton(enabled = typed.trim() == l.wipeWord, onClick = {
                 state.activity.lifecycleScopeLaunch {
-                    state.journal.deleteAll()
+                    state.journal.deleteAll(); state.graph.photos.deleteAll(); state.prefs.driveOn = false
                     state.graph.backup.forget()
                     Alarms.cancelReminder(state.activity)
                     Crypto.deleteDeviceKey()
@@ -244,6 +322,36 @@ fun BackupScreen(state: AppState) {
         ctx.pickingFile = false
         restoreUri = uri
     }
+    val drive = state.graph.drive
+    suspend fun doSync(token: String) {
+        busy = tr2(p.tamil, "Syncing with Google Drive", "Google Drive-உடன் ஒத்திசைகிறது"); message = null
+        message = runCatching {
+            val r = drive.sync(token)
+            p.driveOn = true
+            Alarms.scheduleAll(ctx)
+            TodayWidget.refresh(ctx)
+            state.sealsAfterSave()
+            tr2(p.tamil, "Synced. ", "ஒத்திசைந்தது. ") + if (r.added + r.keptBoth > 0) l.restored(r.added, r.keptBoth) else tr2(p.tamil, "Nothing new from Drive.", "Drive-இலிருந்து புதியது எதுவும் இல்லை.")
+        }.getOrElse { driveError(it, p.tamil) }
+        busy = null
+    }
+    val consent = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { res ->
+        ctx.pickingFile = false
+        val token = drive.tokenFromConsent(res.data)
+        if (token != null) ctx.lifecycleScopeLaunch { doSync(token) } else message = tr2(p.tamil, "Google Drive wasn't connected.", "Google Drive இணைக்கப்படவில்லை.")
+    }
+    fun connectDrive() {
+        ctx.lifecycleScopeLaunch {
+            when (val a = runCatching { drive.authorize() }.getOrElse { message = driveError(it, p.tamil); null }) {
+                is com.inigocode.kuralheart.data.Drive.Auth.Token -> doSync(a.token)
+                is com.inigocode.kuralheart.data.Drive.Auth.NeedsConsent -> {
+                    ctx.pickingFile = true
+                    consent.launch(androidx.activity.result.IntentSenderRequest.Builder(a.intent.intentSender).build())
+                }
+                null -> Unit
+            }
+        }
+    }
     fun run(label: String, block: suspend () -> String) {
         busy = label; message = null
         ctx.lifecycleScopeLaunch {
@@ -264,6 +372,22 @@ fun BackupScreen(state: AppState) {
                 LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 10.dp), color = c.primary, trackColor = c.surface3)
             }
             message?.let { Note(it, icon = Ico.shield) }
+
+            SectionLabel("Google Drive")
+            Group {
+                GroupRow(
+                    if (p.driveOn) tr("Syncing with your Google Drive", "உங்கள் Google Drive-உடன் ஒத்திசைகிறது") else tr("Sync with Google Drive", "Google Drive-உடன் ஒத்திசை"),
+                    sub = if (p.driveOn) lastBackupLabel(p.lastDriveSync, l) else tr("Sign in once. Every page and photo, locked with your passphrase.", "ஒருமுறை உள்நுழையவும். ஒவ்வொரு பக்கமும் படமும் உங்கள் கடவுச்சொற்றொடரால் பூட்டப்படும்."),
+                    divider = false,
+                    trailing = { Toggle(p.driveOn) { on -> if (!on) p.driveOn = false else if (!hasPass) message = tr2(p.tamil, "Set a passphrase below first.", "முதலில் கீழே கடவுச்சொற்றொடரை அமைக்கவும்.") else connectDrive() } },
+                )
+                if (p.driveOn) GroupRow(tr("Sync now", "இப்போதே ஒத்திசை"), onClick = { connectDrive() })
+            }
+            Spacer(Modifier.height(10.dp))
+            Note(tr(
+                "Kural Heart uses a private app folder in your Drive that you can't see in the Drive app. Google only ever holds a locked file.",
+                "உங்கள் Drive-இல் Drive செயலியில் தெரியாத ஒரு தனிக் கோப்புறையைப் பயன்படுத்துகிறது. Google-இடம் பூட்டிய கோப்பு மட்டுமே இருக்கும்.",
+            ))
 
             SectionLabel(l.backupWhere)
             Group {
@@ -411,13 +535,21 @@ fun SourcesScreen(state: AppState) {
                         "1,306 couplets agree, 12 were settled by vote, and 12 lines were chosen by hand.",
                     l.reviewPending, first = true,
                 )
-                Item(if (tamil) "ஆங்கில மொழிபெயர்ப்பு" else "English", "V. V. S. Aiyar, 1916, from Standard Ebooks.", l.publicDomain, ok = true)
+                Item(if (tamil) "ஆங்கில மொழிபெயர்ப்பு" else "English", "V. V. S. Aiyar, 1916, from Standard Ebooks. G. U. Pope, 1886, verse and prose, from Project Madurai's e-text 0153.", l.publicDomain, ok = true)
                 Item(
                     if (tamil) "கேள்விகள்" else "Questions",
                     "Written for Kural Heart in English and Tamil. ${l.draftNote}", l.reviewPending,
                 )
                 Item("Type", "Anek Tamil, Noto Serif Tamil and Literata, under the SIL Open Font License.")
                 Item("Valluvar", "Drawn for Kural Heart. White robes, no marks: a teacher for everyone.")
+                Item(
+                    if (tamil) "உரைகள்" else "Commentaries",
+                    "Modern commentaries (Mu. Varadarasanar, Kalaignar Karunanidhi, Solomon Pappaiah) are under copyright and aren't included. Parimelazhagar's classic commentary will be added when a checked digital text is found.",
+                )
+                Item(
+                    if (tamil) "இணையம்" else "Online",
+                    "Weather from Open-Meteo. Place names from Android's geocoder (Google Play services). Drive sync through Google. Update checks from GitHub. Each only when you turn it on.",
+                )
             }
             Spacer(Modifier.height(12.dp))
             TextButton({
@@ -428,3 +560,111 @@ fun SourcesScreen(state: AppState) {
     }
 }
 
+/** Plain words for Drive failures. A DEVELOPER_ERROR (code 10) means the Google Cloud setup isn't finished. */
+fun driveError(e: Throwable, tamil: Boolean): String {
+    val m = e.message ?: ""
+    return when {
+        "10:" in m || "DEVELOPER_ERROR" in m -> tr2(tamil, "Google sign-in isn't set up for this copy of the app yet (see docs/GOOGLE_DRIVE_SETUP.md).", "இந்தப் பதிப்புக்கு Google உள்நுழைவு இன்னும் அமைக்கப்படவில்லை.")
+        e is com.inigocode.kuralheart.data.Net.HttpError -> tr2(tamil, "Google Drive refused the request (${e.code}).", "Google Drive கோரிக்கையை மறுத்தது (${e.code}).")
+        e is java.io.IOException -> tr2(tamil, "No connection. Try again when you're online.", "இணைப்பு இல்லை. இணையத்தில் இருக்கும்போது மீண்டும் முயலுங்கள்.")
+        else -> m.ifEmpty { tr2(tamil, "Something went wrong.", "ஏதோ தவறு நடந்தது.") }
+    }
+}
+
+@Composable
+private fun ProfileCard(state: AppState) {
+    val c = Olai.colors
+    val p = state.prefs
+    val thread = state.thread()
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(c.surface).clickable { state.push(Route.Profile) }.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Avatar(state, 56)
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(p.name.ifEmpty { tr("Add your name", "உங்கள் பெயரைச் சேர்க்கவும்") }, style = MaterialTheme.typography.titleMedium, color = c.ink)
+            Text(
+                p.journalTitle.ifEmpty { tr("My Kural journal", "என் குறள் நாட்குறிப்பு") } + " · " +
+                    LocalL.current.pages(state.journal.entries.size) + " · " + tr("${thread.days}-day thread", "${thread.days} நாள் நூல்"),
+                style = MaterialTheme.typography.labelMedium, color = c.ink3,
+            )
+        }
+        Icon(Ico.chevron, tint = c.ink3, size = 20.dp)
+    }
+}
+
+@Composable
+fun Avatar(state: AppState, size: Int) {
+    val c = Olai.colors
+    val p = state.prefs
+    Box(Modifier.size(size.dp).clip(androidx.compose.foundation.shape.CircleShape).background(c.primarySoft), contentAlignment = Alignment.Center) {
+        if (p.avatar.isNotEmpty()) PhotoThumb(state, p.avatar, size)
+        else if (p.name.isNotEmpty()) Text(p.name.take(1).uppercase(), style = MaterialTheme.typography.headlineSmall, color = c.onSoft)
+        else Icon(Ico.user, tint = c.onSoft)
+    }
+}
+
+@Composable
+fun ProfileScreen(state: AppState) {
+    val c = Olai.colors
+    val p = state.prefs
+    val ctx = state.activity
+    var name by remember { mutableStateOf(p.name) }
+    var title by remember { mutableStateOf(p.journalTitle) }
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        ctx.pickingFile = false
+        if (uri != null) ctx.lifecycleScopeLaunch { p.avatar = state.graph.photos.add(uri) }
+    }
+    Column(Modifier.fillMaxSize()) {
+        TopBar(tr("Your profile", "உங்கள் சுயவிவரம்"), onBack = { p.name = name.trim(); p.journalTitle = title.trim(); state.pop() })
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Avatar(state, 112)
+            androidx.compose.material3.TextButton({
+                ctx.pickingFile = true
+                pick.launch(androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }) { Text(tr("Choose a photo", "படத்தைத் தேர்ந்தெடு"), color = c.primary) }
+            if (p.avatar.isNotEmpty()) androidx.compose.material3.TextButton({ p.avatar = "" }) { Text(tr("Remove photo", "படத்தை நீக்கு"), color = c.ink3) }
+            Spacer(Modifier.height(8.dp))
+            Column(Modifier.fillMaxWidth()) {
+                SectionLabel(tr("Your name", "உங்கள் பெயர்"))
+                Field(name, { name = it }, tr("What should Valluvar call you?", "வள்ளுவர் உங்களை எப்படி அழைக்கட்டும்?"))
+                SectionLabel(tr("Journal name", "நாட்குறிப்பின் பெயர்"))
+                Field(title, { title = it }, tr("My Kural journal", "என் குறள் நாட்குறிப்பு"))
+                SectionLabel(tr("So far", "இதுவரை"))
+                val thread = state.thread()
+                val chapters = state.journal.entries.map { state.pack.kural(it.kural).chapter }.toSet().size
+                Group {
+                    GroupRow(tr("Pages", "பக்கங்கள்"), sub = "${state.journal.entries.size}", divider = false)
+                    GroupRow(tr("Longest thread", "நீண்ட நூல்"), sub = "${thread.longest}")
+                    GroupRow(tr("Chapters written on", "எழுதிய அதிகாரங்கள்"), sub = "$chapters / 133")
+                    GroupRow(tr("Couplets read", "படித்த குறள்கள்"), sub = "${p.read.size} / 1330")
+                    GroupRow(tr("Seals", "முத்திரைகள்"), sub = "${p.seals().size} / 9")
+                    p.startedOn.takeIf { it.isNotEmpty() }?.let { GroupRow(tr("With Valluvar since", "வள்ளுவருடன் தொடங்கியது"), sub = dateLine(p.tamil, java.time.LocalDate.parse(it))) }
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+            PrimaryButton(LocalL.current.save) { p.name = name.trim(); p.journalTitle = title.trim(); state.pop() }
+            Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+private fun UpdateCard(state: AppState, u: com.inigocode.kuralheart.data.Updates.Release) {
+    val c = Olai.colors
+    val ctx = state.activity
+    var busy by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(c.primarySoft).padding(16.dp)) {
+        Text(tr("Version ${u.version} is ready", "பதிப்பு ${u.version} தயார்"), style = MaterialTheme.typography.titleMedium, color = c.onSoft)
+        if (u.notes.isNotBlank()) Text(u.notes.take(400), style = MaterialTheme.typography.bodyMedium, color = c.ink2, modifier = Modifier.padding(top = 6.dp))
+        PrimaryButton(if (busy) tr("Downloading…", "பதிவிறக்குகிறது…") else tr("Download and install", "பதிவிறக்கி நிறுவு"), enabled = !busy, icon = Ico.download, modifier = Modifier.padding(top = 10.dp)) {
+            busy = true
+            ctx.lifecycleScopeLaunch {
+                runCatching { com.inigocode.kuralheart.data.Updates.install(ctx, com.inigocode.kuralheart.data.Updates.download(ctx, u)) }
+                    .onFailure { state.snackbar.showSnackbar(tr2(state.prefs.tamil, "The download didn't finish. Try again.", "பதிவிறக்கம் முடியவில்லை. மீண்டும் முயலுங்கள்.")) }
+                busy = false
+            }
+        }
+    }
+}

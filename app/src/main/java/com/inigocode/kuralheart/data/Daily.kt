@@ -31,10 +31,11 @@ enum class Period(val ta: String, val en: String, val greetTa: String, val greet
  * couplets by being away, and a day keeps its couplet once chosen.
  */
 object Daily {
-    fun pick(pack: Pack, log: Map<String, Int>, seed: Long, date: LocalDate): Int {
+    fun pick(pack: Pack, log: Map<String, Int>, seed: Long, date: LocalDate, random: Boolean = false): Int {
         log[date.toString()]?.let { return it }
         val used = log.values.toSet()
         val i = log.size
+        if (random) return pack.pool.filter { it !in used }.ifEmpty { pack.pool }.random(Random(seed + date.toEpochDay()))
         if (i < pack.welcome.size) return pack.welcome[i]
         val order = pack.pool.shuffled(Random(seed))
         return order.firstOrNull { it !in used } ?: order[i % order.size]

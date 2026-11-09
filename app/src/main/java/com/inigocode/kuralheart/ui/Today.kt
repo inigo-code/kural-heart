@@ -76,14 +76,14 @@ fun KuralLeaf(pack: Pack, k: Kural, turned: Boolean, modifier: Modifier = Modifi
         Leaf {
             if (!back) {
                 CoupletText(k.a, k.b)
-                LeafNote("${ch.ta} · ${if (tamil) "${LocalL.current.kural} ${k.n}" else "${ch.en} · ${k.n}"}")
+                LeafNote(tr("Chapter ${ch.n} · ${ch.ta} · Kural ${k.n}", "அதிகாரம் ${ch.n} · ${ch.ta} · குறள் ${k.n}"))
             } else {
+                // The back of the leaf carries Pope's verse, so the front's translation line can be Aiyar's prose.
                 Text(
-                    k.en, textAlign = TextAlign.Center, color = Olai.colors.leafInk,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = KuralFonts.Serif, fontStyle = FontStyle.Italic, fontSize = 15.sp),
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    k.popeA + "\n" + k.popeB, color = Olai.colors.leafInk,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontFamily = KuralFonts.Serif, fontStyle = FontStyle.Italic),
                 )
-                LeafNote("${LocalL.current.verseBy} · ${ch.en} · ${k.n}")
+                LeafNote("G. U. Pope, 1886 · ${ch.en} · ${k.n}")
             }
         }
     }
@@ -96,7 +96,8 @@ fun TodayScreen(state: AppState, period: Period) {
     val tamil = state.prefs.tamil
     val pack = state.pack
     val today = Journal.today()
-    val k = remember(today) { pack.kural(state.graph.todayKural(today)) }
+    val k = remember(today, state.graph.todayVersion) { pack.kural(state.graph.todayKural(today)) }
+    val speaker = state.graph.speaker
     val written = state.journal.entries.any { it.date == today }
     val thread = state.thread()
     var turned by rememberSaveable { mutableStateOf(false) }
@@ -120,12 +121,26 @@ fun TodayScreen(state: AppState, period: Period) {
                 Valluvar(if (written) ValluvarState.Resting else ValluvarState.Reading, size = 118.dp, still = LocalStill.current)
             }
         }
-        KuralLeaf(pack, k, turned, Modifier.padding(horizontal = 20.dp, vertical = 16.dp))
+        KuralLeaf(pack, k, turned, Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp).clickable { state.push(Route.KuralView(k.n)) })
+        // The chosen English, under the leaf, so its meaning is never a tap away.
+        Column(Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
+            Text(translationOf(k, state.prefs.translation), style = MaterialTheme.typography.bodyLarge, color = c.ink2)
+            Text(translator(state.prefs.translation), style = MaterialTheme.typography.labelMedium, color = c.ink3, modifier = Modifier.padding(top = 4.dp))
+        }
         Row(
             Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            val playing = speaker.speaking == k.n
+            Chip(if (playing) tr("Stop", "நிறுத்து") else tr("Listen", "கேள்"), if (playing) Ico.stop else Ico.play, playing) {
+                speaker.read(k, translationOf(k, state.prefs.translation))
+            }
             Chip(l.turn, Ico.turn, turned) { turned = !turned }
+            Chip(tr("Another couplet", "வேறு குறள்"), Ico.sync) {
+                val pool = pack.pool.filter { it != k.n }
+                state.graph.setToday(pool.random())
+            }
+            Chip(tr("Choose from the Kural", "குறளிலிருந்து தேர்வு"), Ico.book) { state.tab = Tab.Kural }
             Chip(l.share, Ico.share) { state.push(Route.Share(k.n)) }
             Chip(l.feel, Ico.heart) { state.push(Route.Feeling) }
         }

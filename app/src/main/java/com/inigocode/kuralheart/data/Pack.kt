@@ -11,7 +11,12 @@ enum class Part(val ta: String, val en: String) {
 data class Chapter(val n: Int, val ta: String, val en: String, val part: Part)
 
 /** One couplet. [check] is how the Tamil was verified: agree, voted or review (see tools/content/report.md). */
-data class Kural(val n: Int, val chapter: Int, val a: String, val b: String, val en: String, val check: String)
+data class Kural(
+    val n: Int, val chapter: Int, val a: String, val b: String,
+    /** Aiyar's prose (1916). */ val en: String,
+    /** Pope's verse, two lines, and the prose rendering printed with it (1886). */ val popeA: String, val popeB: String, val popeProse: String,
+    val check: String,
+)
 
 data class Question(val en: String, val ta: String)
 
@@ -58,7 +63,7 @@ class Pack private constructor(
             val ks = root.getJSONArray("kurals")
             val kurals = List(ks.length()) { i ->
                 val o = ks.getJSONObject(i)
-                Kural(o.getInt("n"), o.getInt("c"), o.getString("a"), o.getString("b"), o.getString("en"), o.getString("check"))
+                Kural(o.getInt("n"), o.getInt("c"), o.getString("a"), o.getString("b"), o.getString("en"), o.getString("pa"), o.getString("pb"), o.getString("pp"), o.getString("check"))
             }
             val q = root.getJSONObject("questions")
             fun question(o: JSONObject) = Question(o.getString("en"), o.getString("ta"))

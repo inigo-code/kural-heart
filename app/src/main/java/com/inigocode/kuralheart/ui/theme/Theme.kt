@@ -52,9 +52,20 @@ object Olai {
     val colors: OlaiColors @Composable get() = LocalOlai.current
 }
 
+/** The four accents a person can choose. Each keeps 4.5:1 contrast for its text on both grounds. */
+fun OlaiColors.withAccent(accent: String): OlaiColors = when (accent) {
+    "indigo" -> if (isNight) copy(primary = Color(0xFF9DB0E6), onPrimary = Color(0xFF10162A), primarySoft = Color(0xFF1F2433), onSoft = Color(0xFFC9D3F3))
+        else copy(primary = Color(0xFF3A4E86), onPrimary = Color(0xFFF7F8FF), primarySoft = Color(0xFFE2E6F2), onSoft = Color(0xFF263463))
+    "green" -> if (isNight) copy(primary = Color(0xFF7FC3A5), onPrimary = Color(0xFF0E1F18), primarySoft = Color(0xFF1F2C26), onSoft = Color(0xFFB9E0CD))
+        else copy(primary = Color(0xFF2F6B53), onPrimary = Color(0xFFF4FBF7), primarySoft = Color(0xFFE1EDE6), onSoft = Color(0xFF1E4A39))
+    "rose" -> if (isNight) copy(primary = Color(0xFFE79AAD), onPrimary = Color(0xFF2A1118), primarySoft = Color(0xFF33222A), onSoft = Color(0xFFF4C7D2))
+        else copy(primary = Color(0xFFA8475C), onPrimary = Color(0xFFFFF7F9), primarySoft = Color(0xFFF4E1E5), onSoft = Color(0xFF6E2638))
+    else -> this
+}
+
 @Composable
-fun KuralHeartTheme(night: Boolean = isSystemInDarkTheme(), tamil: Boolean = false, content: @Composable () -> Unit) {
-    val c = if (night) Midnight else Ivory
+fun KuralHeartTheme(night: Boolean = isSystemInDarkTheme(), tamil: Boolean = false, accent: String = "clay", content: @Composable () -> Unit) {
+    val c = (if (night) Midnight else Ivory).withAccent(accent)
     val scheme = if (night) {
         darkColorScheme(
             primary = c.primary, onPrimary = c.onPrimary, primaryContainer = c.primarySoft, onPrimaryContainer = c.onSoft,

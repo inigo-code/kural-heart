@@ -11,7 +11,7 @@
     </LinearLayout>
     <LinearLayout android:id="@+id/w_leaf" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:layout_marginTop="8dp" android:background="@drawable/widget_leaf" android:orientation="vertical"
-        android:gravity="center" android:paddingHorizontal="8dp" android:paddingVertical="6dp">
+        android:gravity="center_vertical|start" android:paddingHorizontal="12dp" android:paddingVertical="6dp">
         <TextView android:id="@+id/w_line1" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:textColor="#2B1E10" android:textSize="16sp" android:fontFamily="@font/anek_tamil" android:maxLines="1" android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="11sp" android:autoSizeMaxTextSize="17sp" />
