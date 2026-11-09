@@ -53,17 +53,18 @@ export function DayArt({ period, style }: { period: Period; style?: StyleProp<Vi
       let s = seed;
       const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
       // Stars stay in the sky above the greeting, not over its letters.
-      for (let i = 0; i < count; i++) out.push({ x: rnd() * w * 0.95, y: 4 + rnd() * h * 0.36, r: 1.2 + rnd() * 1.6 });
+      for (let i = 0; i < count; i++) out.push({ x: w * 0.45 + rnd() * w * 0.53, y: 4 + rnd() * h * 0.4, r: 1.2 + rnd() * 1.6 });
       return out;
     };
-    const horizon = h * 0.82;
-    const line = Skia.Path.MakeFromSVGString(`M${f(w * 0.04)} ${f(horizon)}L${f(w * 0.96)} ${f(horizon)}`)!;
-    // Small birds: two arcs each.
+    // The sky keeps to the clear corner above and right of the greeting, so it never sits behind the words.
+    const horizon = h * 0.42;
+    const line = Skia.Path.MakeFromSVGString(`M${f(w * 0.62)} ${f(horizon)}L${f(w * 0.99)} ${f(horizon)}`)!;
+    // Small birds going home: two arcs each.
     const birds = Skia.Path.MakeFromSVGString(
       [
-        [w * 0.58, h * 0.28, 9],
-        [w * 0.68, h * 0.2, 7],
-        [w * 0.74, h * 0.33, 6],
+        [w * 0.6, h * 0.16, 8],
+        [w * 0.68, h * 0.08, 6],
+        [w * 0.55, h * 0.26, 5],
       ]
         .map(([x, y, s]) => `M${f(x - s)} ${f(y)}Q${f(x - s / 2)} ${f(y - s * 0.7)} ${f(x)} ${f(y)}Q${f(x + s / 2)} ${f(y - s * 0.7)} ${f(x + s)} ${f(y)}`)
         .join(''),
@@ -74,13 +75,13 @@ export function DayArt({ period, style }: { period: Period; style?: StyleProp<Vi
       case 'yaamam':
         return { kind: 'night' as const, moon: crescent(w * 0.78, h * 0.22, h * 0.15), stars: stars(5, 14), venus: null, horizon };
       case 'kaalai':
-        return { kind: 'sun' as const, cx: w * 0.3, cy: horizon, r: h * 0.2, rays: rays(w * 0.3, horizon, h * 0.2 + 12, 3, 15, 165, 25), half: true, line, birds: null };
+        return { kind: 'sun' as const, cx: w * 0.82, cy: horizon, r: h * 0.13, rays: rays(w * 0.82, horizon, h * 0.13 + 10, 2, 20, 160, 28), half: true, line, birds: null };
       case 'nanpagal':
-        return { kind: 'sun' as const, cx: w * 0.5, cy: h * 0.45, r: h * 0.16, rays: rays(w * 0.5, h * 0.45, h * 0.16 + 12, 3, 0, 345, 30), half: false, line: null, birds: null };
+        return { kind: 'sun' as const, cx: w * 0.82, cy: h * 0.22, r: h * 0.09, rays: rays(w * 0.82, h * 0.22, h * 0.09 + 10, 2, 0, 330, 30), half: false, line: null, birds: null };
       case 'erpadu':
-        return { kind: 'sun' as const, cx: w * 0.66, cy: h * 0.58, r: h * 0.17, rays: rays(w * 0.66, h * 0.58, h * 0.17 + 12, 4, 0, 330, 30), half: false, line: null, birds: null };
+        return { kind: 'sun' as const, cx: w * 0.84, cy: h * 0.3, r: h * 0.1, rays: rays(w * 0.84, h * 0.3, h * 0.1 + 10, 3, 0, 330, 30), half: false, line: null, birds: null };
       default:
-        return { kind: 'sun' as const, cx: w * 0.4, cy: horizon, r: h * 0.24, rays: rays(w * 0.4, horizon, h * 0.24 + 12, 2, 20, 160, 20), half: true, line, birds };
+        return { kind: 'sun' as const, cx: w * 0.84, cy: horizon, r: h * 0.15, rays: rays(w * 0.84, horizon, h * 0.15 + 10, 2, 25, 155, 26), half: true, line, birds };
     }
   }, [box, period]);
 
