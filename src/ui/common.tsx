@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
-import Animated, { Easing, FadeIn, FadeInDown, LinearTransition, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeInDown, SlideInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -19,7 +19,7 @@ import type { ValluvarState } from '@/valluvar/Valluvar';
 
 import { MayilBorder, SikkuThreshold } from './kolam';
 import { CoupletText, Leaf, LeafNote, Pronounce } from './leaf';
-import { Icon, T, TextLink, timeLabel } from './parts';
+import { Icon, T, TextLink, raised, timeLabel } from './parts';
 import type { IconName } from './parts';
 import { F, alpha } from './theme';
 import type { Colors } from './theme';
@@ -200,8 +200,9 @@ export function Rise({ i = 0, children, style }: { i?: number; children: ReactNo
   const { still } = useUI();
   return (
     <Animated.View
-      entering={still || i >= 10 ? undefined : FadeInDown.duration(420).delay(80 + Math.min(i, 8) * 70).easing(Easing.out(Easing.cubic)).withInitialValues({ transform: [{ translateY: 14 }] })}
-      layout={still ? undefined : LinearTransition.duration(240)}>
+      // No layout animation: on Android it holds a stale size while it runs, which crops text and lets the next
+      // section ride over this one when a couplet's English grows.
+      entering={still || i >= 10 ? undefined : FadeInDown.duration(420).delay(80 + Math.min(i, 8) * 70).easing(Easing.out(Easing.cubic)).withInitialValues({ transform: [{ translateY: 14 }] })}>
       {/* The look sits on an inner view: Android can leave an animating view with a background unshown. */}
       <View style={style}>{children}</View>
     </Animated.View>
@@ -342,7 +343,7 @@ export function EntryCard({ e }: { e: Entry }) {
     <Pressable
       onPress={() => router.push({ pathname: '/page/[id]', params: { id: e.id } })}
       accessibilityRole="button"
-      style={({ pressed }) => ({ marginHorizontal: 16, marginVertical: 6, borderRadius: 24, backgroundColor: pressed ? c.surface2 : c.surface, padding: 16 })}>
+      style={({ pressed }) => ({ marginHorizontal: 16, marginVertical: 6, borderRadius: 24, backgroundColor: pressed ? c.surface2 : c.surface, padding: 16, ...raised(c) })}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={[type.headline, { fontSize: type.headline.fontSize * 0.7, lineHeight: type.headline.lineHeight * 0.7, color: c.ink2, flex: 1 }]} numberOfLines={1}>
           {longDate(e.date, tamil)}
@@ -515,18 +516,23 @@ export function Dialog({
   );
 }
 
-/** A sheet that rises from the foot of the screen. */
+/**
+ * A sheet that rises from the foot of the screen. The dimmed backdrop fades in where it is, and only the sheet slides
+ * up (a Modal's own "slide" carries the backdrop up with it, a grey band rising from the bottom).
+ */
 export function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: ReactNode }) {
-  const { c } = useUI();
+  const { c, still } = useUI();
   const insets = useSafeAreaInsets();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
-      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
-        <Pressable onPress={() => {}} style={{ backgroundColor: c.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '88%', paddingBottom: insets.bottom }}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
+      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.42)', justifyContent: 'flex-end' }}>
+        <Animated.View entering={still ? undefined : SlideInDown.duration(320).easing(Easing.out(Easing.cubic))} style={{ maxHeight: '88%' }}>
+        <Pressable onPress={() => {}} style={{ backgroundColor: c.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '100%', paddingBottom: insets.bottom }}>
           <View style={{ alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: c.surface3, marginTop: 10 }} />
           <MayilBorder height={12} style={{ alignSelf: 'center', width: 132, marginTop: 10 }} />
           <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 24 }}>{children}</ScrollView>
         </Pressable>
+        </Animated.View>
       </Pressable>
     </Modal>
   );
@@ -611,6 +617,39 @@ export function LinkPills({ items, style }: { items: Action[]; style?: StyleProp
         </Pressable>
       ))}
     </View>
+  );
+}
+
+/** A round button that floats over a long list once it has been scrolled down, and takes it back to the top. */
+export function ToTop({ visible, onPress }: { visible: boolean; onPress: () => void }) {
+  const { c, still, tr } = useUI();
+  if (!visible) return null;
+  return (
+    <Animated.View entering={still ? undefined : FadeInDown.duration(220)} style={{ position: 'absolute', right: 18, bottom: 22 }}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={tr('Back to the top', 'மேலே செல்')}
+        style={({ pressed }) => ({
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 6,
+          height: 48,
+          paddingHorizontal: 16,
+          borderRadius: 24,
+          backgroundColor: c.primary,
+          elevation: 6,
+          shadowColor: '#000',
+          transform: [{ scale: pressed ? 0.95 : 1 }],
+        })}>
+        <View style={{ transform: [{ rotate: '90deg' }] }}>
+          <Icon name="back" size={20} color={c.onPrimary} stroke={2.2} />
+        </View>
+        <T v="label" color={c.onPrimary}>
+          {tr('Top', 'மேலே')}
+        </T>
+      </Pressable>
+    </Animated.View>
   );
 }
 

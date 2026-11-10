@@ -13,7 +13,7 @@ import { useUI } from './ui';
  * app's colour) hands over to this as soon as JavaScript runs. With reduced motion it is still and brief.
  */
 export function SplashOverlay({ ready, shown, onDone }: { ready: boolean; shown: boolean; onDone: () => void }) {
-  const { c, still } = useUI();
+  const { c, still, L, tamil } = useUI();
   const [fade] = useState(() => new Animated.Value(1));
   // When the overlay could first be seen: once Android's own splash has gone.
   const shownAt = useRef(0);
@@ -57,8 +57,8 @@ export function SplashOverlay({ ready, shown, onDone }: { ready: boolean; shown:
       <Text allowFontScaling={false} style={{ fontFamily: F.serifMedium, fontSize: 34, color: c.ink, marginTop: 16 }}>
         Kural Heart
       </Text>
-      <Text allowFontScaling={false} style={{ fontFamily: F.serifTamil, fontSize: 16, lineHeight: 26, color: c.ink3, marginTop: 2 }}>
-        குறளுடன் நாட்குறிப்பு
+      <Text allowFontScaling={false} style={{ fontFamily: tamil ? F.serifTamil : F.serifItalic, fontSize: tamil ? 16 : 18, lineHeight: 26, color: c.ink3, marginTop: 2 }}>
+        {L.tagline}
       </Text>
       <KolamBand style={{ position: 'absolute', left: 0, right: 0, bottom: 64 }} height={26} strength={1.4} />
     </Animated.View>

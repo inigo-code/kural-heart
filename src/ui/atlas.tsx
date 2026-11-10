@@ -1,7 +1,8 @@
 import { Image } from 'expo-image';
 import * as Linking from 'expo-linking';
 import { useMemo, useState } from 'react';
-import { PanResponder, Pressable, Text, View } from 'react-native';
+import { PanResponder, Platform, Pressable, Text, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
 import { Icon, T } from './parts';
 import { F, alpha } from './theme';
@@ -57,6 +58,10 @@ function clampY(cy: number, z: number, h: number) {
   const world = TILE * 2 ** z;
   return world <= h ? world / 2 : Math.max(h / 2, Math.min(world - h / 2, cy));
 }
+
+/** The night look for map tiles, where Android can draw view filters (12 and later). */
+const DARK_FILTER: ViewStyle['filter'] | null =
+  Platform.OS === 'android' && Number(Platform.Version) >= 31 ? [{ invert: 1 }, { hueRotate: '180deg' }, { brightness: 0.92 }, { contrast: 0.88 }, { saturate: 0.7 }] : null;
 
 export function AtlasMap({ points, height, focus, selected, onSelect }: { points: MapPoint[]; height: number; focus?: string; selected?: string[]; onSelect?: (ids: string[]) => void }) {
   const { c, tr } = useUI();
@@ -114,16 +119,20 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
       style={{ height, borderRadius: 24, overflow: 'hidden', backgroundColor: c.isNight ? '#2A2622' : '#E9E3D6' }}
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       {...pan.panHandlers}>
-      {tiles.map((t) => (
-        <Image
-          key={t.key}
-          source={{ uri: t.url, headers: { 'User-Agent': UA } }}
-          cachePolicy="disk"
-          style={{ position: 'absolute', left: t.x, top: t.y, width: TILE, height: TILE, opacity: c.isNight ? 0.82 : 1 }}
-          transition={120}
-          accessible={false}
-        />
-      ))}
+      {/* On Midnight the map turns dark too: the same OpenStreetMap tiles, inverted and turned back round the colour
+          wheel so water stays blue and parks green (Android 12 and later; older phones get them dimmed). */}
+      <View pointerEvents="none" style={[{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }, c.isNight && DARK_FILTER ? { filter: DARK_FILTER } : null]}>
+        {tiles.map((t) => (
+          <Image
+            key={t.key}
+            source={{ uri: t.url, headers: { 'User-Agent': UA } }}
+            cachePolicy="disk"
+            style={{ position: 'absolute', left: t.x, top: t.y, width: TILE, height: TILE, opacity: c.isNight && !DARK_FILTER ? 0.6 : 1 }}
+            transition={120}
+            accessible={false}
+          />
+        ))}
+      </View>
       {view
         ? pins.map((p) => {
             const x = p.x - (view.cx - width / 2);
@@ -175,8 +184,8 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
       <Pressable
         onPress={() => Linking.openURL('https://www.openstreetmap.org/copyright')}
         accessibilityRole="link"
-        style={{ position: 'absolute', right: 0, bottom: 0, paddingHorizontal: 8, paddingVertical: 3, borderTopLeftRadius: 10, backgroundColor: alpha('#FFFFFF', 0.8) }}>
-        <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 11, color: '#333333' }}>
+        style={{ position: 'absolute', right: 0, bottom: 0, paddingHorizontal: 8, paddingVertical: 3, borderTopLeftRadius: 10, backgroundColor: alpha(c.surface, 0.85) }}>
+        <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 11, color: c.ink2 }}>
           © OpenStreetMap contributors
         </Text>
       </Pressable>

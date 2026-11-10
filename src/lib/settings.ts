@@ -190,6 +190,9 @@ export function exportPrefs(): Record<string, unknown> {
     started_on: s.startedOn,
     name: s.name,
     journal_title: s.journalTitle,
+    // The profile photo's id; its picture travels in the backup's photos with the pages' own.
+    avatar: s.avatar,
+    pronounce_style: s.pronounceStyle,
     text_scale: s.textScale,
     accent: s.accent,
     prompt_mode: s.promptMode,
@@ -216,8 +219,34 @@ function obj(v: unknown): Record<string, unknown> {
 }
 
 /** Carry over the history that belongs to the journal (seals, the day log, the start date); keep this phone's choices. */
-export function mergeHistory(incoming: Record<string, unknown>) {
+/**
+ * Bring a backup's history into this phone: days, seals, saved and read couplets, the start date, and the profile
+ * (name, journal title, photo) where this phone has none yet. On a [fresh] phone (no pages yet: a new install being
+ * restored) the look and reading choices come back too, so the app is as it was.
+ */
+export function mergeHistory(incoming: Record<string, unknown>, fresh = false) {
+  const str = (v: unknown) => (typeof v === 'string' ? v : '');
   setSettings((s) => {
+    const profile = {
+      name: s.name || str(incoming.name),
+      journalTitle: s.journalTitle || str(incoming.journal_title),
+      avatar: s.avatar || str(incoming.avatar),
+    };
+    const theme = ({ Auto: 'auto', Ivory: 'ivory', Midnight: 'midnight' } as const)[str(incoming.theme) as 'Auto'];
+    // Values are as this app wrote them; a Kotlin-era backup simply lacks the newer keys.
+    const look: Partial<Settings> = fresh
+      ? ({
+          ...(typeof incoming.tamil === 'boolean' ? { tamil: incoming.tamil } : {}),
+          ...(str(incoming.accent) ? { accent: str(incoming.accent) } : {}),
+          ...(typeof incoming.text_scale === 'number' ? { textScale: incoming.text_scale } : {}),
+          ...(str(incoming.translation) ? { translation: str(incoming.translation) } : {}),
+          ...(str(incoming.prompt_mode) ? { promptMode: str(incoming.prompt_mode) } : {}),
+          ...(str(incoming.pronounce_style) ? { pronounceStyle: str(incoming.pronounce_style) } : {}),
+          ...(theme ? { theme } : {}),
+          ...(typeof incoming.reminder_on === 'boolean' ? { reminderOn: incoming.reminder_on } : {}),
+          ...(typeof incoming.reminder_minutes === 'number' ? { reminderMinutes: incoming.reminder_minutes } : {}),
+        } as Partial<Settings>)
+      : {};
     const dayLog = { ...s.dayLog };
     for (const [k, v] of Object.entries(obj(incoming.day_log))) if (dayLog[k] == null && typeof v === 'number') dayLog[k] = v;
     const seals = { ...s.seals };
@@ -226,6 +255,6 @@ export function mergeHistory(incoming: Record<string, unknown>) {
     const read = [...new Set([...s.read, ...nums(incoming.read_kurals)])];
     const started = typeof incoming.started_on === 'string' ? incoming.started_on : '';
     const startedOn = started && (!s.startedOn || started < s.startedOn) ? started : s.startedOn;
-    return { dayLog, seals, saved, read, startedOn };
+    return { ...look, ...profile, dayLog, seals, saved, read, startedOn };
   });
 }

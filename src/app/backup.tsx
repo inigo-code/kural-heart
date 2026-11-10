@@ -5,7 +5,7 @@ import { sealsAfterSave } from '@/lib/actions';
 import { planNightly } from '@/lib/background';
 import { backupNow, deleteFolderBackup, forgetBackupFolder, pickBackupFile, pickBackupFolder, restoreFrom } from '@/lib/backup';
 import { setPassphrase } from '@/lib/crypto';
-import { DriveError, connectDrive, deleteDriveCopy, disconnectDrive, switchDriveAccount, syncDrive } from '@/lib/drive';
+import { DriveError, connectDrive, deleteDriveCopy, disconnectDrive, driveCopyExists, openDriveCopy, switchDriveAccount, syncDrive } from '@/lib/drive';
 import type { MergeResult } from '@/lib/journal';
 import { awayFor } from '@/lib/lock';
 import { setSettings, settings, useSettings } from '@/lib/settings';
@@ -28,6 +28,8 @@ export default function BackupScreen() {
   // The Drive copy was locked with another passphrase: ask for it once, then sync with it.
   const [askDrivePass, setAskDrivePass] = useState(false);
   const [drivePass, setDrivePass] = useState('');
+  // True when this phone has no passphrase yet and the Drive copy's will become its own.
+  const [firstDrive, setFirstDrive] = useState(false);
   const [confirm, setConfirm] = useState<null | 'drive' | 'folder'>(null);
 
   const run = async (label: string, work: () => Promise<string>) => {
@@ -59,6 +61,16 @@ export default function BackupScreen() {
   const sync = (withPass?: string) =>
     run(tr('Syncing with Google Drive', 'Google Drive-உடன் ஒத்திசைகிறது'), async () => {
       if (!settings().driveOn) await awayFor(() => connectDrive());
+      // A new phone: if this Drive already has a backup, its passphrase opens it and becomes this phone's.
+      if (!settings().hasPassphrase) {
+        if (await driveCopyExists()) {
+          setFirstDrive(true);
+          setDrivePass('');
+          setAskDrivePass(true);
+          return tr('Your Drive has a Kural Heart backup. Enter its passphrase to open it.', 'உங்கள் Drive-இல் Kural Heart காப்பு உள்ளது. அதைத் திறக்க அதன் கடவுச்சொற்றொடரை உள்ளிடுங்கள்.');
+        }
+        return tr('Connected. Set a passphrase above to lock your backup; syncing starts then.', 'இணைந்தது. காப்பைப் பூட்ட மேலே கடவுச்சொற்றொடரை அமையுங்கள்; பிறகு ஒத்திசைவு தொடங்கும்.');
+      }
       try {
         const r = await syncDrive(withPass);
         planNightly().catch(() => {});
@@ -104,6 +116,63 @@ export default function BackupScreen() {
       ) : null}
       {message ? <Note icon="shield">{message}</Note> : null}
 
+      {/* The passphrase comes first: every way of backing up is locked with it. */}
+      {!s.hasPassphrase ? (
+        <>
+          <SectionLabel>{L.passTitle}</SectionLabel>
+          <Note icon="bulb" iconColor={c.primary} style={{ marginBottom: 12 }}>
+            {tr(
+              'Restoring on a new phone? Turn on Google Drive or Restore from a backup below, and enter the passphrase you chose before. This phone keeps it.',
+              'புதிய அலைபேசியில் மீட்கிறீர்களா? கீழே Google Drive-ஐ இயக்குங்கள் அல்லது காப்பிலிருந்து மீட்டெடுங்கள்; முன்பு தேர்ந்த கடவுச்சொற்றொடரை உள்ளிடுங்கள். இந்த அலைபேசி அதை வைத்துக்கொள்ளும்.',
+            )}
+          </Note>
+          <T v="bodyM" color={c.ink2}>
+            {L.passLede}
+          </T>
+          <Field value={pass} onChangeText={setPass} placeholder={L.passLabel} secret style={{ marginTop: 12 }} />
+          <Field value={again} onChangeText={setAgain} placeholder={L.passAgain} secret style={{ marginTop: 10 }} />
+          {problem ? (
+            <T v="labelM" color={c.heart} style={{ margin: 4 }}>
+              {problem}
+            </T>
+          ) : null}
+          <Note icon="bulb" iconColor={c.primary} style={{ marginTop: 10 }}>
+            {L.passTip}
+          </Note>
+          <Pressable onPress={() => setWrote(!wrote)} accessibilityRole="checkbox" accessibilityState={{ checked: wrote }} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 }}>
+            <View style={{ width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: wrote ? c.primary : c.ink3, backgroundColor: wrote ? c.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+              {wrote ? <Icon name="check" size={16} color={c.onPrimary} stroke={2.4} /> : null}
+            </View>
+            <T v="bodyM" style={{ flex: 1 }}>
+              {L.passWritten}
+            </T>
+          </Pressable>
+          <Button
+            label={L.passTurnOn}
+            enabled={pass.length >= 10 && pass === again && wrote}
+            onPress={() =>
+              run(L.passTurnOn, async () => {
+                await setPassphrase(pass);
+                setPass('');
+                setAgain('');
+                setSettings({ hasPassphrase: true });
+                // Whatever was waiting for a passphrase starts now.
+                if (settings().driveOn) {
+                  const r = await syncDrive();
+                  planNightly().catch(() => {});
+                  return merged(r, tr('Locked and synced. ', 'பூட்டி ஒத்திசைந்தது. '));
+                }
+                if (s.backupFolder) {
+                  await backupNow();
+                  return L.backupDone;
+                }
+                return tr('Your passphrase is set. Now choose where the backup lives.', 'கடவுச்சொற்றொடர் அமைந்தது. இனி காப்புப் பிரதி எங்கே இருக்க வேண்டும் எனத் தேர்ந்தெடுங்கள்.');
+              })
+            }
+          />
+        </>
+      ) : null}
+
       <SectionLabel>Google Drive</SectionLabel>
       <Group>
         <SwitchRow
@@ -117,7 +186,6 @@ export default function BackupScreen() {
           value={s.driveOn}
           onChange={(on) => {
             if (!on) disconnectDrive().then(() => planNightly().catch(() => {}));
-            else if (!s.hasPassphrase) setMessage(tr('Set a passphrase below first.', 'முதலில் கீழே கடவுச்சொற்றொடரை அமைக்கவும்.'));
             else sync();
           }}
         />
@@ -174,50 +242,8 @@ export default function BackupScreen() {
         ) : null}
       </Group>
 
-      {!s.hasPassphrase ? (
-        <>
-          <SectionLabel>{L.passTitle}</SectionLabel>
-          <T v="bodyM" color={c.ink2}>
-            {L.passLede}
-          </T>
-          <Field value={pass} onChangeText={setPass} placeholder={L.passLabel} secret style={{ marginTop: 12 }} />
-          <Field value={again} onChangeText={setAgain} placeholder={L.passAgain} secret style={{ marginTop: 10 }} />
-          {problem ? (
-            <T v="labelM" color={c.heart} style={{ margin: 4 }}>
-              {problem}
-            </T>
-          ) : null}
-          <Note icon="bulb" iconColor={c.primary} style={{ marginTop: 10 }}>
-            {L.passTip}
-          </Note>
-          <Pressable onPress={() => setWrote(!wrote)} accessibilityRole="checkbox" accessibilityState={{ checked: wrote }} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 }}>
-            <View style={{ width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: wrote ? c.primary : c.ink3, backgroundColor: wrote ? c.primary : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-              {wrote ? <Icon name="check" size={16} color={c.onPrimary} stroke={2.4} /> : null}
-            </View>
-            <T v="bodyM" style={{ flex: 1 }}>
-              {L.passWritten}
-            </T>
-          </Pressable>
-          <Button
-            label={L.passTurnOn}
-            enabled={pass.length >= 10 && pass === again && wrote}
-            onPress={() =>
-              run(L.passTurnOn, async () => {
-                await setPassphrase(pass);
-                setPass('');
-                setAgain('');
-                setSettings({ hasPassphrase: true });
-                if (s.backupFolder) {
-                  await backupNow();
-                  return L.backupDone;
-                }
-                return L.backupFolder;
-              })
-            }
-          />
-        </>
-      ) : s.backupFolder ? (
-        <Button label={L.backupNow} enabled={!busy} style={{ marginTop: 16 }} onPress={() => run(L.backupNow, async () => (await backupNow(), L.backupDone))} />
+      {s.hasPassphrase && s.backupFolder ? (
+        <Button label={L.backupNow} enabled={!busy} icon="download" style={{ marginTop: 14 }} onPress={() => run(L.backupNow, async () => (await backupNow(), L.backupDone))} />
       ) : null}
 
       <SectionLabel>{L.restore}</SectionLabel>
@@ -297,15 +323,37 @@ export default function BackupScreen() {
               const p = drivePass;
               setAskDrivePass(false);
               setDrivePass('');
-              sync(p);
+              if (!firstDrive) return sync(p);
+              run(tr('Opening your Drive copy', 'உங்கள் Drive பிரதியைத் திறக்கிறது'), async () => {
+                try {
+                  const r = await openDriveCopy(p);
+                  await setPassphrase(p);
+                  setSettings({ hasPassphrase: true });
+                  setFirstDrive(false);
+                  await syncDrive();
+                  planNightly().catch(() => {});
+                  return merged(r, tr('Restored, and this phone now uses that passphrase. ', 'மீட்கப்பட்டது; இந்த அலைபேசி இனி அந்தக் கடவுச்சொற்றொடரைப் பயன்படுத்தும். '));
+                } catch (e) {
+                  if (e instanceof DriveError && e.message === 'passphrase') {
+                    setAskDrivePass(true);
+                    return tr('That passphrase doesn’t open the Drive copy. Try again.', 'அந்தக் கடவுச்சொற்றொடர் Drive பிரதியைத் திறக்கவில்லை. மீண்டும் முயலுங்கள்.');
+                  }
+                  throw e;
+                }
+              });
             },
           },
         ]}>
         <T v="bodyM" color={c.ink2}>
-          {tr(
-            'Enter the passphrase you used when this Drive copy was made. Its pages join this phone’s, and the copy is then locked with this phone’s passphrase.',
-            'இந்த Drive பிரதியை உருவாக்கியபோது பயன்படுத்திய கடவுச்சொற்றொடரை உள்ளிடுங்கள். அதன் பக்கங்கள் இங்கே சேரும்; பிறகு பிரதி இந்த அலைபேசியின் கடவுச்சொற்றொடரால் பூட்டப்படும்.',
-          )}
+          {firstDrive
+            ? tr(
+                'Enter the passphrase you chose when you made this backup. Its pages, profile and history come back, and this phone keeps the passphrase.',
+                'இந்தக் காப்பை உருவாக்கியபோது தேர்ந்த கடவுச்சொற்றொடரை உள்ளிடுங்கள். பக்கங்களும் சுயவிவரமும் வரலாறும் திரும்பும்; இந்த அலைபேசி அந்தக் கடவுச்சொற்றொடரை வைத்துக்கொள்ளும்.',
+              )
+            : tr(
+                'Enter the passphrase you used when this Drive copy was made. Its pages join this phone’s, and the copy is then locked with this phone’s passphrase.',
+                'இந்த Drive பிரதியை உருவாக்கியபோது பயன்படுத்திய கடவுச்சொற்றொடரை உள்ளிடுங்கள். அதன் பக்கங்கள் இங்கே சேரும்; பிறகு பிரதி இந்த அலைபேசியின் கடவுச்சொற்றொடரால் பூட்டப்படும்.',
+              )}
         </T>
         <Field value={drivePass} onChangeText={setDrivePass} placeholder={L.passForRestore} secret style={{ backgroundColor: c.surface2 }} />
       </Dialog>
@@ -329,6 +377,11 @@ export default function BackupScreen() {
                   const r = await restoreFrom(f, p);
                   refreshWidget();
                   sealsAfterSave();
+                  // A new phone takes on the passphrase that opened its old backup, rather than asking for a new one.
+                  if (!settings().hasPassphrase) {
+                    await setPassphrase(p);
+                    setSettings({ hasPassphrase: true });
+                  }
                   return r.added + r.keptBoth > 0 ? L.restored(r.added, r.keptBoth) : tr('Nothing new in that backup: every page is already here.', 'அந்தக் காப்பில் புதியது இல்லை: எல்லாப் பக்கங்களும் ஏற்கெனவே இங்கே உள்ளன.');
                 });
             },

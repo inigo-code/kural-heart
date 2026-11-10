@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,10 +11,12 @@ import { allTags, searchEntries, useJournal } from '@/lib/journal';
 import { PARTS, partOf } from '@/lib/pack';
 import type { Part } from '@/lib/pack';
 import type { Entry } from '@/lib/types';
-import { ArchValluvar, EntryCard, MOODS, MoodChip, PhotoThumb, Rise, Sheet, Wrap, plainMarkdown, usePhoto } from '@/ui/common';
+import { ArchValluvar, EntryCard, MOODS, MoodChip, PhotoThumb, Rise, Sheet, ToTop, Wrap, moodTint, plainMarkdown, usePhoto } from '@/ui/common';
+import { KolamBand } from '@/ui/kolam';
 import { AtlasMap } from '@/ui/atlas';
 import { VideoTile } from '@/ui/media';
-import { Button, Chip, Icon, IconButton, SectionLabel, T, TextLink } from '@/ui/parts';
+import { Button, Chip, Icon, IconButton, SectionLabel, T, TextLink, raised } from '@/ui/parts';
+import { alpha } from '@/ui/theme';
 import { useUI } from '@/ui/ui';
 
 type Filter = { starred: boolean; photos: boolean; moods: string[]; tags: string[]; parts: Part[]; within: number; oldestFirst: boolean };
@@ -39,6 +41,8 @@ function applyFilter(f: Filter, list: Entry[]): Entry[] {
 const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
 export default function JournalScreen() {
+  const listRef = useRef<FlatList<Entry>>(null);
+  const [far, setFar] = useState(false);
   const { c, L, tr, type, tamil } = useUI();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -196,8 +200,11 @@ export default function JournalScreen() {
   );
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <FlatList
+        ref={listRef}
+        onScroll={(ev) => setFar(ev.nativeEvent.contentOffset.y > 1400)}
+        scrollEventThrottle={100}
         data={listing ? shown : []}
         keyExtractor={(e) => e.id}
         ListHeaderComponent={header}
@@ -208,13 +215,14 @@ export default function JournalScreen() {
             <EntryCard e={item} />
           </Rise>
         )}
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 72 }}
       />
+      <ToTop visible={far && listing} onPress={() => listRef.current?.scrollToOffset({ offset: 0, animated: true })} />
       <FilterSheet visible={open} filter={filter} entries={entries} onClose={(f) => {
         setFilter(f);
         setOpen(false);
       }} />
-    </>
+    </View>
   );
 }
 
@@ -251,8 +259,23 @@ function CellPhoto({ id }: { id: string }) {
   return uri ? <Image source={{ uri }} style={StyleSheet.absoluteFill} contentFit="cover" /> : null;
 }
 
+/** A round button to the previous or next month. */
+function MonthButton({ back, onPress }: { back?: boolean; onPress: () => void }) {
+  const { c, tr } = useUI();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={back ? tr('Previous month', 'முந்தைய மாதம்') : tr('Next month', 'அடுத்த மாதம்')}
+      style={({ pressed }) => ({ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.primarySoft : c.surface2 })}>
+      <Icon name={back ? 'back' : 'chevron'} size={20} color={c.ink} stroke={2} />
+    </Pressable>
+  );
+}
+
 function CalendarMonth({ entries }: { entries: Entry[] }) {
   const { c, tamil, tr } = useUI();
+  const router = useRouter();
   const now = new Date();
   const [ym, setYm] = useState<[number, number]>([now.getFullYear(), now.getMonth()]);
   const [picked, setPicked] = useState<Day>(today());
@@ -277,72 +300,97 @@ function CalendarMonth({ entries }: { entries: Entry[] }) {
     setYm([t.getFullYear(), t.getMonth()]);
   };
   const t = today();
+  const monthKey = `${y}-${String(mo + 1).padStart(2, '0')}`;
+  const inMonth = entries.filter((e) => e.date.startsWith(monthKey));
+  const daysWritten = new Set(inMonth.map((e) => e.date)).size;
+  const pickedPages = byDay.get(picked) ?? [];
   return (
     <View style={{ paddingHorizontal: 16 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <IconButton name="back" label={tr('Previous month', 'முந்தைய மாதம்')} onPress={() => move(-1)} />
-        <T v="headline" style={{ flex: 1, textAlign: 'center' }}>{`${monthName(mo, tamil)} ${y}`}</T>
-        <IconButton name="chevron" label={tr('Next month', 'அடுத்த மாதம்')} onPress={() => move(1)} />
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        {heads.map((h, i) => (
-          <T key={i} v="labelM" color={c.ink3} style={{ flex: 1, textAlign: 'center' }}>
-            {h}
-          </T>
+      <View style={{ borderRadius: 28, backgroundColor: c.surface, padding: 14, paddingTop: 12, ...raised(c) }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <MonthButton back onPress={() => move(-1)} />
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <T v="headline" style={{ textAlign: 'center' }}>{`${monthName(mo, tamil)} ${y}`}</T>
+            <T v="small" color={daysWritten ? c.primary : c.ink3}>
+              {daysWritten
+                ? tr(`${inMonth.length} ${inMonth.length === 1 ? 'page' : 'pages'} on ${daysWritten} ${daysWritten === 1 ? 'day' : 'days'}`, `${daysWritten} நாளில் ${inMonth.length} பக்கங்கள்`)
+                : tr('No pages yet this month', 'இந்த மாதம் இன்னும் பக்கம் இல்லை')}
+            </T>
+          </View>
+          <MonthButton onPress={() => move(1)} />
+        </View>
+        <KolamBand height={10} strength={0.8} style={{ marginTop: 10, marginBottom: 6 }} />
+        <View style={{ flexDirection: 'row' }}>
+          {heads.map((h, i) => (
+            <T key={i} v="small" color={i >= 5 ? c.primary : c.ink3} style={{ flex: 1, textAlign: 'center', paddingVertical: 4 }}>
+              {h}
+            </T>
+          ))}
+        </View>
+        {Array.from({ length: rows }, (_, r) => (
+          <View key={r} style={{ flexDirection: 'row' }}>
+            {Array.from({ length: 7 }, (_, col) => {
+              const i = r * 7 + col - lead + 1;
+              if (i < 1 || i > days) return <View key={col} style={{ flex: 1, aspectRatio: 1 }} />;
+              const day = dayOf(new Date(y, mo, i, 12));
+              const pages = byDay.get(day);
+              const on = day === picked;
+              const photo = photoOf.get(day);
+              // A written day carries a dot in the colour of its feeling (or the accent).
+              const m = pages ? MOODS.find((x) => x.id === pages[0].mood) : undefined;
+              const dot = m ? moodTint(m, c) : c.primary;
+              return (
+                <View key={col} style={{ flex: 1, aspectRatio: 1, padding: 3 }}>
+                  <Pressable
+                    onPress={() => setPicked(day)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: on }}
+                    accessibilityLabel={pages ? `${longDate(day, tamil)}, ${pages.length}` : longDate(day, tamil)}
+                    style={{
+                      flex: 1,
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: photo ? c.surface2 : on ? c.primary : pages ? alpha(dot, c.isNight ? 0.22 : 0.14) : 'transparent',
+                      borderWidth: photo && on ? 2.5 : day === t && !on ? 1.5 : 0,
+                      borderColor: c.primary,
+                    }}>
+                    {photo ? (
+                      <View style={StyleSheet.absoluteFill}>
+                        <CellPhoto id={photo} />
+                        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(20,16,12,0.38)' }]} />
+                      </View>
+                    ) : null}
+                    <T
+                      v="label"
+                      color={photo ? '#FFFFFF' : on ? c.onPrimary : pages ? c.ink : c.ink2}
+                      style={photo ? { textShadowColor: 'rgba(0,0,0,0.75)', textShadowRadius: 3, textShadowOffset: { width: 0, height: 1 } } : undefined}>
+                      {i}
+                    </T>
+                    {pages && !photo ? <View style={{ position: 'absolute', bottom: 5, width: 5, height: 5, borderRadius: 3, backgroundColor: on ? c.onPrimary : dot }} /> : null}
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
         ))}
       </View>
-      {Array.from({ length: rows }, (_, r) => (
-        <View key={r} style={{ flexDirection: 'row' }}>
-          {Array.from({ length: 7 }, (_, col) => {
-            const i = r * 7 + col - lead + 1;
-            if (i < 1 || i > days) return <View key={col} style={{ flex: 1, aspectRatio: 1 }} />;
-            const day = dayOf(new Date(y, mo, i, 12));
-            const has = byDay.has(day);
-            const on = day === picked;
-            const photo = photoOf.get(day);
-            return (
-              <View key={col} style={{ flex: 1, aspectRatio: 1, padding: 3 }}>
-                <Pressable
-                  onPress={() => setPicked(day)}
-                  accessibilityRole="button"
-                  accessibilityLabel={longDate(day, tamil)}
-                  style={{
-                    flex: 1,
-                    borderRadius: 100,
-                    overflow: 'hidden',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    // A day with a photo shows it; chosen, it gets a ring rather than a fill that would hide it.
-                    backgroundColor: photo ? c.surface2 : on ? c.primary : has ? c.primarySoft : 'transparent',
-                    borderWidth: photo && on ? 2.5 : day === t && !on ? 1.5 : 0,
-                    borderColor: c.primary,
-                  }}>
-                  {photo ? (
-                    <View style={StyleSheet.absoluteFill}>
-                      <CellPhoto id={photo} />
-                      <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(20,16,12,0.38)' }]} />
-                    </View>
-                  ) : null}
-                  <T
-                    v="label"
-                    color={photo ? '#FFFFFF' : on ? c.onPrimary : has ? c.onSoft : c.ink2}
-                    style={photo ? { textShadowColor: 'rgba(0,0,0,0.75)', textShadowRadius: 3, textShadowOffset: { width: 0, height: 1 } } : undefined}>
-                    {i}
-                  </T>
-                </Pressable>
-              </View>
-            );
-          })}
-        </View>
-      ))}
-      <View style={{ height: 12 }} />
-      {(byDay.get(picked) ?? []).length === 0 ? (
-        <T v="label" color={c.ink3} style={{ padding: 4 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 18, marginBottom: 4, marginLeft: 4 }}>
+        <T v="label" color={c.ink2} style={{ flex: 1 }}>
           {longDate(picked, tamil)}
         </T>
+      </View>
+      {pickedPages.length === 0 ? (
+        <View style={{ alignItems: 'center', paddingVertical: 18, gap: 10 }}>
+          <T v="bodyM" color={c.ink3} style={{ textAlign: 'center' }}>
+            {picked === t ? tr('Nothing written yet today.', 'இன்று இன்னும் எதுவும் எழுதவில்லை.') : tr('No page on this day.', 'இந்த நாளில் பக்கம் இல்லை.')}
+          </T>
+          {picked === t ? <Button label={tr('Write today’s page', 'இன்றைய பக்கத்தை எழுது')} icon="pen" onPress={() => router.navigate('/')} /> : null}
+        </View>
       ) : null}
       <View style={{ marginHorizontal: -16 }}>
-        {(byDay.get(picked) ?? []).map((e) => (
+        {pickedPages.map((e) => (
           <EntryCard key={e.id} e={e} />
         ))}
       </View>

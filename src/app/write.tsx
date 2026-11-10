@@ -20,7 +20,7 @@ import type { Entry, Place, Weather } from '@/lib/types';
 import { wordCount } from '@/lib/types';
 import { Dialog, Field, HScroll, MOODS, MoodChip, PhotoThumb, WEATHER_NAMES, Wrap, questionText, timeOf, weatherLabel } from '@/ui/common';
 import { KeyboardSafe } from '@/ui/keyboard';
-import { AudioNote, VideoTile, VoiceRecorder } from '@/ui/media';
+import { AudioNote, VideoNote, VoiceRecorder } from '@/ui/media';
 import { CoupletText, Pronounce } from '@/ui/leaf';
 import { BackButton, Button, Chip, Icon, IconButton, Note, T, TextLink } from '@/ui/parts';
 import { F } from '@/ui/theme';
@@ -366,7 +366,7 @@ export default function WriteScreen() {
               />
             </View>
           </View>
-          {photos.length || videos.length ? (
+          {photos.length ? (
             <HScroll style={{ marginTop: 12 }}>
               {photos.map((id) => (
                 <View key={id}>
@@ -389,21 +389,22 @@ export default function WriteScreen() {
                   </Pressable>
                 </View>
               ))}
-              {videos.map((id) => (
-                <VideoTile key={id} id={id} onRemove={() => setVideos((v) => v.filter((x) => x !== id))} />
-              ))}
             </HScroll>
           ) : null}
           <HScroll style={{ marginTop: 12 }}>
             <Chip label={tr('Photos', 'படங்கள்')} icon="gallery" onPress={pickPhotos} />
             <Chip label={tr('Camera', 'கேமரா')} icon="photo" onPress={camera} />
-            <Chip label={videoBusy ? '…' : tr('Video', 'காணொளி')} icon="play" onPress={pickVideo} />
+            <Chip label={videoBusy ? '…' : tr('Video', 'காணொளி')} icon="video" onPress={pickVideo} />
             <Chip label={tr('Voice note', 'குரல் குறிப்பு')} icon="mic" onPress={() => setRecording(true)} />
           </HScroll>
-          {audio.length ? (
+          {/* Voice notes and videos play right here, so you can check them before keeping the page. */}
+          {audio.length || videos.length ? (
             <View style={{ gap: 8, marginHorizontal: 20, marginTop: 10 }}>
               {audio.map((id) => (
                 <AudioNote key={id} id={id} onRemove={() => setAudio((a) => a.filter((x) => x !== id))} />
+              ))}
+              {videos.map((id) => (
+                <VideoNote key={id} id={id} onRemove={() => setVideos((v) => v.filter((x) => x !== id))} />
               ))}
             </View>
           ) : null}

@@ -13,7 +13,7 @@ import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
 import { ActionRow, Avatar, FadeSwap, KuralLeaf, LinkPills, MeaningUnder, Rise, questionText } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
 import { SikkuThreshold } from '@/ui/kolam';
-import { Button, Icon, T } from '@/ui/parts';
+import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
@@ -60,9 +60,15 @@ export default function TodayScreen() {
 ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
             <Icon name={PERIOD_ICON[period]} size={18} color={c.primary} stroke={2} />
-            <T v="label" color={c.primary} style={{ flexShrink: 1 }}>
-              {tamil ? p.ta : `${p.ta} · ${p.en.toLowerCase()}`}
+            {/* Tamil and English as separate pieces: one mixed line can be measured short on Android and lose its end. */}
+            <T v="label" color={c.primary} numberOfLines={1}>
+              {p.ta}
             </T>
+            {tamil ? null : (
+              <T v="label" color={c.primary} numberOfLines={1}>
+                {`· ${p.en.toLowerCase()}`}
+              </T>
+            )}
           </View>
         </View>
         <View style={{ width: 156, height: 156, alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -86,7 +92,7 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
       </Rise>
       <Rise i={3}>
         <ActionRow
-          style={{ marginTop: 8 }}
+          style={{ marginTop: 18 }}
           items={[
             { icon: playing ? 'stop' : 'play', label: playing ? tr('Stop', 'நிறுத்து') : tr('Listen', 'கேள்'), on: playing, onPress: () => readAloud(k, english(k, s.translation)) },
             { icon: 'turn', label: L.turn, on: turned, onPress: () => setTurned(!turned) },
@@ -110,7 +116,7 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
           ]}
         />
       </Rise>
-      <Rise i={4} style={{ margin: 20, borderRadius: 28, backgroundColor: c.surface, padding: 18 }}>
+      <Rise i={4} style={{ margin: 20, borderRadius: 28, backgroundColor: c.surface, padding: 18, ...raised(c) }}>
         <T v="label" color={c.ink3}>
           {L.todayQ}
         </T>
@@ -147,12 +153,15 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
         />
       </Rise>
       {thread.days > 0 ? (
-        <Pressable
-          onPress={() => router.navigate('/journey')}
-          style={{ marginHorizontal: 20, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 20, backgroundColor: c.inbamSoft, paddingHorizontal: 14, paddingVertical: 10 }}>
-          <Icon name="heart" color={c.heart} size={20} />
-          <T v="label">{L.threadDays(thread.days)}</T>
-        </Pressable>
+        <Rise i={5}>
+          <ActionCard
+            icon="journey"
+            title={L.threadDays(thread.days)}
+            sub={tr('Your seals, chapters and insights', 'உங்கள் முத்திரைகள், அதிகாரங்கள், புள்ளிவிவரங்கள்')}
+            onPress={() => router.navigate('/journey')}
+            style={{ marginHorizontal: 20 }}
+          />
+        </Rise>
       ) : null}
     </ScrollView>
   );

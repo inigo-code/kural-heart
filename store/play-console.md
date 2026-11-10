@@ -6,8 +6,9 @@ what the app actually does. If the app changes (new data, a new library, ads), u
 
 ## Before you start
 
-- **The bundle:** `dist/kuralheart-1.0.3-play.aab` (versionCode 5, update channel `production`, signed with the EAS
-  key). `dist/` isn't in git; keep a copy of every bundle you upload.
+- **The bundle:** `dist/kuralheart-1.0.4-play.aab` (versionCode 7, update channel `production`, signed with the EAS
+  key). `dist/` isn't in git; keep a copy of every bundle you upload. (1.0.3's bundle was versionCode 5; it never
+  needs uploading now.)
 - **Package name:** `com.inigocode.kuralheart`. It is permanent once uploaded.
 - **New personal developer accounts must run a closed test first**, for every new app: at least **12 testers** opted
   in for **14 days in a row** before Play lets you apply for production. Start the closed test as early as you can;
@@ -19,8 +20,8 @@ what the app actually does. If the app changes (new data, a new library, ads), u
     then restore.
   - Google Drive sign-in needs the Play key's SHA-1 too (step 9 below).
 - **Version codes:** every upload to Play needs a higher versionCode than the last. GitHub APKs and Play bundles share
-  one sequence (1.0.3 APK is 4, this bundle is 5). Before the next `eas build`, run
-  `npx eas-cli build:version:set -p android` and set it to 5, so EAS carries on from here.
+  one sequence (1.0.3 APK 4, its bundle 5; 1.0.4 APK 6, its bundle 7). Before the next `eas build`, run
+  `npx eas-cli build:version:set -p android` and set it to 7, so EAS carries on from here.
 - **Over-the-air updates:** Play builds listen on the `production` channel, GitHub APKs on `preview`. Publish every
   `eas update` to both, after checking the runtime fingerprint (local builds have their own; see the Prompt Heart
   notes). Every update needs a new What's new entry.
@@ -50,7 +51,7 @@ Grow users → Store presence → **Main store listing**: paste from `store/list
 
 Test and release → Testing → **Internal testing** → Create new release.
 - When asked about app signing, choose **Use Google-generated key** (Play App Signing). Continue.
-- Upload `dist/kuralheart-1.0.3-play.aab`. Release name: `1.0.3 (5)`. Release notes: from `store/listing.md`.
+- Upload `dist/kuralheart-1.0.4-play.aab`. Release name: `1.0.4 (7)`. Release notes: from `store/listing.md`.
 - **Testers** tab: create an email list with your own Google account, save, and copy the **opt-in link**.
 - Save → Review release → **Start rollout to Internal testing**.
 - On your phone, open the opt-in link, accept, then install from Play. (Uninstall the GitHub APK first, after a

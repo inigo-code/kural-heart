@@ -17,7 +17,7 @@ import { wordCount } from '@/lib/types';
 import type { Entry } from '@/lib/types';
 import { MOODS, Rise, moodTint } from '@/ui/common';
 import { AthangudiCorner, MayilBorder } from '@/ui/kolam';
-import { Card, Icon, Page, SectionLabel, T } from '@/ui/parts';
+import { Card, Icon, Page, SectionLabel, T, raised } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
 import { alpha } from '@/ui/theme';
 import { useUI } from '@/ui/ui';
@@ -347,7 +347,7 @@ function BookRings({ done }: { done: Record<Part, number> }) {
 function Tile({ icon, value, label }: { icon: IconName; value: string; label: string }) {
   const { c, type } = useUI();
   return (
-    <View style={{ flexBasis: '46%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.surface, borderRadius: 22, paddingVertical: 14, paddingHorizontal: 14, gap: 12 }}>
+    <View style={{ flexBasis: '46%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.surface, borderRadius: 22, paddingVertical: 14, paddingHorizontal: 14, gap: 12, ...raised(c) }}>
       <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: c.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
         <Icon name={icon} size={19} color={c.onSoft} />
       </View>

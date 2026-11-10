@@ -6,7 +6,7 @@ import { forMood } from '@/lib/daily';
 import { kural } from '@/lib/pack';
 import { useSettings } from '@/lib/settings';
 import { KuralLeaf, MOODS, MeaningUnder, MoodChip, Wrap } from '@/ui/common';
-import { Button, Chip, Icon, Page, T, TextLink } from '@/ui/parts';
+import { Button, Chip, Icon, Page, raised, T, TextLink } from '@/ui/parts';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
 
@@ -63,7 +63,7 @@ export default function FeelingScreen() {
 function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
   const { c, L } = useUI();
   return (
-    <View style={{ marginTop: 16, borderRadius: 24, backgroundColor: c.surface, padding: 16 }}>
+    <View style={{ marginTop: 16, borderRadius: 24, backgroundColor: c.surface, padding: 16, ...raised(c) }}>
       <T v="headline">{L.heavyTitle}</T>
       <T v="bodyM" color={c.ink2} style={{ marginTop: 6 }}>
         {L.heavyBody}

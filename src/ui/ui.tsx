@@ -4,7 +4,7 @@ import { AccessibilityInfo, useColorScheme } from 'react-native';
 
 import { STRINGS } from '@/i18n/strings';
 import type { Strings } from '@/i18n/strings';
-import { PERIODS, periodAt } from '@/lib/daily';
+import { periodAt } from '@/lib/daily';
 import type { Period } from '@/lib/daily';
 import { useSettings } from '@/lib/settings';
 
@@ -26,7 +26,7 @@ export type UI = {
 
 const Ctx = createContext<UI | null>(null);
 
-/** The six times of day change the greeting and, on Auto, the theme; checked once a minute. */
+/** The six times of day change the greeting and the sky in Valluvar's arch; checked once a minute. */
 function usePeriod(): Period {
   const [p, setP] = useState<Period>(() => periodAt());
   useEffect(() => {
@@ -40,13 +40,14 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const s = useSettings();
   const period = usePeriod();
   const [systemStill, setSystemStill] = useState(false);
-  useColorScheme();
+  // Auto follows the phone's own light or dark setting, so the app always matches the system's splash and bars.
+  const scheme = useColorScheme();
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled().then(setSystemStill).catch(() => {});
     const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setSystemStill);
     return () => sub.remove();
   }, []);
-  const night = s.theme === 'midnight' || (s.theme === 'auto' && PERIODS[period].night);
+  const night = s.theme === 'midnight' || (s.theme === 'auto' && scheme === 'dark');
   const value = useMemo<UI>(() => {
     const scale = s.textScale / 100;
     const L = STRINGS[s.tamil ? 'ta' : 'en'];

@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -7,7 +7,7 @@ import { useJournal } from '@/lib/journal';
 import { CHAPTERS, KURALS, PARTS, chapter } from '@/lib/pack';
 import type { Chapter, Kural, Part } from '@/lib/pack';
 import { useSettings } from '@/lib/settings';
-import { HScroll, partColor } from '@/ui/common';
+import { HScroll, ToTop, partColor } from '@/ui/common';
 import { KuralRow } from '@/ui/kuralRow';
 import { BackButton, Chip, Icon, IconButton, T } from '@/ui/parts';
 import { alpha, tamilSerif } from '@/ui/theme';
@@ -26,6 +26,8 @@ export default function LibraryScreen() {
   // Opened from Today or Settings: a back button returns there, and Settings can ask for the saved couplets.
   const { from, show } = useLocalSearchParams<{ from?: string; show?: string }>();
   const [query, setQuery] = useState('');
+  const list = useRef<FlatList<Item>>(null);
+  const [far, setFar] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   const [shown, setShown] = useState<string | undefined>(undefined);
   if (show && show !== shown) {
@@ -135,11 +137,16 @@ export default function LibraryScreen() {
   );
 
   return (
+    <View style={{ flex: 1 }}>
     <FlatList
+      ref={list}
       data={items}
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={header}
-      contentContainerStyle={{ paddingBottom: 48 }}
+      // Room under the last chapter, clear of the tab bar's pattern.
+      contentContainerStyle={{ paddingBottom: 72 }}
+      onScroll={(e) => setFar(e.nativeEvent.contentOffset.y > 1400)}
+      scrollEventThrottle={100}
       initialNumToRender={14}
       windowSize={9}
       keyExtractor={(it) => (it.kind === 'part' ? `p${it.p}` : it.kind === 'chapter' ? `c${it.ch.n}` : it.kind === 'kural' ? `k${it.k.n}` : 'count')}
@@ -191,5 +198,7 @@ export default function LibraryScreen() {
         );
       }}
     />
+    <ToTop visible={far} onPress={() => list.current?.scrollToOffset({ offset: 0, animated: true })} />
+    </View>
   );
 }

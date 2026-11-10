@@ -1,12 +1,15 @@
 import { Canvas, Group as SkGroup, Path, Skia } from '@shopify/react-native-skia';
 import type { SkPath } from '@shopify/react-native-skia';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Switch, Text, View } from 'react-native';
+import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import type { ScrollViewProps, StyleProp, TextProps, TextStyle, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { alpha } from './theme';
+import { alpha, mix } from './theme';
 import type { Variant } from './theme';
 import { useUI } from './ui';
 
@@ -56,10 +59,12 @@ export const Ico = {
   bullets: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
   quote: 'M5 7h5v5H7c0 2 1 3 3 3M14 7h5v5h-3c0 2 1 3 3 3',
   check: 'M4 5h16v14H4ZM8 12l3 3 5-6',
+  tick: 'M5 12.5l4.5 4.5L19 7.5',
   user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 20c1.5-4 4.5-6 8-6s6.5 2 8 6',
   download: 'M12 4v11M8 11l4 4 4-4M5 19h14',
   sync: 'M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M6 21v-4h4',
   mic: 'M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3ZM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6',
+  video: 'M4 7h11a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1ZM16 10.5l5-3v9l-5-3',
   map: 'M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14',
   chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
   grid: 'M4 4h7v7H4ZM13 4h7v7h-7ZM4 13h7v7H4ZM13 13h7v7h-7Z',
@@ -190,10 +195,15 @@ export function Page({
   );
 }
 
+/** The raised look of a card on the page: a fine edge and, on Ivory, a soft shadow, so it doesn't melt into the ground. */
+export function raised(c: { isNight: boolean; line: string }): ViewStyle {
+  return { borderWidth: 1, borderColor: c.line, elevation: c.isNight ? 0 : 1.5, shadowColor: '#3C280A' };
+}
+
 /** A white rounded group of rows, as in Settings. */
 export function Group({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
-  return <View style={[{ backgroundColor: c.surface, borderRadius: 24, overflow: 'hidden' }, style]}>{children}</View>;
+  return <View style={[{ backgroundColor: c.surface, borderRadius: 24, overflow: 'hidden' }, raised(c), style]}>{children}</View>;
 }
 
 export function Row({
@@ -239,25 +249,40 @@ export function Row({
   );
 }
 
-export function SwitchRow({ title, sub, value, onChange, divider = true }: { title: string; sub?: string | null; value: boolean; onChange: (v: boolean) => void; divider?: boolean }) {
-  const { c } = useUI();
+/**
+ * The app's own on/off switch: a pill that fills with the accent, its thumb sliding across and showing a tick when on.
+ * Android's stock switch was thin and grey on the ivory ground, and gave no sense of "on".
+ */
+export function Toggle({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
+  const { c, still } = useUI();
+  const on = useSharedValue(value ? 1 : 0);
+  useEffect(() => {
+    on.value = still ? (value ? 1 : 0) : withTiming(value ? 1 : 0, { duration: 180 });
+    // on is a shared value and stays the same object.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, still]);
+  const offTrack = c.isNight ? c.surface3 : '#E3D9C9';
+  const track = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(on.value, [0, 1], [offTrack, c.primary]) }));
+  const thumb = useAnimatedStyle(() => ({
+    transform: [{ translateX: 4 + on.value * 22 }],
+    width: 22 + on.value * 2,
+    height: 22 + on.value * 2,
+    borderRadius: 12,
+    marginTop: (28 - (22 + on.value * 2)) / 2,
+  }));
   return (
-    <Row
-      title={title}
-      sub={sub}
-      divider={divider}
-      onPress={() => onChange(!value)}
-      trailing={
-        <Switch
-          value={value}
-          onValueChange={onChange}
-          trackColor={{ true: c.primary, false: alpha(c.ink3, c.isNight ? 0.5 : 0.42) }}
-          thumbColor={value ? '#FFFFFF' : c.isNight ? c.ink2 : '#FFFFFF'}
-          accessibilityLabel={title}
-        />
-      }
-    />
+    <Pressable onPress={() => onChange(!value)} accessibilityRole="switch" accessibilityState={{ checked: value }} accessibilityLabel={label} hitSlop={8}>
+      <Animated.View style={[{ width: 52, height: 28, borderRadius: 14, borderWidth: value ? 0 : 1.5, borderColor: alpha(c.ink3, 0.45) }, track]}>
+        <Animated.View style={[{ position: 'absolute', top: value ? 0 : -1.5, left: value ? 0 : -1.5, backgroundColor: value ? '#FFFFFF' : c.isNight ? c.ink2 : '#FFFFFF', alignItems: 'center', justifyContent: 'center', elevation: 2, shadowColor: '#000' }, thumb]}>
+          {value ? <Icon name="tick" size={14} color={c.primary} stroke={2.6} /> : null}
+        </Animated.View>
+      </Animated.View>
+    </Pressable>
   );
+}
+
+export function SwitchRow({ title, sub, value, onChange, divider = true }: { title: string; sub?: string | null; value: boolean; onChange: (v: boolean) => void; divider?: boolean }) {
+  return <Row title={title} sub={sub} divider={divider} onPress={() => onChange(!value)} trailing={<Toggle value={value} onChange={onChange} label={title} />} />;
 }
 
 export function SectionLabel({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
@@ -355,32 +380,88 @@ export function Button({
   style?: StyleProp<ViewStyle>;
 }) {
   const { c } = useUI();
-  const bg = !enabled ? c.surface3 : danger ? c.heart : tonal ? c.primarySoft : c.primary;
-  const fg = !enabled ? c.ink3 : danger ? '#FFFFFF' : tonal ? c.onSoft : c.onPrimary;
+  const base = danger ? c.heart : c.primary;
+  const filled = enabled && !tonal;
+  const fg = !enabled ? c.ink3 : tonal ? c.onSoft : danger ? '#FFFFFF' : c.onPrimary;
   return (
     <Pressable
       onPress={onPress}
       disabled={!enabled || busy}
       accessibilityRole="button"
+      accessibilityState={{ disabled: !enabled }}
       style={({ pressed }) => [
         {
-          minHeight: 52,
-          borderRadius: 26,
-          backgroundColor: bg,
-          opacity: pressed ? 0.85 : 1,
+          minHeight: 54,
+          borderRadius: 27,
+          overflow: 'hidden',
+          backgroundColor: !enabled ? c.surface3 : tonal ? c.primarySoft : base,
+          borderWidth: tonal && enabled ? 1 : 0,
+          borderColor: alpha(c.primary, 0.3),
+          // A filled button sits up off the page a little, in its own colour, so it reads as the thing to do.
+          elevation: filled && !pressed ? 4 : 0,
+          shadowColor: base,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 10,
-          paddingHorizontal: 20,
+          paddingHorizontal: 22,
           paddingVertical: 12,
         },
         style,
       ]}>
-      {busy ? <ActivityIndicator color={fg} /> : icon ? <Icon name={icon} size={20} color={fg} /> : null}
+      {filled ? <LinearGradient colors={[mix(base, '#FFFFFF', 0.16), base]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} /> : null}
+      {busy ? <ActivityIndicator color={fg} /> : icon ? <Icon name={icon} size={20} color={tonal && enabled ? c.primary : fg} stroke={2} /> : null}
       <T v="title" color={fg} style={{ textAlign: 'center', flexShrink: 1 }}>
         {label}
       </T>
+    </Pressable>
+  );
+}
+
+/**
+ * An invitation to go somewhere (Insights, your journey): an accent tile with its icon, a title, a line of what is
+ * there, and an arrow. Reads as a door, where a plain button reads as a form's Submit.
+ */
+export function ActionCard({ icon, title, sub, onPress, style }: { icon: IconName; title: string; sub?: string; onPress: () => void; style?: StyleProp<ViewStyle> }) {
+  const { c } = useUI();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={sub ? `${title}. ${sub}` : title}
+      style={({ pressed }) => [
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 14,
+          padding: 14,
+          paddingRight: 16,
+          borderRadius: 24,
+          backgroundColor: pressed ? c.surface2 : c.surface,
+          borderWidth: 1,
+          borderColor: c.line,
+          elevation: c.isNight ? 0 : 1.5,
+          shadowColor: '#3C280A',
+          transform: [{ scale: pressed ? 0.985 : 1 }],
+        },
+        style,
+      ]}>
+      <View style={{ width: 50, height: 50, borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+        <LinearGradient colors={[mix(c.primary, '#FFFFFF', 0.18), c.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} />
+        <Icon name={icon} size={24} color={c.onPrimary} stroke={2} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <T v="title">{title}</T>
+        {sub ? (
+          <T v="labelM" color={c.ink3} numberOfLines={2}>
+            {sub}
+          </T>
+        ) : null}
+      </View>
+      <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: c.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="chevron" size={18} color={c.onSoft} stroke={2.2} />
+      </View>
     </Pressable>
   );
 }
@@ -398,7 +479,7 @@ export function TextLink({ label, onPress, color }: { label: string; onPress: ()
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
-  return <View style={[{ backgroundColor: c.surface, borderRadius: 28, padding: 18 }, style]}>{children}</View>;
+  return <View style={[{ backgroundColor: c.surface, borderRadius: 28, padding: 18 }, raised(c), style]}>{children}</View>;
 }
 
 export function Divider() {

@@ -138,6 +138,29 @@ export async function syncDrive(drivePass?: string): Promise<MergeResult> {
   return result;
 }
 
+/** Whether there is a Kural Heart backup in this Google account's Drive (signed in already). */
+export async function driveCopyExists(): Promise<boolean> {
+  const auth = { Authorization: `Bearer ${await token()}` };
+  return !!(await findFile(auth));
+}
+
+/**
+ * Open the Drive copy with [pass] and merge it in, without uploading: a new phone proving the passphrase it was made
+ * with. Throws DriveError('passphrase') if [pass] doesn't open it.
+ */
+export async function openDriveCopy(pass: string): Promise<MergeResult> {
+  const auth = { Authorization: `Bearer ${await token()}` };
+  const id = await findFile(auth);
+  if (!id) return { added: 0, keptBoth: 0 };
+  const remote = new Uint8Array(await (await call(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, { headers: auth })).arrayBuffer());
+  try {
+    return await importBytes(remote, pass);
+  } catch (e) {
+    if (e instanceof BackupError && /passphrase/i.test(e.message)) throw new DriveError('passphrase');
+    throw e;
+  }
+}
+
 /** Delete the copy in Drive (this phone's journal is untouched). Returns whether there was one. */
 export async function deleteDriveCopy(): Promise<boolean> {
   const auth = { Authorization: `Bearer ${await token()}` };

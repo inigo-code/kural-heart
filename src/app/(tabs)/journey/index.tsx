@@ -11,7 +11,7 @@ import type { Part } from '@/lib/pack';
 import { SEALS, sealProgress } from '@/lib/progress';
 import { useSettings } from '@/lib/settings';
 import { Rise, partColor } from '@/ui/common';
-import { Button, SectionLabel, T } from '@/ui/parts';
+import { ActionCard, raised, SectionLabel, T } from '@/ui/parts';
 import { useRouter } from 'expo-router';
 import { SealMedal } from '@/ui/seal';
 import { alpha } from '@/ui/theme';
@@ -39,7 +39,7 @@ export default function JourneyScreen() {
           {L.since(since)}
         </T>
       ) : null}
-      <Rise i={0} style={{ marginTop: 16, borderRadius: 28, backgroundColor: c.surface, padding: 18, flexDirection: 'row', alignItems: 'center' }}>
+      <Rise i={0} style={{ marginTop: 16, borderRadius: 28, backgroundColor: c.surface, padding: 18, flexDirection: 'row', alignItems: 'center', ...raised(c) }}>
         <View style={{ flex: 1 }}>
           <T v="display" style={{ fontSize: type.display.fontSize * 1.4, lineHeight: type.display.lineHeight * 1.3 }}>
             {thread.days}
@@ -63,11 +63,17 @@ export default function JourneyScreen() {
         <Valluvar state={thread.writtenToday ? 'celebrating' : 'walking'} size={150} headroom={0.12} />
       </Rise>
       <Rise i={1}>
-        <Button label={tr('See your insights', 'உங்கள் புள்ளிவிவரங்கள்')} icon="chart" tonal onPress={() => router.push('/journey/insights')} style={{ marginTop: 14 }} />
+        <ActionCard
+          icon="chart"
+          title={tr('See your insights', 'உங்கள் புள்ளிவிவரங்கள்')}
+          sub={tr('Your words, feelings, writing times and chapters', 'உங்கள் சொற்கள், உணர்வுகள், எழுதும் நேரங்கள், அதிகாரங்கள்')}
+          onPress={() => router.push('/journey/insights')}
+          style={{ marginTop: 14 }}
+        />
       </Rise>
       <Rise i={2}>
       <SectionLabel>{`${L.chapters} · ${chaptersWritten.size} ${L.of133}`}</SectionLabel>
-      <View style={{ borderRadius: 24, backgroundColor: c.surface, padding: 16 }}>
+      <View style={{ borderRadius: 24, backgroundColor: c.surface, padding: 16, ...raised(c) }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
           {CHAPTERS.map((ch) => {
             const col = partColor(ch.part, c);

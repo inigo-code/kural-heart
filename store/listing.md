@@ -46,7 +46,7 @@ SHARE A COUPLET
 • Your own words are added only if you switch that on
 
 MAKE IT YOURS
-• Ivory by day and Midnight by night, or either always
+• Ivory or Midnight, or follow your phone's light or dark setting
 • Four accent colours and four text sizes, in English or Tamil
 • A Today widget and a gentle morning reminder
 
@@ -74,7 +74,7 @@ The Tamil text is Project Madurai's, checked line by line against two other sour
 | Feature graphic | `feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `screenshots/01.png` to `06.png` | 1080 × 1920 |
 
-## Release notes for the first Play release, 1.0.3 (500 max)
+## Release notes for the first Play release, 1.0.4 (500 max)
 
 <en-IN>
 Welcome to Kural Heart on Google Play. One Thirukkural couplet each day on its palm leaf, in Tamil and English, with Mu. Varadarasanar's Tamil explanation, a question to write about, and a private journal that stays on your phone. No account, no ads.

@@ -30,6 +30,12 @@ export async function exportBytes(): Promise<Uint8Array> {
       if (b) media[id] = toBase64(b);
     }
   }
+  // The profile photo, so a restored phone shows it again.
+  const avatar = settings().avatar;
+  if (avatar && !photos[avatar]) {
+    const j = await photoJpeg(avatar);
+    if (j) photos[avatar] = toBase64(j);
+  }
   const payload = { format: 3, created: Date.now(), prefs: exportPrefs(), entries: allEntries().map(entryToJson), photos, media };
   return sealBackup(utf8(JSON.stringify(payload)), await storedPassphrase());
 }
@@ -45,7 +51,7 @@ export async function importBytes(bytes: Uint8Array, pass?: string): Promise<Mer
   };
   for (const [id, b64] of Object.entries(o.photos ?? {})) await putJpeg(id, fromBase64(b64));
   for (const [id, b64] of Object.entries(o.media ?? {})) await putMediaBytes(id, fromBase64(b64));
-  if (o.prefs) mergeHistory(o.prefs);
+  if (o.prefs) mergeHistory(o.prefs, allEntries().length === 0);
   return mergeEntries((o.entries ?? []).map(entryFromJson));
 }
 

@@ -176,6 +176,13 @@ export function toneColors(tone: string): [string, string, string] {
   }
 }
 
+/** [hex] moved [k] (0 to 1) of the way towards [to]: for a gradient's lighter or darker end. */
+export function mix(hex: string, to: string, k: number): string {
+  const n = (h: string, i: number) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16);
+  const ch = (i: number) => Math.round(n(hex, i) + (n(to, i) - n(hex, i)) * k).toString(16).padStart(2, '0');
+  return `#${ch(0)}${ch(1)}${ch(2)}`;
+}
+
 export function alpha(hex: string, a: number): string {
   const v = Math.round(Math.max(0, Math.min(1, a)) * 255)
     .toString(16)

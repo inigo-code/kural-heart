@@ -224,7 +224,7 @@ function Card({ k, story, line, tamil, translation, W, H, theme }: { k: Kural; s
             Kural Heart
           </Text>
           <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 28 * u, color: theme.quiet }}>
-            குறளுடன் நாட்குறிப்பு
+            {tamil ? 'குறளுடன் நாட்குறிப்பு' : 'A journal with the Kural'}
           </Text>
         </View>
       </View>

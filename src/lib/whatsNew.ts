@@ -1,17 +1,19 @@
 // "What's new" after every update (Heart Apps rule): bump ID and write its lines with each release or eas update.
 
 export const WHATS_NEW = {
-  id: 14,
+  id: 15,
   en: [
-    'A cleaner Today: round buttons, the time of day shown in Valluvar’s arch, and a leaf that turns over in your hand.',
-    'Every couplet fits its leaf on two lines, with no cut-off words.',
-    'Listen uses your phone’s own Tamil voice, which reads more naturally. Choose one in Settings.',
-    'Clearer colours in light mode, a tab bar under Insights, and less text on many pages.',
+    'Voice notes play again, while you write and after.',
+    'Restoring on a new phone: enter the passphrase you chose before, and your pages, profile photo, name and settings come back.',
+    'The theme can follow your phone’s light or dark setting, and the map turns dark at night.',
+    'A fresh look for buttons, switches, the calendar and each journal page, and a Top button on long lists.',
+    'Fixed: the English under a couplet no longer runs into the buttons, and labels no longer get cut off.',
   ],
   ta: [
-    'புதிய இன்று: வட்டப் பொத்தான்கள், வள்ளுவரின் வளைவில் நாளின் நேரம், கையில் திரும்பும் ஓலை.',
-    'ஒவ்வொரு குறளும் ஓலையில் இரண்டு வரிகளில், சொல் வெட்டப்படாமல்.',
-    'கேள் இப்போது உங்கள் அலைபேசியின் தமிழ்க் குரலைப் பயன்படுத்தும்; அது இயல்பாகப் படிக்கும். அமைப்புகளில் தேர்ந்தெடுக்கலாம்.',
-    'ஒளி முறையில் தெளிவான நிறங்கள், புள்ளிவிவரங்களின் கீழ் தாவல் பட்டை, பல பக்கங்களில் குறைந்த உரை.',
+    'குரல் குறிப்புகள் மீண்டும் இயங்குகின்றன, எழுதும்போதும் பின்னரும்.',
+    'புதிய அலைபேசியில் மீட்க: முன்பு தேர்ந்த கடவுச்சொற்றொடரை உள்ளிடுங்கள்; பக்கங்கள், சுயவிவரப் படம், பெயர், அமைப்புகள் திரும்பும்.',
+    'தோற்றம் அலைபேசியின் ஒளி/இருள் அமைப்பைப் பின்தொடரலாம்; இரவில் வரைபடமும் இருளாகும்.',
+    'பொத்தான்கள், மாற்றிகள், நாள்காட்டி, நாட்குறிப்புப் பக்கம் புதிய தோற்றத்தில்; நீண்ட பட்டியல்களில் மேலே செல்லும் பொத்தான்.',
+    'சரிசெய்யப்பட்டது: குறளின் கீழுள்ள ஆங்கிலம் பொத்தான்களுடன் மோதுவதில்லை; சொற்கள் வெட்டப்படுவதில்லை.',
   ],
 };

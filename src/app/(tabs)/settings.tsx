@@ -23,7 +23,7 @@ import { english, kural } from '@/lib/pack';
 import { today } from '@/lib/dates';
 import { Avatar, Dialog, Field, lastLabel } from '@/ui/common';
 import { OptionSheet, VoiceSheet } from '@/ui/options';
-import { Choice, Group, Icon, Row, SectionLabel, SwitchRow, T, TextLink, Button, timeLabel } from '@/ui/parts';
+import { Button, Choice, Group, Icon, raised, Row, SectionLabel, SwitchRow, T, TextLink, timeLabel } from '@/ui/parts';
 import { ACCENT_SWATCH } from '@/ui/theme';
 import { toast } from '@/ui/toast';
 import { useUI } from '@/ui/ui';
@@ -66,7 +66,7 @@ export default function SettingsScreen() {
       </T>
       <Pressable
         onPress={() => router.push('/profile')}
-        style={{ marginTop: 12, borderRadius: 24, backgroundColor: c.surface, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        style={{ marginTop: 12, borderRadius: 24, backgroundColor: c.surface, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, ...raised(c) }}>
         <Avatar size={56} />
         <View style={{ flex: 1 }}>
           <T v="title">{s.name || tr('Add your name', 'உங்கள் பெயரைச் சேர்க்கவும்')}</T>
@@ -207,7 +207,7 @@ export default function SettingsScreen() {
         ) : null}
       </Group>
       {s.reminderOn && !notifyOk ? (
-        <View style={{ marginTop: 12, borderRadius: 24, backgroundColor: c.surface, padding: 16, alignItems: 'center' }}>
+        <View style={{ marginTop: 12, borderRadius: 24, backgroundColor: c.surface, padding: 16, alignItems: 'center', ...raised(c) }}>
           <Valluvar state="listening" size={160} />
           <T v="headline" style={{ textAlign: 'center' }}>
             {L.remOffTitle}
@@ -292,7 +292,7 @@ export default function SettingsScreen() {
         onChange={(v) => set({ theme: v })}
         onClose={() => setSheet(null)}
         options={[
-          { value: 'auto', title: L.themeAuto, sub: tr('Ivory by day, Midnight from evening to dawn', 'பகலில் வெளிர், மாலை முதல் வைகறை வரை இருள்') },
+          { value: 'auto', title: L.themeAuto, sub: tr('Ivory or Midnight, as your phone is set', 'அலைபேசியின் அமைப்பைப் போல வெளிர் அல்லது இருள்') },
           { value: 'ivory', title: L.themeIvory, sub: tr('Warm paper, always', 'எப்போதும் வெளிர் காகிதம்') },
           { value: 'midnight', title: L.themeMidnight, sub: tr('Dark, always', 'எப்போதும் இருள்') },
         ]}

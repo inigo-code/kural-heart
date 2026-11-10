@@ -98,7 +98,8 @@
     "132": {"en": "What small thing did someone you love do that you noticed?", "ta": "நீங்கள் நேசிப்பவர் செய்த எந்தச் சிறிய செயலை நீங்கள் கவனித்தீர்கள்?"},
     "133": {"en": "After a disagreement, what brings you back together?", "ta": "ஒரு கருத்து வேறுபாட்டுக்குப் பிறகு உங்களை மீண்டும் இணைப்பது எது?"}
   },
-  "welcome": [391, 622, 783, 108, 151, 34, 423],
+  "_welcome_note": "The first week. 294 first: living true to your own heart, the spirit of a private journal (391 was too familiar a start).",
+  "welcome": [294, 622, 783, 108, 151, 34, 423],
   "moods": {
     "calm": [8, 10, 34, 36, 99],
     "grateful": [11, 104, 81],

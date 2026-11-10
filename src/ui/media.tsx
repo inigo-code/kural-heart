@@ -1,10 +1,12 @@
-import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus, useAudioRecorder } from 'expo-audio';
+import { RecordingPresets, createAudioPlayer, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder } from 'expo-audio';
+import type { AudioPlayer } from 'expo-audio';
 import { useRouter } from 'expo-router';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { awayFor } from '@/lib/lock';
-import { addMediaFile, openMedia } from '@/lib/photos';
+import { addMediaFile, closeMedia, openMedia } from '@/lib/photos';
 
 import { Dialog } from './common';
 import { Icon, T, TextLink } from './parts';
@@ -14,54 +16,73 @@ import { useUI } from './ui';
 
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-/** A voice note on a page: play and pause, how far along, and (while writing) remove. */
+/**
+ * A voice note on a page: play and pause, how far along, and (while writing) remove. The player is made when Play is
+ * first tapped, from the note's temporary plain copy, after setting the audio mode for playback; the same way the
+ * couplet recordings played (a player from the hook, waiting for "loaded", could stay silent on some phones).
+ */
 export function AudioNote({ id, onRemove }: { id: string; onRemove?: () => void }) {
   const { c, tr } = useUI();
-  const [uri, setUri] = useState<string | null>(null);
+  const player = useRef<AudioPlayer | null>(null);
   const [opening, setOpening] = useState(false);
-  const player = useAudioPlayer(uri ? { uri } : null);
-  const status = useAudioPlayerStatus(player);
-  const wantPlay = useRef(false);
-  useEffect(() => {
-    if (uri && wantPlay.current && status.isLoaded) {
-      wantPlay.current = false;
-      player.play();
-    }
-  }, [uri, status.isLoaded, player]);
+  const [st, setSt] = useState({ playing: false, at: 0, length: 0 });
+  // Let go of the player when the note leaves the screen.
+  useEffect(
+    () => () => {
+      try {
+        player.current?.remove();
+      } catch {}
+      player.current = null;
+    },
+    [],
+  );
   const toggle = async () => {
-    if (!uri) {
-      setOpening(true);
-      const u = await openMedia(id, 'm4a');
-      setOpening(false);
-      if (!u) return toast(tr('This voice note can’t be opened.', 'இந்தக் குரல் குறிப்பைத் திறக்க இயலவில்லை.'));
-      wantPlay.current = true;
-      setUri(u);
+    const p0 = player.current;
+    if (p0) {
+      if (p0.playing) p0.pause();
+      else {
+        if (p0.duration && p0.currentTime >= p0.duration - 0.2) await p0.seekTo(0);
+        p0.play();
+      }
       return;
     }
-    if (status.playing) player.pause();
-    else {
-      if (status.duration && status.currentTime >= status.duration - 0.2) player.seekTo(0);
-      player.play();
+    setOpening(true);
+    const uri = await openMedia(id, 'm4a');
+    if (!uri) {
+      setOpening(false);
+      return toast(tr('This voice note can’t be opened.', 'இந்தக் குரல் குறிப்பைத் திறக்க இயலவில்லை.'));
     }
+    await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true, shouldRouteThroughEarpiece: false }).catch(() => {});
+    const p = createAudioPlayer({ uri });
+    player.current = p;
+    p.addListener('playbackStatusUpdate', (s) => {
+      setSt({ playing: s.playing, at: s.currentTime, length: s.duration || 0 });
+      if (s.didJustFinish) p.seekTo(0).catch(() => {});
+    });
+    setOpening(false);
+    p.play();
   };
-  const progress = status.duration ? Math.min(1, status.currentTime / status.duration) : 0;
+  const progress = st.length ? Math.min(1, st.at / st.length) : 0;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 12, borderRadius: 22, backgroundColor: c.surface2 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 14, borderRadius: 24, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
       <Pressable
         onPress={toggle}
         accessibilityRole="button"
-        accessibilityLabel={status.playing ? tr('Pause voice note', 'குரல் குறிப்பை நிறுத்து') : tr('Play voice note', 'குரல் குறிப்பை இயக்கு')}
-        style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: c.primary, alignItems: 'center', justifyContent: 'center' }}>
-        {opening ? <ActivityIndicator color={c.onPrimary} /> : <Icon name={status.playing ? 'stop' : 'play'} size={20} color={c.onPrimary} fill />}
+        accessibilityLabel={st.playing ? tr('Pause voice note', 'குரல் குறிப்பை நிறுத்து') : tr('Play voice note', 'குரல் குறிப்பை இயக்கு')}
+        style={({ pressed }) => ({ width: 46, height: 46, borderRadius: 23, backgroundColor: c.primary, alignItems: 'center', justifyContent: 'center', transform: [{ scale: pressed ? 0.93 : 1 }] })}>
+        {opening ? <ActivityIndicator color={c.onPrimary} /> : <Icon name={st.playing ? 'stop' : 'play'} size={20} color={c.onPrimary} fill />}
       </Pressable>
-      <View style={{ flex: 1, gap: 6 }}>
-        <T v="label">{tr('Voice note', 'குரல் குறிப்பு')}</T>
-        <View style={{ height: 4, borderRadius: 2, backgroundColor: alpha(c.ink3, 0.25), overflow: 'hidden' }}>
+      <View style={{ flex: 1, gap: 7 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Icon name="mic" size={15} color={c.primary} />
+          <T v="label">{tr('Voice note', 'குரல் குறிப்பு')}</T>
+        </View>
+        <View style={{ height: 4, borderRadius: 2, backgroundColor: alpha(c.ink3, 0.22), overflow: 'hidden' }}>
           <View style={{ width: `${progress * 100}%`, height: 4, backgroundColor: c.primary }} />
         </View>
       </View>
       <T v="labelM" color={c.ink3}>
-        {status.duration ? `${mmss(status.currentTime)} / ${mmss(status.duration)}` : ''}
+        {st.length ? `${mmss(st.at)} / ${mmss(st.length)}` : st.playing ? mmss(st.at) : ''}
       </T>
       {onRemove ? (
         <Pressable onPress={onRemove} hitSlop={8} accessibilityLabel={tr('Remove voice note', 'குரல் குறிப்பை நீக்கு')}>
@@ -148,7 +169,74 @@ export function VoiceRecorder({ visible, onClose, onSaved }: { visible: boolean;
   );
 }
 
-/** A video on a page, as a tile that opens the player. */
+/**
+ * A video on a page, played right there: a compact card until tapped, then the player at the page's width, sized to
+ * the clip, with its own controls (and their full-screen button, for anyone who wants it).
+ */
+export function VideoNote({ id, onRemove }: { id: string; onRemove?: () => void }) {
+  const { c, tr } = useUI();
+  const [uri, setUri] = useState<string | null>(null);
+  const [opening, setOpening] = useState(false);
+  const [ratio, setRatio] = useState(16 / 9);
+  const player = useVideoPlayer(uri ? { uri } : null, (p) => {
+    p.loop = false;
+    p.play();
+  });
+  useEffect(() => {
+    const sub = player.addListener('videoTrackChange', ({ videoTrack }) => {
+      const s = videoTrack?.size;
+      if (s && s.width && s.height) setRatio(s.width / s.height);
+    });
+    return () => sub.remove();
+  }, [player]);
+  // The plain copy is only for the player; it goes when the page does.
+  useEffect(() => () => closeMedia(`${id}.mp4`), [id]);
+  const open = async () => {
+    setOpening(true);
+    const u = await openMedia(id, 'mp4');
+    setOpening(false);
+    if (!u) return toast(tr('This video can’t be opened.', 'இந்தக் காணொளியைத் திறக்க இயலவில்லை.'));
+    setUri(u);
+  };
+  const remove = onRemove ? (
+    <Pressable
+      onPress={onRemove}
+      hitSlop={8}
+      accessibilityLabel={tr('Remove video', 'காணொளியை நீக்கு')}
+      style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(20,16,12,0.55)', alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name="close" size={16} color="#F6F2EA" />
+    </Pressable>
+  ) : null;
+  if (!uri)
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 14, borderRadius: 24, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
+        <Pressable
+          onPress={open}
+          accessibilityRole="button"
+          accessibilityLabel={tr('Play video', 'காணொளியை இயக்கு')}
+          style={({ pressed }) => ({ width: 46, height: 46, borderRadius: 23, backgroundColor: '#1E1A16', alignItems: 'center', justifyContent: 'center', transform: [{ scale: pressed ? 0.93 : 1 }] })}>
+          {opening ? <ActivityIndicator color="#F6F2EA" /> : <Icon name="play" size={20} color="#F6F2EA" fill />}
+        </Pressable>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Icon name="video" size={16} color={c.primary} />
+          <T v="label">{tr('Video', 'காணொளி')}</T>
+        </View>
+        {onRemove ? (
+          <Pressable onPress={onRemove} hitSlop={8} accessibilityLabel={tr('Remove video', 'காணொளியை நீக்கு')}>
+            <Icon name="close" size={18} color={c.ink3} />
+          </Pressable>
+        ) : null}
+      </View>
+    );
+  return (
+    <View style={{ borderRadius: 22, overflow: 'hidden', backgroundColor: '#000000', aspectRatio: Math.max(0.75, Math.min(16 / 9, ratio)) }}>
+      <VideoView player={player} style={{ flex: 1 }} contentFit="contain" nativeControls fullscreenOptions={{ enable: true }} />
+      {remove ? <View style={{ position: 'absolute', top: 8, right: 8 }}>{remove}</View> : null}
+    </View>
+  );
+}
+
+/** A video in the media grid, as a tile that opens the player. */
 export function VideoTile({ id, size = 96, onRemove }: { id: string; size?: number; onRemove?: () => void }) {
   const { c, tr } = useUI();
   const router = useRouter();
