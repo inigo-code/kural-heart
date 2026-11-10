@@ -1,9 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import type { ComponentRef } from 'react';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { currentThread } from '@/lib/actions';
+import { useTabTop } from '@/lib/tabTop';
 import { addDays, parseDay, monthName, today } from '@/lib/dates';
 import { useJournal } from '@/lib/journal';
 import { CHAPTERS, PARTS, kural } from '@/lib/pack';
@@ -23,6 +25,8 @@ export default function JourneyScreen() {
   const router = useRouter();
   const s = useSettings();
   const insets = useSafeAreaInsets();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  useTabTop('journey', () => scroll.current?.scrollTo({ y: 0, animated: true }));
   const { entries } = useJournal();
   const thread = currentThread();
   const t = today();
@@ -30,7 +34,7 @@ export default function JourneyScreen() {
   const chaptersWritten = useMemo(() => new Set(entries.map((e) => kural(e.kural).c)), [entries]);
   const since = s.startedOn ? `${parseDay(s.startedOn).getDate()} ${monthName(parseDay(s.startedOn).getMonth(), tamil)}` : null;
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
       <T v="display" style={{ marginLeft: 4 }}>
         {L.journey}
       </T>

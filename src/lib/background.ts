@@ -16,7 +16,9 @@ export async function runNightly(force = false) {
   const s = settings();
   if (!s.hasPassphrase) return;
   if (!isLoaded()) await loadJournal();
-  if (s.backupNightly && s.backupFolder && (force || Date.now() - s.lastBackup > DAY)) {
+  // Pressing "Back up now" or "Sync now" ([force]) works whatever the nightly switch says.
+  if (!force && !s.autoBackup) return;
+  if (s.backupFolder && (force || Date.now() - s.lastBackup > DAY)) {
     await backupNow().catch(() => {});
   }
   if (s.driveOn && (force || Date.now() - s.lastDriveSync > DAY)) await syncQuietly();
@@ -36,7 +38,7 @@ export function defineNightly() {
 
 export async function planNightly() {
   const s = settings();
-  const want = (s.backupNightly && !!s.backupFolder) || s.driveOn;
+  const want = s.autoBackup && s.hasPassphrase && (!!s.backupFolder || s.driveOn);
   const has = await TaskManager.isTaskRegisteredAsync(TASK);
   if (want && !has) await BackgroundTask.registerTaskAsync(TASK, { minimumInterval: 12 * 60 });
   if (!want && has) await BackgroundTask.unregisterTaskAsync(TASK);

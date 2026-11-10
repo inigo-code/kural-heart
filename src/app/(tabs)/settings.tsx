@@ -3,11 +3,13 @@ import { Directory } from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ComponentRef } from 'react';
 import { AppState, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { currentThread } from '@/lib/actions';
+import { useTabTop } from '@/lib/tabTop';
 import { exportTextTo } from '@/lib/backup';
 import { deleteDeviceKey } from '@/lib/crypto';
 import { disconnectDrive } from '@/lib/drive';
@@ -35,6 +37,8 @@ export default function SettingsScreen() {
   const s = useSettings();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  useTabTop('settings', () => scroll.current?.scrollTo({ y: 0, animated: true }));
   const { entries } = useJournal();
   const [wipe, setWipe] = useState(false);
   const [typed, setTyped] = useState('');
@@ -60,7 +64,7 @@ export default function SettingsScreen() {
   const themeLabel = s.theme === 'auto' ? L.themeAuto : s.theme === 'ivory' ? L.themeIvory : L.themeMidnight;
 
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
       <T v="display" style={{ marginLeft: 4 }}>
         {L.settings}
       </T>

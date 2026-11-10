@@ -1,8 +1,9 @@
 import { Circle, Group, Path, RadialGradient, Rect, Skia, vec } from '@shopify/react-native-skia';
 import { useMemo, useState } from 'react';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
+import Svg, { Circle as SvgCircle } from 'react-native-svg';
 
 import { SkiaStill } from './still';
 import { alpha } from './theme';
@@ -197,6 +198,26 @@ export function AthangudiCorner({ size = 132, style, strength = 1, bg }: { size?
           </Rect>
         </Group>
       </SkiaStill>
+    </View>
+  );
+}
+
+/**
+ * A ring of kolam pulli around something round (the profile photo on Today): a circle of dots in gold, with a fine
+ * inner line, like the dotted border drawn round a doorstep design.
+ */
+export function KolamRing({ size, children }: { size: number; children: ReactNode }) {
+  const { c } = useUI();
+  const r = size / 2 - 2;
+  const dots = 20;
+  const gap = (2 * Math.PI * r) / dots;
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size} style={{ position: 'absolute' }} pointerEvents="none">
+        <SvgCircle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={alpha(c.gold, c.isNight ? 0.85 : 0.95)} strokeWidth={2.6} strokeLinecap="round" strokeDasharray={`0.1 ${gap.toFixed(2)}`} />
+        <SvgCircle cx={size / 2} cy={size / 2} r={r - 3.5} fill="none" stroke={alpha(c.gold, 0.45)} strokeWidth={1} />
+      </Svg>
+      {children}
     </View>
   );
 }

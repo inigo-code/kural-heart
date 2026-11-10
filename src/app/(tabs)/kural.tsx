@@ -4,6 +4,7 @@ import { FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useJournal } from '@/lib/journal';
+import { useTabTop } from '@/lib/tabTop';
 import { CHAPTERS, KURALS, PARTS, chapter } from '@/lib/pack';
 import type { Chapter, Kural, Part } from '@/lib/pack';
 import { useSettings } from '@/lib/settings';
@@ -28,6 +29,7 @@ export default function LibraryScreen() {
   const [query, setQuery] = useState('');
   const list = useRef<FlatList<Item>>(null);
   const [far, setFar] = useState(false);
+  useTabTop('kural', () => list.current?.scrollToOffset({ offset: 0, animated: true }));
   const [filter, setFilter] = useState<Filter>('all');
   const [shown, setShown] = useState<string | undefined>(undefined);
   if (show && show !== shown) {

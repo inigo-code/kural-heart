@@ -1,9 +1,11 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { ComponentRef } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { currentThread } from '@/lib/actions';
+import { useTabTop } from '@/lib/tabTop';
 import { PERIODS, anotherToday, pick, todayKural } from '@/lib/daily';
 import { longDate, today } from '@/lib/dates';
 import { useJournal } from '@/lib/journal';
@@ -12,7 +14,7 @@ import { setSettings, useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
 import { ActionRow, Avatar, FadeSwap, KuralLeaf, LinkPills, MeaningUnder, Rise, questionText } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
-import { SikkuThreshold } from '@/ui/kolam';
+import { KolamBand, KolamRing, SikkuThreshold } from '@/ui/kolam';
 import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
 import { useUI } from '@/ui/ui';
@@ -26,6 +28,8 @@ export default function TodayScreen() {
   const s = useSettings();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  useTabTop('index', () => scroll.current?.scrollTo({ y: 0, animated: true }));
   const { entries } = useJournal();
   const speaker = useSpeaker();
   const day = today();
@@ -45,13 +49,19 @@ export default function TodayScreen() {
     stopReading();
   }, [k.n]);
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 12, minHeight: 48 }}>
-        <T v="label" color={c.ink3} style={{ flex: 1 }}>
-          {longDate(day, tamil)}
-        </T>
+    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 12, minHeight: 56 }}>
+        {/* The date, underlined with a short row of pulli kolam, as a threshold is drawn each morning. */}
+        <View style={{ flex: 1, alignItems: 'flex-start' }}>
+          <T v="label" color={c.ink2}>
+            {longDate(day, tamil)}
+          </T>
+          <KolamBand height={10} strength={1.1} style={{ width: 132, marginTop: 6 }} />
+        </View>
         <Pressable onPress={() => router.push('/profile')} accessibilityRole="button" accessibilityLabel={tr('Your profile', 'உங்கள் சுயவிவரம்')} hitSlop={6}>
-          <Avatar size={40} />
+          <KolamRing size={52}>
+            <Avatar size={40} />
+          </KolamRing>
         </Pressable>
       </View>
       <Rise i={0} style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20, paddingRight: 8 }}>

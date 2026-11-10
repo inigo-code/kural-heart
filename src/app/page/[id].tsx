@@ -1,14 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Pressable, Share, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { deletePage } from '@/lib/actions';
 import { longDate } from '@/lib/dates';
 import { toggleStar, useJournal } from '@/lib/journal';
 import { chapterOf, kural } from '@/lib/pack';
 import { wordCount } from '@/lib/types';
-import { MOODS, Markdown, PhotoFull, moodTint, plainMarkdown, questionText, timeOf, weatherLabel } from '@/ui/common';
+import { MOODS, Markdown, PhotoGallery, moodTint, plainMarkdown, questionText, timeOf, weatherLabel } from '@/ui/common';
 import { MayilBorder } from '@/ui/kolam';
 import { CoupletText, Leaf, LeafNote } from '@/ui/leaf';
 import { Button, Icon, IconButton, Page, T, raised } from '@/ui/parts';
@@ -22,7 +21,6 @@ export default function PageScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { c, L, tamil, tr, type, scale } = useUI();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { entries } = useJournal();
   const e = entries.find((x) => x.id === id);
   useEffect(() => {
@@ -40,6 +38,28 @@ export default function PageScreen() {
       <Page
         title={longDate(e.date, tamil)}
         contentStyle={{ paddingBottom: 24 }}
+        footer={
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Button label={L.edit} icon="pen" style={{ flex: 1, minHeight: 50 }} onPress={() => router.replace({ pathname: '/write', params: { kural: String(e.kural), id: e.id } })} />
+            <Button
+              label={L.share}
+              icon="share"
+              tonal
+              style={{ flex: 1, minHeight: 50 }}
+              onPress={() => Share.share({ message: `${plainMarkdown(e.text)}\n\n— ${L.kural} ${k.n}: ${k.a} / ${k.b}` }).catch(() => {})}
+            />
+            <Pressable
+              onPress={() => {
+                router.back();
+                deletePage(e.id);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={L.delete}
+              style={({ pressed }) => ({ width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: alpha(c.heart, 0.5), backgroundColor: pressed ? alpha(c.heart, 0.12) : 'transparent' })}>
+              <Icon name="trash" size={20} color={c.heart} />
+            </Pressable>
+          </View>
+        }
         actions={
           <IconButton
             name="star"
@@ -91,11 +111,11 @@ export default function PageScreen() {
           </View>
         </View>
 
-        {e.photos.map((ph) => (
-          <View key={ph} style={{ marginTop: 12 }}>
-            <PhotoFull id={ph} />
+        {e.photos.length ? (
+          <View style={{ marginTop: 12 }}>
+            <PhotoGallery ids={e.photos} />
           </View>
-        ))}
+        ) : null}
         {e.audio.map((a) => (
           <View key={a} style={{ marginTop: 12 }}>
             <AudioNote id={a} />
@@ -114,28 +134,6 @@ export default function PageScreen() {
           </View>
         ) : null}
       </Page>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 10, paddingBottom: insets.bottom + 12, borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.bg }}>
-        <Button label={L.edit} icon="pen" style={{ flex: 1, minHeight: 50 }} onPress={() => router.replace({ pathname: '/write', params: { kural: String(e.kural), id: e.id } })} />
-        <Button
-          label={L.share}
-          icon="share"
-          tonal
-          style={{ flex: 1, minHeight: 50 }}
-          onPress={() => Share.share({ message: `${plainMarkdown(e.text)}
-
-— ${L.kural} ${k.n}: ${k.a} / ${k.b}` }).catch(() => {})}
-        />
-        <Pressable
-          onPress={() => {
-            router.back();
-            deletePage(e.id);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={L.delete}
-          style={({ pressed }) => ({ width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: alpha(c.heart, 0.5), backgroundColor: pressed ? alpha(c.heart, 0.12) : 'transparent' })}>
-          <Icon name="trash" size={20} color={c.heart} />
-        </Pressable>
-      </View>
     </View>
   );
 }

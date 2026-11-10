@@ -507,7 +507,7 @@ export default function InsightsScreen() {
       <View style={{ flexDirection: 'row', gap: 4, marginTop: 4, padding: 4, borderRadius: 22, backgroundColor: c.surface2 }}>
         {(
           [
-            ['30', tr('30 days', '30 நாள்')],
+            ['30', tr('30 days', '30 நாட்கள்')],
             ['365', tr('12 months', '12 மாதம்')],
             ['all', tr('All time', 'எல்லாம்')],
           ] as const
@@ -523,7 +523,7 @@ export default function InsightsScreen() {
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
               style={{ flex: 1, minHeight: 40, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? c.primary : 'transparent' }}>
-              <T v="label" color={on ? c.onPrimary : c.ink2} numberOfLines={1} adjustsFontSizeToFit>
+              <T v="label" color={on ? c.onPrimary : c.ink2} numberOfLines={1} style={{ paddingHorizontal: 4 }}>
                 {label}
               </T>
             </Pressable>
@@ -560,12 +560,12 @@ export default function InsightsScreen() {
 
       <Rise i={1} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10 }}>
         <Tile icon="journal" value={String(data.pages)} label={tr(plural(data.pages, 'page', 'pages'), 'பக்கங்கள்')} />
-        <Tile icon="calendar" value={String(data.days)} label={tr(plural(data.days, 'day written', 'days written'), data.days === 1 ? 'எழுதிய நாள்' : 'எழுதிய நாள்கள்')} />
+        <Tile icon="calendar" value={String(data.days)} label={tr(plural(data.days, 'day written', 'days written'), data.days === 1 ? 'எழுதிய நாள்' : 'எழுதிய நாட்கள்')} />
         <Tile icon="words" value={String(data.average)} label={tr(plural(data.average, 'word a page', 'words a page'), 'பக்கத்துக்குச் சொற்கள்')} />
         <Tile icon="pen" value={String(data.longest)} label={tr(plural(data.longest, 'word, longest page', 'words, longest page'), 'சொற்கள், நீண்ட பக்கம்')} />
       </Rise>
 
-      <Section title={tr('Writing days', 'எழுதிய நாள்கள்')} note={dayPick ? `${weekdayShort(dayPick, tamil)} ${shortDate(dayPick, tamil)} · ${dayNote(dayPick)}` : tr('Last 18 weeks', 'கடந்த 18 வாரம்')}>
+      <Section title={tr('Writing days', 'எழுதிய நாட்கள்')} note={dayPick ? `${weekdayShort(dayPick, tamil)} ${shortDate(dayPick, tamil)} · ${dayNote(dayPick)}` : tr('Last 18 weeks', 'கடந்த 18 வாரம்')}>
         <Card>
           <Heatmap words={allTime.words} written={allTime.written} weeks={18} picked={dayPick} onPick={setDayPick} />
         </Card>
@@ -602,7 +602,7 @@ export default function InsightsScreen() {
         </Card>
       </Section>
 
-      <Section title={tr('Days of the week', 'வாரத்தின் நாள்கள்')} note={rangeName}>
+      <Section title={tr('Days of the week', 'வாரத்தின் நாட்கள்')} note={rangeName}>
         <Card>
           <Columns values={data.weekdays} labels={dayNames} color={c.primary} />
         </Card>

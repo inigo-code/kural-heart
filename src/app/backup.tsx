@@ -4,13 +4,13 @@ import { ActivityIndicator, Pressable, View } from 'react-native';
 import { sealsAfterSave } from '@/lib/actions';
 import { planNightly } from '@/lib/background';
 import { backupNow, deleteFolderBackup, forgetBackupFolder, pickBackupFile, pickBackupFolder, restoreFrom } from '@/lib/backup';
-import { setPassphrase } from '@/lib/crypto';
+import { BackupError, setPassphrase } from '@/lib/crypto';
 import { DriveError, connectDrive, deleteDriveCopy, disconnectDrive, driveCopyExists, openDriveCopy, switchDriveAccount, syncDrive } from '@/lib/drive';
 import type { MergeResult } from '@/lib/journal';
 import { awayFor } from '@/lib/lock';
 import { setSettings, settings, useSettings } from '@/lib/settings';
 import { Dialog, Field, lastLabel } from '@/ui/common';
-import { Button, Group, Icon, Note, Page, Row, SectionLabel, SwitchRow, T } from '@/ui/parts';
+import { ActionCard, Button, Group, Icon, Note, Page, Row, SectionLabel, SwitchRow, T } from '@/ui/parts';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
 import { refreshWidget } from '@/widget/widgets';
@@ -28,11 +28,14 @@ export default function BackupScreen() {
   // The Drive copy was locked with another passphrase: ask for it once, then sync with it.
   const [askDrivePass, setAskDrivePass] = useState(false);
   const [drivePass, setDrivePass] = useState('');
+  // A wrong passphrase is said in the dialog itself, under the field, where the person is looking.
+  const [passError, setPassError] = useState<string | null>(null);
+  const wrongPass = () => tr('That passphrase doesn’t open this backup. Check it and try again.', 'அந்தக் கடவுச்சொற்றொடர் இந்தக் காப்பைத் திறக்கவில்லை. சரிபார்த்து மீண்டும் முயலுங்கள்.');
   // True when this phone has no passphrase yet and the Drive copy's will become its own.
   const [firstDrive, setFirstDrive] = useState(false);
   const [confirm, setConfirm] = useState<null | 'drive' | 'folder'>(null);
 
-  const run = async (label: string, work: () => Promise<string>) => {
+  const run = async (label: string, work: () => Promise<string | null>) => {
     setBusy(label);
     setMessage(null);
     try {
@@ -78,6 +81,7 @@ export default function BackupScreen() {
       } catch (e) {
         if (e instanceof DriveError && e.message === 'passphrase') {
           setDrivePass('');
+          setPassError(withPass ? wrongPass() : null);
           setAskDrivePass(true);
           return withPass
             ? tr('That passphrase doesn’t open the Drive copy either.', 'அந்தக் கடவுச்சொற்றொடரும் Drive பிரதியைத் திறக்கவில்லை.')
@@ -156,6 +160,7 @@ export default function BackupScreen() {
                 setPass('');
                 setAgain('');
                 setSettings({ hasPassphrase: true });
+                planNightly().catch(() => {});
                 // Whatever was waiting for a passphrase starts now.
                 if (settings().driveOn) {
                   const r = await syncDrive();
@@ -217,17 +222,6 @@ export default function BackupScreen() {
           divider={false}
           onPress={() => awayFor(() => pickBackupFolder())}
         />
-        {s.hasPassphrase && s.backupFolder ? (
-          <SwitchRow
-            title={L.backupNightly}
-            sub={lastLabel(s.lastBackup, L, tamil)}
-            value={s.backupNightly}
-            onChange={(v) => {
-              setSettings({ backupNightly: v });
-              planNightly().catch(() => {});
-            }}
-          />
-        ) : null}
         {s.backupFolder ? (
           <>
             <Row
@@ -246,19 +240,40 @@ export default function BackupScreen() {
         <Button label={L.backupNow} enabled={!busy} icon="download" style={{ marginTop: 14 }} onPress={() => run(L.backupNow, async () => (await backupNow(), L.backupDone))} />
       ) : null}
 
+      {/* Automatic: one switch for every night, to Drive and to the folder alike. */}
+      {s.hasPassphrase && (s.driveOn || s.backupFolder) ? (
+        <>
+          <SectionLabel>{tr('Automatic backup', 'தானியங்கிக் காப்பு')}</SectionLabel>
+          <Group>
+            <SwitchRow
+              title={L.backupNightly}
+              sub={
+                s.autoBackup
+                  ? lastLabel(Math.max(s.lastBackup, s.lastDriveSync), L, tamil)
+                  : tr('Off: back up with Sync now or Back up now', 'அணைந்துள்ளது: இப்போதே ஒத்திசை / காப்பு எடு மூலம்')
+              }
+              divider={false}
+              value={s.autoBackup}
+              onChange={(v) => {
+                setSettings({ autoBackup: v });
+                planNightly().catch(() => {});
+              }}
+            />
+          </Group>
+        </>
+      ) : null}
+
       <SectionLabel>{L.restore}</SectionLabel>
-      <T v="bodyM" color={c.ink2}>
-        {L.restoreSub}
-      </T>
-      <Button
-        label={L.restore}
-        tonal
-        enabled={!busy}
-        style={{ marginTop: 10 }}
+      <ActionCard
+        icon="download"
+        title={tr('Restore from a backup file', 'காப்புக் கோப்பிலிருந்து மீட்டெடு')}
+        sub={L.restoreSub}
         onPress={async () => {
+          if (busy) return;
           const f = await awayFor(() => pickBackupFile()).catch(() => null);
           if (f) {
             setRestorePass('');
+            setPassError(null);
             setRestoreFile(f);
           }
         }}
@@ -313,9 +328,9 @@ export default function BackupScreen() {
       <Dialog
         visible={askDrivePass}
         title={tr('Open your Drive copy', 'உங்கள் Drive பிரதியைத் திற')}
-        onClose={() => setAskDrivePass(false)}
+        onClose={() => (setAskDrivePass(false), setPassError(null))}
         actions={[
-          { label: L.cancel, onPress: () => setAskDrivePass(false) },
+          { label: L.cancel, onPress: () => (setAskDrivePass(false), setPassError(null)) },
           {
             label: L.open,
             disabled: !drivePass,
@@ -323,20 +338,23 @@ export default function BackupScreen() {
               const p = drivePass;
               setAskDrivePass(false);
               setDrivePass('');
+              setPassError(null);
               if (!firstDrive) return sync(p);
               run(tr('Opening your Drive copy', 'உங்கள் Drive பிரதியைத் திறக்கிறது'), async () => {
                 try {
                   const r = await openDriveCopy(p);
                   await setPassphrase(p);
                   setSettings({ hasPassphrase: true });
+                  planNightly().catch(() => {});
                   setFirstDrive(false);
                   await syncDrive();
                   planNightly().catch(() => {});
                   return merged(r, tr('Restored, and this phone now uses that passphrase. ', 'மீட்கப்பட்டது; இந்த அலைபேசி இனி அந்தக் கடவுச்சொற்றொடரைப் பயன்படுத்தும். '));
                 } catch (e) {
                   if (e instanceof DriveError && e.message === 'passphrase') {
+                    setPassError(wrongPass());
                     setAskDrivePass(true);
-                    return tr('That passphrase doesn’t open the Drive copy. Try again.', 'அந்தக் கடவுச்சொற்றொடர் Drive பிரதியைத் திறக்கவில்லை. மீண்டும் முயலுங்கள்.');
+                    return null;
                   }
                   throw e;
                 }
@@ -355,39 +373,73 @@ export default function BackupScreen() {
                 'இந்த Drive பிரதியை உருவாக்கியபோது பயன்படுத்திய கடவுச்சொற்றொடரை உள்ளிடுங்கள். அதன் பக்கங்கள் இங்கே சேரும்; பிறகு பிரதி இந்த அலைபேசியின் கடவுச்சொற்றொடரால் பூட்டப்படும்.',
               )}
         </T>
-        <Field value={drivePass} onChangeText={setDrivePass} placeholder={L.passForRestore} secret style={{ backgroundColor: c.surface2 }} />
+        <Field
+          value={drivePass}
+          onChangeText={(v) => (setDrivePass(v), setPassError(null))}
+          placeholder={L.passForRestore}
+          secret
+          style={{ backgroundColor: c.surface2, borderWidth: passError ? 1.5 : 0, borderColor: c.heart }}
+        />
+        {passError ? (
+          <T v="labelM" color={c.heart}>
+            {passError}
+          </T>
+        ) : null}
       </Dialog>
 
       <Dialog
         visible={!!restoreFile}
         title={L.restore}
-        onClose={() => setRestoreFile(null)}
+        onClose={() => (setRestoreFile(null), setPassError(null))}
         actions={[
-          { label: L.cancel, onPress: () => setRestoreFile(null) },
+          { label: L.cancel, onPress: () => (setRestoreFile(null), setPassError(null)) },
           {
             label: L.open,
             disabled: !restorePass,
             onPress: () => {
               const f = restoreFile;
               const p = restorePass;
-              setRestoreFile(null);
-              setRestorePass('');
-              if (f)
-                run(L.restoring, async () => {
-                  const r = await restoreFrom(f, p);
+              if (!f) return;
+              run(L.restoring, async () => {
+                let r: MergeResult;
+                try {
+                  r = await restoreFrom(f, p);
+                } catch (e) {
+                  if (e instanceof BackupError && /passphrase/i.test(e.message)) {
+                    setRestorePass('');
+                    setPassError(wrongPass());
+                    return null;
+                  }
+                  setRestoreFile(null);
+                  throw e;
+                }
+                setRestoreFile(null);
+                setRestorePass('');
                   refreshWidget();
                   sealsAfterSave();
                   // A new phone takes on the passphrase that opened its old backup, rather than asking for a new one.
                   if (!settings().hasPassphrase) {
                     await setPassphrase(p);
                     setSettings({ hasPassphrase: true });
+                    planNightly().catch(() => {});
                   }
                   return r.added + r.keptBoth > 0 ? L.restored(r.added, r.keptBoth) : tr('Nothing new in that backup: every page is already here.', 'அந்தக் காப்பில் புதியது இல்லை: எல்லாப் பக்கங்களும் ஏற்கெனவே இங்கே உள்ளன.');
-                });
+              });
             },
           },
         ]}>
-        <Field value={restorePass} onChangeText={setRestorePass} placeholder={L.passForRestore} secret style={{ backgroundColor: c.surface2 }} />
+        <Field
+          value={restorePass}
+          onChangeText={(v) => (setRestorePass(v), setPassError(null))}
+          placeholder={L.passForRestore}
+          secret
+          style={{ backgroundColor: c.surface2, borderWidth: passError ? 1.5 : 0, borderColor: c.heart }}
+        />
+        {passError ? (
+          <T v="labelM" color={c.heart}>
+            {passError}
+          </T>
+        ) : null}
       </Dialog>
     </Page>
   );

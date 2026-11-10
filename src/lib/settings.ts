@@ -22,6 +22,8 @@ export type Settings = {
   /** The folder picked for backups (a content:// tree), or ''. */
   backupFolder: string;
   backupNightly: boolean;
+  /** Back up every night, to Drive and the folder alike (the switch on the Backup page). */
+  autoBackup: boolean;
   lastBackup: number;
   startedOn: Day | '';
   lastLens: number;
@@ -76,6 +78,7 @@ export const DEFAULTS: Settings = {
   lockOn: false,
   backupFolder: '',
   backupNightly: false,
+  autoBackup: true,
   lastBackup: 0,
   startedOn: '',
   lastLens: 0,

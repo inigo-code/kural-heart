@@ -51,11 +51,11 @@ export type Seal = { id: SealId; glyph: string; num: string | null; tone: Tone; 
 export const SEALS: Seal[] = [
   { id: 'FirstLeaf', glyph: '௧', num: '1', tone: 'clay', ta: 'முதல் ஏடு', en: 'First leaf', ce: 'Your first saved page', ct: 'சேமித்த முதல் பக்கம்' },
   { id: 'InTamil', glyph: 'அ', num: null, tone: 'indigo', ta: 'தமிழில்', en: 'In Tamil', ce: 'A page written in Tamil', ct: 'தமிழில் எழுதிய பக்கம்' },
-  { id: 'Seven', glyph: '௭', num: '7', tone: 'rose', ta: 'ஏழு நாள் தொடர்', en: 'Seven-day thread', ce: '7 days on your thread', ct: 'தொடரில் 7 நாள்கள்' },
+  { id: 'Seven', glyph: '௭', num: '7', tone: 'rose', ta: 'ஏழு நாள் தொடர்', en: 'Seven-day thread', ce: '7 days on your thread', ct: 'தொடரில் 7 நாட்கள்' },
   { id: 'Chapter', glyph: '௰', num: '10', tone: 'clay', ta: 'அதிகாரம்', en: 'A chapter', ce: '10 pages', ct: '10 பக்கங்கள்' },
   { id: 'SixTimes', glyph: '௬', num: '6', tone: 'green', ta: 'ஆறு பொழுது', en: 'All six times', ce: 'A page in each part of the day', ct: 'ஒவ்வொரு பொழுதிலும் ஒரு பக்கம்' },
   { id: 'ThreeParts', glyph: '௩', num: '3', tone: 'green', ta: 'முப்பால்', en: 'All three parts', ce: 'A page on Aram, Porul and Inbam', ct: 'அறம், பொருள், இன்பம் மூன்றிலும் ஒரு பக்கம்' },
-  { id: 'Thirty', glyph: '௩௰', num: '30', tone: 'rose', ta: 'முப்பது நாள் தொடர்', en: 'Thirty-day thread', ce: '30 days on your thread', ct: 'தொடரில் 30 நாள்கள்' },
+  { id: 'Thirty', glyph: '௩௰', num: '30', tone: 'rose', ta: 'முப்பது நாள் தொடர்', en: 'Thirty-day thread', ce: '30 days on your thread', ct: 'தொடரில் 30 நாட்கள்' },
   { id: 'Hundred', glyph: '௱', num: '100', tone: 'clay', ta: 'நூறு ஏடுகள்', en: 'A hundred leaves', ce: '100 pages', ct: '100 பக்கங்கள்' },
   { id: 'Year', glyph: '௩௱௬௰௫', num: '365', tone: 'clay', ta: 'ஓர் ஆண்டு', en: 'A year with Valluvar', ce: '365 pages', ct: '365 பக்கங்கள்' },
 ];

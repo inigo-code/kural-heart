@@ -5,6 +5,7 @@ import { FlatList, Pressable, StyleSheet, TextInput, View, useWindowDimensions }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { todayKural } from '@/lib/daily';
+import { useTabTop } from '@/lib/tabTop';
 import { addDays, dayOf, longDate, monthName, today } from '@/lib/dates';
 import type { Day } from '@/lib/dates';
 import { allTags, searchEntries, useJournal } from '@/lib/journal';
@@ -43,6 +44,7 @@ const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x
 export default function JournalScreen() {
   const listRef = useRef<FlatList<Entry>>(null);
   const [far, setFar] = useState(false);
+  useTabTop('journal', () => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
   const { c, L, tr, type, tamil } = useUI();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -421,8 +423,8 @@ function FilterSheet({ visible, filter, entries, onClose }: { visible: boolean; 
         {(
           [
             [0, 'Any time', 'எப்போதும்'],
-            [7, 'Last 7 days', 'கடந்த 7 நாள்கள்'],
-            [30, 'Last 30 days', 'கடந்த 30 நாள்கள்'],
+            [7, 'Last 7 days', 'கடந்த 7 நாட்கள்'],
+            [30, 'Last 30 days', 'கடந்த 30 நாட்கள்'],
             [365, 'Last year', 'கடந்த ஆண்டு'],
           ] as const
         ).map(([d, en, ta]) => (

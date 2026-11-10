@@ -54,10 +54,11 @@ export function SplashOverlay({ ready, shown, onDone }: { ready: boolean; shown:
         <Valluvar state="greeting" face="greet" size={220} wink />
       </View>
       <SikkuThreshold height={18} style={{ width: 200, marginTop: 8 }} />
-      <Text allowFontScaling={false} style={{ fontFamily: F.serifMedium, fontSize: 34, color: c.ink, marginTop: 16 }}>
+      <Text allowFontScaling={false} textBreakStrategy="simple" style={{ fontFamily: F.serifMedium, fontSize: 34, color: c.ink, marginTop: 16 }}>
         Kural Heart
       </Text>
-      <Text allowFontScaling={false} style={{ fontFamily: tamil ? F.serifTamil : F.serifItalic, fontSize: tamil ? 16 : 18, lineHeight: 26, color: c.ink3, marginTop: 2 }}>
+      {/* Wraps rather than clips, with room for the italic's overhang. */}
+      <Text allowFontScaling={false} textBreakStrategy="simple" style={{ fontFamily: tamil ? F.serifTamil : F.serifItalic, fontSize: tamil ? 16 : 18, lineHeight: 26, color: c.ink3, marginTop: 2, maxWidth: 300, paddingHorizontal: 6, textAlign: 'center' }}>
         {L.tagline}
       </Text>
       <KolamBand style={{ position: 'absolute', left: 0, right: 0, bottom: 64 }} height={26} strength={1.4} />

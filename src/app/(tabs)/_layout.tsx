@@ -1,4 +1,7 @@
+import { useRouter } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
+
+import { tabTop } from '@/lib/tabTop';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,6 +30,7 @@ type BarProps = {
 
 function NavBar({ state, navigateToTab }: BarProps) {
   const { c, L, scale } = useUI();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   // At the largest text sizes only the open tab keeps its label.
   const big = scale >= 1.3;
@@ -45,7 +49,12 @@ function NavBar({ state, navigateToTab }: BarProps) {
           return (
             <Pressable
               key={r.key}
-              onPress={() => navigateToTab(r.key)}
+              onPress={() => {
+                if (!on) return navigateToTab(r.key);
+                // Tapped again: back to the top (and out of Insights to Journey itself).
+                if (r.name === 'journey') router.navigate('/journey');
+                tabTop(r.name);
+              }}
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
               accessibilityLabel={L[tab.label]}

@@ -1,6 +1,5 @@
-import { Canvas, Group as SkGroup, Path, Skia } from '@shopify/react-native-skia';
-import type { SkPath } from '@shopify/react-native-skia';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path as SvgPath } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
@@ -68,30 +67,22 @@ export const Ico = {
   map: 'M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14',
   chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
   grid: 'M4 4h7v7H4ZM13 4h7v7h-7ZM4 13h7v7H4ZM13 13h7v7h-7Z',
+  expand: 'M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7',
 } as const;
 
 export type IconName = keyof typeof Ico;
 
-const paths = new Map<string, SkPath>();
-function pathOf(d: string): SkPath {
-  let p = paths.get(d);
-  if (!p) {
-    p = Skia.Path.MakeFromSVGString(d) ?? Skia.Path.Make();
-    paths.set(d, p);
-  }
-  return p;
-}
-
+/**
+ * A line icon, drawn as native vector paths. (They were small Skia canvases, and on Android a canvas could come back
+ * blank after a sheet or dialog had covered it: the tab bar lost its icons.)
+ */
 export function Icon({ name, size = 24, color, stroke = 1.8, fill }: { name: IconName; size?: number; color?: string; stroke?: number; fill?: boolean }) {
   const { c } = useUI();
   const tint = color ?? c.ink;
   return (
-    <Canvas style={{ width: size, height: size }} pointerEvents="none">
-      <SkGroup transform={[{ scale: size / 24 }]}>
-        {fill ? <Path path={pathOf(Ico[name])} color={tint} /> : null}
-        <Path path={pathOf(Ico[name])} color={tint} style="stroke" strokeWidth={stroke} strokeCap="round" strokeJoin="round" />
-      </SkGroup>
-    </Canvas>
+    <Svg width={size} height={size} viewBox="0 0 24 24" pointerEvents="none">
+      <SvgPath d={Ico[name]} fill={fill ? tint : 'none'} stroke={tint} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
   );
 }
 
@@ -99,7 +90,9 @@ export function Icon({ name, size = 24, color, stroke = 1.8, fill }: { name: Ico
 export function T({ v = 'body', color, style, children, ...rest }: TextProps & { v?: Variant; color?: string; style?: StyleProp<TextStyle> }) {
   const { c, type } = useUI();
   return (
-    <Text maxFontSizeMultiplier={1.6} {...rest} style={[type[v], { color: color ?? c.ink }, style]}>
+    // "simple" line breaking: Android's default "highQuality" measures Anek Tamil and Literata Italic a touch short,
+    // then drops the end of a line ("30 நாள்" showing as "30", "midday" vanishing after "·").
+    <Text maxFontSizeMultiplier={1.6} textBreakStrategy="simple" {...rest} style={[type[v], { color: color ?? c.ink }, style]}>
       {children}
     </Text>
   );
@@ -154,9 +147,12 @@ export function Page({
   contentStyle,
   scrollProps,
   inTab,
+  footer,
 }: {
   /** The page sits inside the tabs, above the tab bar, which keeps the bottom inset itself. */
   inTab?: boolean;
+  /** A bar of actions fixed under the content (the page view's Edit, Share, Delete); it takes the bottom inset. */
+  footer?: ReactNode;
   title: string;
   close?: boolean;
   actions?: ReactNode;
@@ -182,15 +178,19 @@ export function Page({
       {scroll ? (
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[{ paddingHorizontal: 20, paddingBottom: (inTab ? 0 : insets.bottom) + 32 }, contentStyle]}
+          contentContainerStyle={[{ paddingHorizontal: 20, paddingBottom: (inTab || footer ? 0 : insets.bottom) + 32 }, contentStyle]}
           {...scrollProps}>
           {children}
         </ScrollView>
       ) : (
         <View style={[{ flex: 1, paddingBottom: inTab ? 0 : insets.bottom }, contentStyle]}>{children}</View>
       )}
-      {/* A strip behind the system's buttons, so text scrolls under it rather than through the buttons. */}
-      {inTab ? null : <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: insets.bottom, backgroundColor: c.bg }} />}
+      {footer ? (
+        <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: insets.bottom + 12, borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.bg }}>{footer}</View>
+      ) : inTab ? null : (
+        // A strip behind the system's buttons, so text scrolls under it rather than through the buttons.
+        <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: insets.bottom, backgroundColor: c.bg }} />
+      )}
     </View>
   );
 }

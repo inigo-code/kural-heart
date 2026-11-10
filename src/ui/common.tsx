@@ -2,9 +2,9 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Animated as RNAnimated, Easing as RNEasing, FlatList, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
-import Animated, { Easing, FadeIn, FadeInDown, SlideInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -288,14 +288,90 @@ export function PhotoThumb({ id, size, round }: { id: string; size: number; roun
   );
 }
 
-export function PhotoFull({ id }: { id: string }) {
-  const { c } = useUI();
+/** One photo of a page, cropped to a tidy size; tap to see it whole. */
+function PhotoTile({ id, height, width, onPress }: { id: string; height: number; width?: number; onPress: () => void }) {
+  const { c, tr } = useUI();
   const uri = usePhoto(id);
-  const [ratio, setRatio] = useState(4 / 3);
   return (
-    <View style={{ width: '100%', aspectRatio: ratio, borderRadius: 18, overflow: 'hidden', backgroundColor: c.surface2 }}>
-      {uri ? <Image source={{ uri }} style={{ flex: 1 }} contentFit="cover" onLoad={(e) => setRatio(e.source.width / e.source.height)} /> : null}
-    </View>
+    <Pressable onPress={onPress} accessibilityRole="imagebutton" accessibilityLabel={tr('Open photo', 'படத்தைத் திற')} style={{ width: width ?? '100%', height, borderRadius: 18, overflow: 'hidden', backgroundColor: c.surface2 }}>
+      {uri ? <Image source={{ uri }} style={{ flex: 1 }} contentFit="cover" transition={150} /> : null}
+      <View style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(20,16,12,0.5)', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="expand" size={16} color="#F6F2EA" stroke={2} />
+      </View>
+    </Pressable>
+  );
+}
+
+/**
+ * A page's photos, kept compact: one fills the width at a modest height, more sit two to a row as squares. Tapping
+ * one opens the viewer, the photos whole on black, swiped through one by one.
+ */
+export function PhotoGallery({ ids }: { ids: string[] }) {
+  const { width } = useWindowDimensions();
+  const [open, setOpen] = useState<number | null>(null);
+  if (!ids.length) return null;
+  const half = (width - 40 - 10) / 2;
+  return (
+    <>
+      {ids.length === 1 ? (
+        <PhotoTile id={ids[0]} height={230} onPress={() => setOpen(0)} />
+      ) : (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+          {ids.map((id, i) => (
+            <PhotoTile key={id} id={id} width={half} height={half} onPress={() => setOpen(i)} />
+          ))}
+        </View>
+      )}
+      <PhotoViewer ids={ids} start={open} onClose={() => setOpen(null)} />
+    </>
+  );
+}
+
+function ViewerImage({ id, width, height }: { id: string; width: number; height: number }) {
+  const uri = usePhoto(id);
+  return <View style={{ width, height, justifyContent: 'center' }}>{uri ? <Image source={{ uri }} style={{ width, height }} contentFit="contain" /> : <ActivityIndicator color="#FFFFFF" />}</View>;
+}
+
+/** Photos at full size on black: swipe between them, a count at the top, close to go back. */
+function PhotoViewer({ ids, start, onClose }: { ids: string[]; start: number | null; onClose: () => void }) {
+  const { L } = useUI();
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const [at, setAt] = useState(0);
+  const [was, setWas] = useState<number | null>(null);
+  if (start !== was) {
+    setWas(start);
+    if (start != null) setAt(start);
+  }
+  return (
+    <Modal visible={start != null} transparent={false} animationType="fade" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
+      <View style={{ flex: 1, backgroundColor: '#000000' }}>
+        {start != null ? (
+          <FlatList
+            data={ids}
+            horizontal
+            pagingEnabled
+            initialScrollIndex={start}
+            getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(id) => id}
+            onMomentumScrollEnd={(e) => setAt(Math.round(e.nativeEvent.contentOffset.x / width))}
+            renderItem={({ item }) => <ViewerImage id={item} width={width} height={height} />}
+          />
+        ) : null}
+        <View style={{ position: 'absolute', top: insets.top + 8, left: 12, right: 16, flexDirection: 'row', alignItems: 'center' }}>
+          <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel={L.close} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="close" size={22} color="#FFFFFF" />
+          </Pressable>
+          <View style={{ flex: 1 }} />
+          {ids.length > 1 ? (
+            <T v="label" color="#FFFFFF">
+              {`${at + 1} / ${ids.length}`}
+            </T>
+          ) : null}
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -517,23 +593,37 @@ export function Dialog({
 }
 
 /**
- * A sheet that rises from the foot of the screen. The dimmed backdrop fades in where it is, and only the sheet slides
- * up (a Modal's own "slide" carries the backdrop up with it, a grey band rising from the bottom).
+ * A sheet that rises from the foot of the screen. The dimmed backdrop fades in where it is and only the sheet slides
+ * up (a Modal's own "slide" carries the backdrop with it). React Native's own Animated moves it: inside a Modal's
+ * window it lands flush on the bottom edge, where an entering animation could leave a gap under the sheet.
  */
 export function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: ReactNode }) {
   const { c, still } = useUI();
   const insets = useSafeAreaInsets();
+  const [rise] = useState(() => new RNAnimated.Value(1));
+  useEffect(() => {
+    if (!visible) return;
+    rise.setValue(still ? 0 : 1);
+    if (!still) RNAnimated.timing(rise, { toValue: 0, duration: 300, easing: RNEasing.out(RNEasing.cubic), useNativeDriver: true }).start();
+  }, [visible, still, rise]);
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
-      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.42)', justifyContent: 'flex-end' }}>
-        <Animated.View entering={still ? undefined : SlideInDown.duration(320).easing(Easing.out(Easing.cubic))} style={{ maxHeight: '88%' }}>
-        <Pressable onPress={() => {}} style={{ backgroundColor: c.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '100%', paddingBottom: insets.bottom }}>
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <Pressable onPress={onClose} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.42)' }]} accessibilityLabel="Close" />
+        <RNAnimated.View
+          style={{
+            maxHeight: '88%',
+            backgroundColor: c.surface,
+            borderTopLeftRadius: 28,
+            borderTopRightRadius: 28,
+            paddingBottom: insets.bottom,
+            transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [0, 600] }) }],
+          }}>
           <View style={{ alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: c.surface3, marginTop: 10 }} />
           <MayilBorder height={12} style={{ alignSelf: 'center', width: 132, marginTop: 10 }} />
           <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 24 }}>{children}</ScrollView>
-        </Pressable>
-        </Animated.View>
-      </Pressable>
+        </RNAnimated.View>
+      </View>
     </Modal>
   );
 }

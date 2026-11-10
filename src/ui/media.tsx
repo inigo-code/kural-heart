@@ -54,10 +54,17 @@ export function AudioNote({ id, onRemove }: { id: string; onRemove?: () => void 
     }
     await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true, shouldRouteThroughEarpiece: false }).catch(() => {});
     const p = createAudioPlayer({ uri });
+    p.loop = false;
     player.current = p;
     p.addListener('playbackStatusUpdate', (s) => {
+      // At the end it stops and stays there; the next tap starts again from the top (see above). Seeking back to the
+      // start here made Android play it again, over and over.
+      if (s.didJustFinish) {
+        p.pause();
+        setSt({ playing: false, at: s.duration || s.currentTime, length: s.duration || 0 });
+        return;
+      }
       setSt({ playing: s.playing, at: s.currentTime, length: s.duration || 0 });
-      if (s.didJustFinish) p.seekTo(0).catch(() => {});
     });
     setOpening(false);
     p.play();
@@ -214,7 +221,7 @@ export function VideoNote({ id, onRemove }: { id: string; onRemove?: () => void 
           onPress={open}
           accessibilityRole="button"
           accessibilityLabel={tr('Play video', 'காணொளியை இயக்கு')}
-          style={({ pressed }) => ({ width: 46, height: 46, borderRadius: 23, backgroundColor: '#1E1A16', alignItems: 'center', justifyContent: 'center', transform: [{ scale: pressed ? 0.93 : 1 }] })}>
+          style={({ pressed }) => ({ width: 46, height: 46, borderRadius: 23, backgroundColor: c.isNight ? c.surface3 : '#1E1A16', alignItems: 'center', justifyContent: 'center', transform: [{ scale: pressed ? 0.93 : 1 }] })}>
           {opening ? <ActivityIndicator color="#F6F2EA" /> : <Icon name="play" size={20} color="#F6F2EA" fill />}
         </Pressable>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
