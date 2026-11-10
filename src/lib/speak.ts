@@ -1,24 +1,12 @@
-// Reads a couplet aloud: the Tamil first, then (if wanted) the English. The Tamil comes from the app's own recording
-// of every couplet (an open, natural Tamil voice, so it sounds the same on every phone and works offline) unless a
-// phone voice is chosen in Settings. The English, and any phone voice, use the phone's text-to-speech.
+// Reads a couplet aloud with the phone's own voices: the Tamil first, then (if wanted) the English. The phone's Tamil
+// voices (Google's on most phones) read more naturally than the open recorded voice 1.0.2 shipped, so that was dropped.
 
-import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
-import type { AudioPlayer } from 'expo-audio';
 import * as IntentLauncher from 'expo-intent-launcher';
 import * as Speech from 'expo-speech';
 import { useSyncExternalStore } from 'react';
 
 import type { Kural } from './pack';
 import { settings } from './settings';
-import { VOICE_FILES } from './voiceFiles';
-
-/** The Tamil voice setting's value for the app's own recordings (also what an empty setting means). */
-export const BUILT_IN = 'kural-heart';
-
-export const usesBuiltIn = () => {
-  const v = settings().voiceTa;
-  return v === '' || v === BUILT_IN;
-};
 
 let speaking = 0;
 let missingTamil = false;
@@ -41,50 +29,6 @@ export function useSpeaker() {
     () => snap,
     () => snap,
   );
-}
-
-let player: AudioPlayer | null = null;
-
-function stopRecording() {
-  if (player) {
-    try {
-      player.remove();
-    } catch {}
-    player = null;
-  }
-}
-
-/** Play couplet [n]'s recording. Resolves true when it plays to the end, false when stopped, replaced or missing. */
-function playRecording(n: number, rate: number, current: () => boolean): Promise<boolean> {
-  const src = VOICE_FILES[n];
-  if (!src) return Promise.resolve(false);
-  return new Promise((resolve) => {
-    stopRecording();
-    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
-    const p = createAudioPlayer(src);
-    player = p;
-    // The recordings are made at a gentle reciting pace; the speed setting (0.85 is "gentle") scales around it.
-    p.setPlaybackRate(Math.max(0.7, Math.min(1.3, rate / 0.85)));
-    let settled = false;
-    let sub: { remove: () => void } | null = null;
-    let watch: ReturnType<typeof setInterval> | null = null;
-    const finish = (ok: boolean) => {
-      if (settled) return;
-      settled = true;
-      sub?.remove();
-      if (watch) clearInterval(watch);
-      if (player === p) stopRecording();
-      resolve(ok);
-    };
-    sub = p.addListener('playbackStatusUpdate', (st) => {
-      if (st.didJustFinish) finish(current());
-    });
-    // A newer reading, or Stop, ends this one even if the player sends nothing more.
-    watch = setInterval(() => {
-      if (!current() || player !== p) finish(false);
-    }, 200);
-    p.play();
-  });
 }
 
 export type Voice = { id: string; name: string; language: string; quality: string };
@@ -149,15 +93,13 @@ export async function readAloud(k: Kural, englishText: string) {
   speaking = k.n;
   missingTamil = false;
   publish();
-  stopRecording();
   await Speech.stop();
   if (mine !== generation) return;
   const s = settings();
-  const builtIn = usesBuiltIn() && !!VOICE_FILES[k.n];
-  const ta = builtIn ? null : await pick('ta');
+  const ta = await pick('ta');
   const en = s.readEnglish ? await pick('en') : null;
   if (mine !== generation) return;
-  missingTamil = !builtIn && !ta;
+  missingTamil = !ta;
   publish();
   const done = () => {
     if (mine === generation && speaking === k.n) {
@@ -167,13 +109,6 @@ export async function readAloud(k: Kural, englishText: string) {
   };
   const readEnglish = () =>
     Speech.speak(englishText.split('\n').join(' '), { ...options(en, 'en-IN', s.speechRate), onDone: done, onStopped: done, onError: done });
-  if (builtIn) {
-    const finished = await playRecording(k.n, s.speechRate, () => mine === generation);
-    if (mine !== generation) return;
-    if (finished && s.readEnglish) readEnglish();
-    else done();
-    return;
-  }
   const last = s.readEnglish || !ta ? 'en' : 'ta';
   if (ta) Speech.speak(`${k.a}. ${k.b}.`, { ...options(ta, 'ta-IN', s.speechRate), ...(last === 'ta' ? { onDone: done, onStopped: done, onError: done } : {}) });
   if (last === 'en') readEnglish();
@@ -181,7 +116,6 @@ export async function readAloud(k: Kural, englishText: string) {
 
 export function stopReading() {
   generation++;
-  stopRecording();
   Speech.stop();
   if (speaking) {
     speaking = 0;
@@ -192,16 +126,8 @@ export function stopReading() {
 /** Play a short sample in one phone voice, for choosing in Settings. */
 export async function tryVoice(v: Voice, sample: string, rate: number) {
   generation++;
-  stopRecording();
   await Speech.stop();
   Speech.speak(sample, { voice: v.id, language: v.language, rate });
-}
-
-/** Play couplet [n] in the built-in voice, for choosing in Settings. */
-export async function tryBuiltIn(n: number, rate: number) {
-  const mine = ++generation;
-  await Speech.stop();
-  await playRecording(n, rate, () => mine === generation);
 }
 
 export function voiceSettings() {

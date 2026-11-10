@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { AppState, View } from 'react-native';
@@ -90,6 +91,8 @@ function Root() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <StatusBar style={c.isNight ? 'light' : 'dark'} />
+      {/* The system's buttons sit on the app's own ground, with no grey scrim (enforceContrast is off in app.json). */}
+      <NavigationBar style={c.isNight ? 'dark' : 'light'} />
       {!ready ? null : !s.onboarded ? (
         <Onboarding />
       ) : locked ? (

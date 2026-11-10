@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
-import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeInDown, LinearTransition, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { clock, longDate } from '@/lib/dates';
@@ -119,8 +120,11 @@ export const timeOf = (e: Entry) => {
   return timeLabel(d.getHours() * 60 + d.getMinutes());
 };
 
-/** The couplet on its leaf. Turned, it shows Pope's verse on the back. */
-export function KuralLeaf({ k, turned, onPress, max }: { k: Kural; turned?: boolean; onPress?: () => void; max?: number }) {
+/**
+ * The couplet on its leaf. Turned, it shows Pope's verse on the back: the leaf tips over on its long side, as an
+ * olai is turned in the hand, and comes back up showing the other face.
+ */
+export function KuralLeaf({ k, turned = false, onPress, max }: { k: Kural; turned?: boolean; onPress?: () => void; max?: number }) {
   const { c, tamil, type, still } = useUI();
   const ch = chapterOf(k);
   // Both faces are measured and the leaf keeps the taller one's height, so turning it never moves the page.
@@ -129,6 +133,23 @@ export function KuralLeaf({ k, turned, onPress, max }: { k: Kural; turned?: bool
     const h = Math.ceil(e.nativeEvent.layout.height);
     setHeights((hs) => (hs[i] === h ? hs : i === 0 ? [h, hs[1]] : [hs[0], h]));
   };
+  // The face on show trails [turned] by half a turn: it changes while the leaf is edge-on.
+  const [flipped, setShown] = useState(turned);
+  // With motion reduced the face simply changes.
+  const shown = still ? turned : flipped;
+  const tip = useSharedValue(0);
+  useEffect(() => {
+    if (still || turned === flipped) return;
+    tip.value = withTiming(90, { duration: 170, easing: Easing.in(Easing.quad) }, (done) => {
+      if (!done) return;
+      scheduleOnRN(setShown, turned);
+      tip.value = -90;
+      tip.value = withTiming(0, { duration: 260, easing: Easing.out(Easing.back(1.4)) });
+    });
+    // tip is a shared value and stays the same object.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [turned, still]);
+  const tipping = useAnimatedStyle(() => ({ transform: [{ perspective: 900 }, { rotateX: `${tip.value}deg` }] }));
   const front = (
     <>
       <CoupletText a={k.a} b={k.b} max={max} />
@@ -138,31 +159,62 @@ export function KuralLeaf({ k, turned, onPress, max }: { k: Kural; turned?: bool
   );
   const back = (
     <>
-      <Text style={[type.body, { fontFamily: F.serifItalic, color: c.leafInk }]}>{`${k.pa}\n${k.pb}`}</Text>
+      {[k.pa, k.pb].map((line, i) => (
+        <Text key={i} style={[type.body, { fontFamily: F.serifItalic, color: c.leafInk, marginTop: i ? 4 : 0 }]}>
+          {line}
+        </Text>
+      ))}
       <LeafNote>{`G. U. Pope, 1886 · ${ch.en} · ${k.n}`}</LeafNote>
     </>
   );
   return (
     <Pressable onPress={onPress} disabled={!onPress} accessibilityRole={onPress ? 'button' : undefined}>
-      <Animated.View layout={still ? undefined : LinearTransition.duration(220)}>
+      <Animated.View style={tipping}>
         <Leaf>
-          <View style={{ alignSelf: 'stretch', minHeight: Math.max(heights[0], heights[1]) }}>
-            <Animated.View key={turned ? 'back' : 'front'} entering={still ? undefined : FadeIn.duration(220)} onLayout={measure(turned ? 1 : 0)} style={{ alignItems: 'flex-start' }}>
-              {turned ? back : front}
-            </Animated.View>
+          <View style={{ alignSelf: 'stretch', minHeight: Math.max(heights[0], heights[1]), justifyContent: 'center' }}>
+            <View onLayout={measure(shown ? 1 : 0)} style={{ alignItems: 'flex-start' }}>
+              {shown ? back : front}
+            </View>
             {/* The hidden face, laid out unseen, only to know its height. */}
             <View
-              onLayout={measure(turned ? 0 : 1)}
+              onLayout={measure(shown ? 0 : 1)}
               style={{ position: 'absolute', left: 0, right: 0, top: 0, opacity: 0, alignItems: 'flex-start' }}
               pointerEvents="none"
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants">
-              {turned ? front : back}
+              {shown ? front : back}
             </View>
           </View>
         </Leaf>
       </Animated.View>
     </Pressable>
+  );
+}
+
+/**
+ * A piece of a screen that rises softly into place the first time the screen shows it, [i] steps after the first, so
+ * a page settles in from top to bottom instead of appearing all at once. Beyond the tenth piece (a long list as it
+ * scrolls) nothing waits. Nothing moves with Reduce motion on.
+ */
+export function Rise({ i = 0, children, style }: { i?: number; children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const { still } = useUI();
+  return (
+    <Animated.View
+      entering={still || i >= 10 ? undefined : FadeInDown.duration(420).delay(80 + Math.min(i, 8) * 70).easing(Easing.out(Easing.cubic)).withInitialValues({ transform: [{ translateY: 14 }] })}
+      layout={still ? undefined : LinearTransition.duration(240)}>
+      {/* The look sits on an inner view: Android can leave an animating view with a background unshown. */}
+      <View style={style}>{children}</View>
+    </Animated.View>
+  );
+}
+
+/** Text that fades in afresh whenever [k] changes (a new question, a new count). */
+export function FadeSwap({ k, children, style }: { k: string | number; children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const { still } = useUI();
+  return (
+    <Animated.View key={k} entering={still ? undefined : FadeIn.duration(320)} style={style}>
+      {children}
+    </Animated.View>
   );
 }
 
@@ -486,27 +538,77 @@ export function Wrap({ children, style }: { children: ReactNode; style?: StylePr
 
 export type Action = { icon: IconName; label: string; onPress: () => void; on?: boolean };
 
-/** A couplet's actions as even tiles, three to a row, so every label fits on any phone. */
-export function ActionGrid({ items, style }: { items: Action[]; style?: StyleProp<ViewStyle> }) {
+/**
+ * A couplet's actions: round icon buttons in one row with their names under them, like a player's controls. The
+ * one that is on (Listen while it reads, the leaf while it is turned) fills with the accent.
+ */
+export function ActionRow({ items, style }: { items: Action[]; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
   return (
-    <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 20 }, style]}>
+    <View style={[{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 12 }, style]}>
       {items.map((a) => (
-        // The rounded tile clips the press ripple; on Android a ripple on the Pressable itself squares the corners.
-        <View key={a.icon + a.label} style={{ flexBasis: '30%', flexGrow: 1, borderRadius: 20, overflow: 'hidden', backgroundColor: a.on ? c.primary : c.surface }}>
-          <Pressable
-            onPress={a.onPress}
-            accessibilityRole="button"
-            accessibilityState={a.on != null ? { selected: a.on } : undefined}
-            android_ripple={{ color: a.on ? alpha(c.onPrimary, 0.18) : c.surface3, foreground: true }}
-            style={{ minHeight: 86, paddingVertical: 12, paddingHorizontal: 8, gap: 8, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name={a.icon} size={22} color={a.on ? c.onPrimary : c.ink2} />
-            {/* Up to three lines, shrinking a little before anything is cut: Tamil labels run longer. */}
-            <T v="labelM" color={a.on ? c.onPrimary : c.ink} numberOfLines={3} adjustsFontSizeToFit minimumFontScale={0.8} style={{ textAlign: 'center' }}>
-              {a.label}
-            </T>
-          </Pressable>
-        </View>
+        <Pressable
+          key={a.icon + a.label}
+          onPress={a.onPress}
+          accessibilityRole="button"
+          accessibilityLabel={a.label}
+          accessibilityState={a.on != null ? { selected: a.on } : undefined}
+          style={{ flex: 1, maxWidth: 104, alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+          {({ pressed }) => (
+            <>
+              <View
+                style={{
+                  width: 58,
+                  height: 58,
+                  borderRadius: 29,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: a.on ? c.primary : pressed ? c.primarySoft : c.surface,
+                  borderWidth: a.on ? 0 : 1,
+                  borderColor: c.line,
+                  transform: [{ scale: pressed ? 0.94 : 1 }],
+                }}>
+                <Icon name={a.icon} size={24} color={a.on ? c.onPrimary : pressed ? c.onSoft : c.ink} stroke={2} />
+              </View>
+              <T v="labelM" color={a.on ? c.primary : c.ink2} numberOfLines={2} style={{ textAlign: 'center', paddingHorizontal: 2 }}>
+                {a.label}
+              </T>
+            </>
+          )}
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+/** Wider ways on from a couplet (choose another, say how you feel): soft pills with an icon, side by side. */
+export function LinkPills({ items, style }: { items: Action[]; style?: StyleProp<ViewStyle> }) {
+  const { c } = useUI();
+  return (
+    <View style={[{ flexDirection: 'row', gap: 10, paddingHorizontal: 20 }, style]}>
+      {items.map((a) => (
+        <Pressable
+          key={a.icon + a.label}
+          onPress={a.onPress}
+          accessibilityRole="button"
+          style={({ pressed }) => ({
+            flex: 1,
+            minHeight: 52,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 26,
+            borderWidth: 1,
+            borderColor: c.line,
+            backgroundColor: pressed ? c.primarySoft : c.surface,
+          })}>
+          <Icon name={a.icon} size={20} color={c.primary} stroke={2} />
+          <T v="label" color={c.ink} numberOfLines={2} style={{ flex: 1 }}>
+            {a.label}
+          </T>
+        </Pressable>
       ))}
     </View>
   );

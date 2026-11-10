@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KolamBand } from '@/ui/kolam';
 import { Icon, T } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
-import { alpha } from '@/ui/theme';
+import { F, alpha } from '@/ui/theme';
 import { useUI } from '@/ui/ui';
 
 const TABS: {
@@ -38,10 +38,10 @@ function NavBar({ state, navigateToTab }: BarProps) {
       }}>
       <KolamBand height={14} strength={0.9} />
       <View style={{ flexDirection: 'row', height: 76 }}>
-        {state.routes.map((r, i) => {
+        {state.routes.map((r) => {
           const tab = TABS.find((t) => t.name === r.name);
           if (!tab) return null;
-          const on = state.index === i;
+          const on = state.routes[state.index]?.name === r.name;
           return (
             <Pressable
               key={r.key}
@@ -60,7 +60,7 @@ function NavBar({ state, navigateToTab }: BarProps) {
                   backgroundColor: on ? c.primarySoft : alpha(c.primarySoft, 0),
                   overflow: 'hidden',
                 }}>
-                <Icon name={tab.icon} color={on ? c.onSoft : c.ink3} />
+                <Icon name={tab.icon} color={on ? c.onSoft : c.ink2} stroke={on ? 2.2 : 1.8} />
               </View>
               {!big || on ? (
                 <T
@@ -69,9 +69,10 @@ function NavBar({ state, navigateToTab }: BarProps) {
                   numberOfLines={1}
                   adjustsFontSizeToFit
                   minimumFontScale={0.75}
-                  color={on ? c.ink : c.ink3}
+                  color={on ? c.ink : c.ink2}
                   style={{
                     marginTop: 4,
+                    fontFamily: on ? F.sansBold : F.sansMedium,
                     fontSize: 12 * Math.min(scale, 1.15),
                     lineHeight: 16 * Math.min(scale, 1.15),
                   }}>
@@ -93,6 +94,7 @@ export default function TabsLayout() {
     <View style={{ flex: 1 }}>
       <Tabs
         tabBar={(p) => <NavBar {...(p as unknown as BarProps)} />}
+        backBehavior="history"
         screenOptions={{
           headerShown: false,
           sceneStyle: { backgroundColor: c.bg },

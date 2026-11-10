@@ -92,7 +92,7 @@ export default function BackupScreen() {
         <T v="body" color={c.ink2} style={{ flex: 1 }}>
           {L.backupLede}
         </T>
-        <Valluvar state={busy ? 'walking' : 'presenting'} size={146} />
+        <Valluvar state={busy ? 'walking' : 'presenting'} size={116} />
       </View>
       {busy ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 8 }}>
@@ -126,7 +126,6 @@ export default function BackupScreen() {
             <Row title={tr('Sync now', 'இப்போதே ஒத்திசை')} icon="sync" onPress={() => !busy && sync()} />
             <Row
               title={tr('Use another Google account', 'வேறொரு Google கணக்கைப் பயன்படுத்து')}
-              sub={tr('Sign out of this one and choose or add another', 'இதிலிருந்து வெளியேறி வேறொன்றைத் தேர்ந்தெடு அல்லது சேர்')}
               icon="user"
               onPress={() => !busy && switchAccount()}
             />
@@ -136,8 +135,8 @@ export default function BackupScreen() {
       </Group>
       <Note style={{ marginTop: 10 }}>
         {tr(
-          'Kural Heart uses a private app folder in your Drive that you can’t see in the Drive app. Google only ever holds a locked file.',
-          'உங்கள் Drive-இல் Drive செயலியில் தெரியாத ஒரு தனிக் கோப்புறையைப் பயன்படுத்துகிறது. Google-இடம் பூட்டிய கோப்பு மட்டுமே இருக்கும்.',
+          'Kept in a hidden app folder in your Drive. Google only ever holds a locked file.',
+          'உங்கள் Drive-இன் மறைவான செயலிக் கோப்புறையில். Google-இடம் பூட்டிய கோப்பு மட்டுமே.',
         )}
       </Note>
 
@@ -165,7 +164,6 @@ export default function BackupScreen() {
           <>
             <Row
               title={tr('Stop using this folder', 'இந்தக் கோப்புறையை நிறுத்து')}
-              sub={tr('The backup file already there stays', 'அங்குள்ள பிரதிக் கோப்பு அப்படியே இருக்கும்')}
               onPress={() => {
                 forgetBackupFolder();
                 planNightly().catch(() => {});
@@ -175,7 +173,6 @@ export default function BackupScreen() {
           </>
         ) : null}
       </Group>
-      <Note style={{ marginTop: 12 }}>{L.backupPromise}</Note>
 
       {!s.hasPassphrase ? (
         <>

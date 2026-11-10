@@ -182,6 +182,9 @@ function record(list: Op[], p: Plan, t: number, k: number, w: number, h: number,
 
 const LETTERS = require('../../assets/fonts/NotoSerifTamil-ExtraBold.ttf');
 
+/** Room kept above the art by default: his bun rises past the art's box as he bobs, bows and lifts. */
+const DEFAULT_HEADROOM = 0.1;
+
 type Props = {
   state: ValluvarState;
   size?: number;
@@ -218,7 +221,7 @@ function useSetup({ state, size = 240, face, typing = false, nod = false, once =
 
 /** The canvas: the art's box plus any headroom, with the picture moved down into it. */
 function Frame({ props, w, h, picture }: { props: Props; w: number; h: number; picture: SkPicture | SharedValue<SkPicture> }) {
-  const top = Math.round((props.headroom ?? 0) * h);
+  const top = Math.round((props.headroom ?? DEFAULT_HEADROOM) * h);
   return (
     <View accessible={!!props.label} accessibilityLabel={props.label} style={{ width: w, height: h + top }}>
       <Canvas style={{ width: w, height: h + top }}>
@@ -234,7 +237,7 @@ function MovingValluvar(props: Props) {
   const { list, p, w, h, k } = useSetup(props);
   const font = useFont(LETTERS, 20);
   const clock = useClock();
-  const top = Math.round((props.headroom ?? 0) * h);
+  const top = Math.round((props.headroom ?? DEFAULT_HEADROOM) * h);
   const picture = useDerivedValue(() => record(list, p, clock.value, k, w, h, font, top));
   return <Frame props={props} w={w} h={h} picture={picture} />;
 }
@@ -242,7 +245,7 @@ function MovingValluvar(props: Props) {
 function StillValluvar(props: Props) {
   const { list, p, w, h, k } = useSetup(props);
   const font = useFont(LETTERS, 20);
-  const top = Math.round((props.headroom ?? 0) * h);
+  const top = Math.round((props.headroom ?? DEFAULT_HEADROOM) * h);
   const picture = useMemo(() => record(list, p, -1, k, w, h, font, top), [list, p, k, w, h, font, top]);
   return <Frame props={props} w={w} h={h} picture={picture} />;
 }

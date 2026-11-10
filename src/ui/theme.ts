@@ -39,12 +39,13 @@ export const Ivory: Colors = {
   surface3: '#E7DECF',
   ink: '#1E1A16',
   ink2: '#564D44',
-  ink3: '#73695E',
-  line: '#E4DACA',
+  ink3: '#6B6156',
+  line: '#E0D4C1',
   primary: '#B4492A',
   onPrimary: '#FFF8F2',
-  primarySoft: '#F6E2D7',
-  onSoft: '#7A2E17',
+  // Strong enough to read as 'selected' on the ivory ground, not just a tint of it.
+  primarySoft: '#F1D2C1',
+  onSoft: '#6E2610',
   aram: '#2F6B53',
   porul: '#3A4E86',
   inbam: '#A8475C',
@@ -88,15 +89,15 @@ export function withAccent(c: Colors, accent: string): Colors {
     case 'indigo':
       return n
         ? { ...c, primary: '#9DB0E6', onPrimary: '#10162A', primarySoft: '#2C3A63', onSoft: '#DCE3FA' }
-        : { ...c, primary: '#3A4E86', onPrimary: '#F7F8FF', primarySoft: '#E2E6F2', onSoft: '#263463' };
+        : { ...c, primary: '#3A4E86', onPrimary: '#F7F8FF', primarySoft: '#D3DAF0', onSoft: '#22305C' };
     case 'green':
       return n
         ? { ...c, primary: '#7FC3A5', onPrimary: '#0E1F18', primarySoft: '#21463A', onSoft: '#C9EBDA' }
-        : { ...c, primary: '#2F6B53', onPrimary: '#F4FBF7', primarySoft: '#E1EDE6', onSoft: '#1E4A39' };
+        : { ...c, primary: '#2F6B53', onPrimary: '#F4FBF7', primarySoft: '#CDE3D7', onSoft: '#1A4333' };
     case 'rose':
       return n
         ? { ...c, primary: '#E79AAD', onPrimary: '#2A1118', primarySoft: '#55293A', onSoft: '#F8D5DE' }
-        : { ...c, primary: '#A8475C', onPrimary: '#FFF7F9', primarySoft: '#F4E1E5', onSoft: '#6E2638' };
+        : { ...c, primary: '#A8475C', onPrimary: '#FFF7F9', primarySoft: '#F0CFD7', onSoft: '#64202F' };
     default:
       return c;
   }

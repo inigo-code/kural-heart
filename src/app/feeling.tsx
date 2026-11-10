@@ -50,7 +50,7 @@ export default function FeelingScreen() {
             <MeaningUnder k={k} />
           </View>
           <View style={{ flexDirection: 'row', marginTop: 10 }}>
-            <Chip label={L.another} icon="turn" onPress={() => setAttempt(attempt + 1)} />
+            <Chip label={L.another} icon="shuffle" onPress={() => setAttempt(attempt + 1)} />
           </View>
           <Button label={L.write} icon="pen" style={{ marginTop: 14 }} onPress={() => router.replace({ pathname: '/write', params: { kural: String(k.n) } })} />
         </>

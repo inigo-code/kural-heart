@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { setSettings, useSettings } from '@/lib/settings';
-import { BUILT_IN, isOnline, tryBuiltIn, tryVoice, voiceSettings, voicesFor } from '@/lib/speak';
+import { isOnline, tryVoice, voiceSettings, voicesFor } from '@/lib/speak';
 import type { Voice } from '@/lib/speak';
 
 import { Sheet } from './common';
@@ -116,11 +116,8 @@ function VoiceChoice({ on, title, sub, onPick, onTry }: { on: boolean; title: st
   );
 }
 
-/**
- * Choose the voice for one language, with Try beside each. Tamil starts with the app's own recordings (the default);
- * then the phone's voices, one entry per voice, saying whether each needs the internet.
- */
-export function VoiceSheet({ lang, visible, onClose, sample, n }: { lang: 'ta' | 'en'; visible: boolean; onClose: () => void; sample: string; n: number }) {
+/** Choose the phone voice for one language, with Try beside each, saying whether each needs the internet. */
+export function VoiceSheet({ lang, visible, onClose, sample }: { lang: 'ta' | 'en'; visible: boolean; onClose: () => void; sample: string }) {
   const { c, tr } = useUI();
   const s = useSettings();
   const [list, setList] = useState<Voice[] | null>(null);
@@ -130,42 +127,26 @@ export function VoiceSheet({ lang, visible, onClose, sample, n }: { lang: 'ta' |
   }, [visible, lang]);
   const chosen = lang === 'ta' ? s.voiceTa : s.voiceEn;
   const set = (id: string) => setSettings(lang === 'ta' ? { voiceTa: id } : { voiceEn: id });
+  // As Listen does: with nothing chosen (or a voice since removed), the best voice on the phone.
   const known = !!list?.some((x) => x.id === chosen);
-  // As Listen does: Tamil falls back to the recordings, English to the best phone voice.
-  const builtInOn = lang === 'ta' && !known;
   const where = (v: Voice) =>
     `${v.language} · ${isOnline(v) ? tr('needs internet', 'இணையம் தேவை') : tr('on this phone', 'இந்த அலைபேசியில்')}${v.quality === 'Enhanced' ? tr(' · clearer', ' · தெளிவானது') : ''}`;
   return (
     <Sheet visible={visible} onClose={onClose}>
       <T v="headline">{lang === 'ta' ? tr('Tamil voice', 'தமிழ்க் குரல்') : tr('English voice', 'ஆங்கிலக் குரல்')}</T>
-      <T v="bodyM" color={c.ink2} style={{ marginTop: 6 }}>
-        {lang === 'ta'
-          ? tr(
-              'Kural Heart’s own voice reads every couplet the same way on any phone, even offline. Your phone’s voices are below; tap Try to hear each.',
-              'Kural Heart குரல் எந்த அலைபேசியிலும், இணையம் இல்லாமலும் ஒவ்வொரு குறளையும் ஒரே மாதிரிப் படிக்கும். உங்கள் அலைபேசியின் குரல்கள் கீழே; ஒவ்வொன்றையும் கேட்க "கேள்" தொடவும்.',
-            )
-          : tr('These are the voices on this phone. Tap Try to hear each one.', 'இவை இந்த அலைபேசியில் உள்ள குரல்கள். ஒவ்வொன்றையும் கேட்க "கேள்" தொடவும்.')}
-      </T>
       <View style={{ gap: 10, marginTop: 16 }}>
-        {lang === 'ta' ? (
-          <VoiceChoice
-            on={builtInOn}
-            title={tr('Kural Heart voice', 'Kural Heart குரல்')}
-            sub={tr('Natural Tamil, recorded for every couplet · works offline', 'இயல்பான தமிழ், ஒவ்வொரு குறளுக்கும் பதிவு · இணையம் தேவையில்லை')}
-            onPick={() => set(BUILT_IN)}
-            onTry={() => tryBuiltIn(n, s.speechRate)}
-          />
-        ) : null}
         {!list ? <ActivityIndicator color={c.primary} style={{ marginTop: 8 }} /> : null}
-        {list && list.length === 0 && lang === 'en' ? (
+        {list && list.length === 0 ? (
           <T v="bodyM" color={c.heart}>
-            {tr('No English voice is installed yet.', 'ஆங்கிலக் குரல் இன்னும் நிறுவப்படவில்லை.')}
+            {lang === 'ta'
+              ? tr('No Tamil voice is installed yet. Add one in Android settings.', 'தமிழ்க் குரல் இன்னும் நிறுவப்படவில்லை. Android அமைப்புகளில் சேர்க்கவும்.')
+              : tr('No English voice is installed yet.', 'ஆங்கிலக் குரல் இன்னும் நிறுவப்படவில்லை.')}
           </T>
         ) : null}
         {(list ?? []).map((v, i) => (
           <VoiceChoice
             key={v.id}
-            on={lang === 'ta' ? known && chosen === v.id : known ? chosen === v.id : i === 0}
+            on={known ? chosen === v.id : i === 0}
             title={`${tr('Phone voice', 'அலைபேசிக் குரல்')} ${i + 1}`}
             sub={where(v)}
             onPick={() => set(v.id)}

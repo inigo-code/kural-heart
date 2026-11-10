@@ -32,7 +32,11 @@ export const Ico = {
   phone: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1Z',
   keyboard: 'M4 7h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1ZM7 10h.01M10 10h.01M13 10h.01M16 10h.01M8 14h8',
   bulb: 'M12 3.5a6 6 0 0 0-3.5 10.9V17h7v-2.6A6 6 0 0 0 12 3.5ZM9.5 20h5',
-  turn: 'M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4',
+  // A leaf lying flat with an arrow tipping it over.
+  turn: 'M4 14h16v5H4ZM6.5 11A6.5 6.5 0 0 1 17.5 8M17.5 4v4h-4',
+  shuffle: 'M3 7h3c4.5 0 6.5 10 11 10h4M3 17h3c1.7 0 3-1.4 4.2-3.3M13.8 9.3C15 7.9 15.9 7 17 7h4M18 4l3 3-3 3M18 14l3 3-3 3',
+  moon: 'M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z',
+  sunrise: 'M7 17a5 5 0 0 1 10 0M3 17h18M12 5v3M5.6 9.6l1.8 1.8M18.4 9.6l-1.8 1.8M2.5 13.5h2M19.5 13.5h2M8 21h8',
   words: 'M4 6h16M4 12h10M4 18h7M17 15l3 3-3 3',
   book: 'M4 5.5C6.5 4.2 9.5 4.2 12 6c2.5-1.8 5.5-1.8 8-.5v13c-2.5-1.3-5.5-1.3-8 .5-2.5-1.8-5.5-1.8-8-.5ZM12 6v13',
   star: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9Z',
@@ -144,7 +148,10 @@ export function Page({
   onBack,
   contentStyle,
   scrollProps,
+  inTab,
 }: {
+  /** The page sits inside the tabs, above the tab bar, which keeps the bottom inset itself. */
+  inTab?: boolean;
   title: string;
   close?: boolean;
   actions?: ReactNode;
@@ -170,13 +177,15 @@ export function Page({
       {scroll ? (
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[{ paddingHorizontal: 20, paddingBottom: insets.bottom + 32 }, contentStyle]}
+          contentContainerStyle={[{ paddingHorizontal: 20, paddingBottom: (inTab ? 0 : insets.bottom) + 32 }, contentStyle]}
           {...scrollProps}>
           {children}
         </ScrollView>
       ) : (
-        <View style={[{ flex: 1, paddingBottom: insets.bottom }, contentStyle]}>{children}</View>
+        <View style={[{ flex: 1, paddingBottom: inTab ? 0 : insets.bottom }, contentStyle]}>{children}</View>
       )}
+      {/* A strip behind the system's buttons, so text scrolls under it rather than through the buttons. */}
+      {inTab ? null : <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: insets.bottom, backgroundColor: c.bg }} />}
     </View>
   );
 }
@@ -242,8 +251,8 @@ export function SwitchRow({ title, sub, value, onChange, divider = true }: { tit
         <Switch
           value={value}
           onValueChange={onChange}
-          trackColor={{ true: c.primary, false: alpha(c.ink3, 0.32) }}
-          thumbColor={value ? c.onPrimary : c.ink2}
+          trackColor={{ true: c.primary, false: alpha(c.ink3, c.isNight ? 0.5 : 0.42) }}
+          thumbColor={value ? '#FFFFFF' : c.isNight ? c.ink2 : '#FFFFFF'}
           accessibilityLabel={title}
         />
       }
@@ -254,7 +263,7 @@ export function SwitchRow({ title, sub, value, onChange, divider = true }: { tit
 export function SectionLabel({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
   const { c } = useUI();
   return (
-    <T v="label" color={c.ink3} style={[{ marginLeft: 4, marginTop: 24, marginBottom: 8 }, style]}>
+    <T v="label" color={c.ink2} style={[{ marginLeft: 4, marginTop: 28, marginBottom: 10 }, style]}>
       {children}
     </T>
   );

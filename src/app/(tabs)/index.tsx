@@ -10,12 +10,16 @@ import { useJournal } from '@/lib/journal';
 import { english, kural } from '@/lib/pack';
 import { setSettings, useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
-import { ActionGrid, Avatar, KuralLeaf, MeaningUnder, questionText } from '@/ui/common';
-import { DayArt } from '@/ui/dayArt';
+import { ActionRow, Avatar, FadeSwap, KuralLeaf, LinkPills, MeaningUnder, Rise, questionText } from '@/ui/common';
+import { ArchSky } from '@/ui/dayArt';
 import { SikkuThreshold } from '@/ui/kolam';
 import { Button, Icon, T } from '@/ui/parts';
+import type { IconName } from '@/ui/parts';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
+
+/** The sun or moon beside the time of day's name. */
+const PERIOD_ICON: Record<string, IconName> = { vaigarai: 'moon', kaalai: 'sunrise', nanpagal: 'sun', erpadu: 'sun', maalai: 'sunrise', yaamam: 'moon' };
 
 export default function TodayScreen() {
   const { c, L, tamil, tr, period, type } = useUI();
@@ -50,47 +54,63 @@ export default function TodayScreen() {
           <Avatar size={40} />
         </Pressable>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20, paddingRight: 8 }}>
+      <Rise i={0} style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20, paddingRight: 8 }}>
         <View style={{ flex: 1, paddingBottom: 10 }}>
-          {/* The sky of this time of day, faint behind the greeting. */}
-          <DayArt period={period} style={{ position: 'absolute', left: -20, right: -8, top: -36, bottom: 0 }} />
           <T v="display">{s.name ? `${tamil ? p.greetTa : p.greetEn},
 ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
-          <T v="label" color={c.primary} style={{ marginTop: 4 }}>
-            {tamil ? p.ta : `${p.ta} · ${p.en.toLowerCase()}`}
-          </T>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+            <Icon name={PERIOD_ICON[period]} size={18} color={c.primary} stroke={2} />
+            <T v="label" color={c.primary} style={{ flexShrink: 1 }}>
+              {tamil ? p.ta : `${p.ta} · ${p.en.toLowerCase()}`}
+            </T>
+          </View>
         </View>
         <View style={{ width: 156, height: 156, alignItems: 'center', justifyContent: 'flex-end' }}>
-          <View style={{ position: 'absolute', left: 8, right: 8, top: 6, bottom: 0, backgroundColor: c.surface2, borderTopLeftRadius: 78, borderTopRightRadius: 78, borderBottomLeftRadius: 18, borderBottomRightRadius: 18 }} />
+          {/* The arch shows the sky of this time of day behind him. */}
+          <ArchSky period={period} width={140} height={150} style={{ position: 'absolute', left: 8, top: 6 }} />
           {/* He recites while Listen plays, rests once you've written today, and otherwise reads. */}
           <Valluvar state={playing ? 'teaching' : written ? 'resting' : 'reading'} size={156} label={tr('Valluvar', 'வள்ளுவர்')} />
           <SikkuThreshold height={14} style={{ position: 'absolute', left: 14, right: 14, bottom: -18 }} />
         </View>
-      </View>
-      <View style={{ paddingHorizontal: 20, paddingTop: 30 }}>
-        <KuralLeaf k={k} turned={turned} onPress={() => router.push({ pathname: '/kural/[n]', params: { n: String(k.n) } })} />
-      </View>
-      <View style={{ paddingHorizontal: 24, paddingVertical: 12 }}>
-        <MeaningUnder k={k} />
-      </View>
-      <ActionGrid
-        items={[
-          { icon: playing ? 'stop' : 'play', label: playing ? tr('Stop', 'நிறுத்து') : tr('Listen', 'கேள்'), on: playing, onPress: () => readAloud(k, english(k, s.translation)) },
-          { icon: 'turn', label: L.turn, on: turned, onPress: () => setTurned(!turned) },
-          {
-            icon: 'sync',
-            label: tr('Another couplet', 'வேறு குறள்'),
-            onPress: () => {
-              stopReading();
-              anotherToday();
+      </Rise>
+      <Rise i={1} style={{ paddingHorizontal: 20, paddingTop: 30 }}>
+        {/* A new couplet fades onto the leaf. */}
+        <FadeSwap k={k.n}>
+          <KuralLeaf k={k} turned={turned} onPress={() => router.push({ pathname: '/kural/[n]', params: { n: String(k.n) } })} />
+        </FadeSwap>
+      </Rise>
+      <Rise i={2} style={{ paddingHorizontal: 24, paddingVertical: 12 }}>
+        <FadeSwap k={k.n}>
+          <MeaningUnder k={k} />
+        </FadeSwap>
+      </Rise>
+      <Rise i={3}>
+        <ActionRow
+          style={{ marginTop: 8 }}
+          items={[
+            { icon: playing ? 'stop' : 'play', label: playing ? tr('Stop', 'நிறுத்து') : tr('Listen', 'கேள்'), on: playing, onPress: () => readAloud(k, english(k, s.translation)) },
+            { icon: 'turn', label: L.turn, on: turned, onPress: () => setTurned(!turned) },
+            {
+              icon: 'shuffle',
+              label: tr('Another', 'வேறு குறள்'),
+              onPress: () => {
+                stopReading();
+                setTurned(false);
+                anotherToday();
+              },
             },
-          },
-          { icon: 'book', label: tr('Choose from the Kural', 'குறளைத் தேர்ந்தெடு'), onPress: () => router.navigate({ pathname: '/kural', params: { from: 'today' } }) },
-          { icon: 'share', label: L.share, onPress: () => router.push({ pathname: '/share/[n]', params: { n: String(k.n) } }) },
-          { icon: 'heart', label: L.feel, onPress: () => router.push('/feeling') },
-        ]}
-      />
-      <View style={{ margin: 20, borderRadius: 28, backgroundColor: c.surface, padding: 18 }}>
+            { icon: 'share', label: L.share, onPress: () => router.push({ pathname: '/share/[n]', params: { n: String(k.n) } }) },
+          ]}
+        />
+        <LinkPills
+          style={{ marginTop: 18 }}
+          items={[
+            { icon: 'book', label: tr('Choose a couplet', 'குறள் தேர்வு'), onPress: () => router.navigate({ pathname: '/kural', params: { from: 'today' } }) },
+            { icon: 'heart', label: L.feel, onPress: () => router.push('/feeling') },
+          ]}
+        />
+      </Rise>
+      <Rise i={4} style={{ margin: 20, borderRadius: 28, backgroundColor: c.surface, padding: 18 }}>
         <T v="label" color={c.ink3}>
           {L.todayQ}
         </T>
@@ -111,9 +131,11 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
             );
           })}
         </View>
-        <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.88 }}>
-          {questionText(k, lens, tamil)}
-        </T>
+        <FadeSwap k={`${k.n}-${lens}`}>
+          <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.88 }}>
+            {questionText(k, lens, tamil)}
+          </T>
+        </FadeSwap>
         <Button
           label={written ? L.keep : L.write}
           icon="pen"
@@ -123,7 +145,7 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
             router.push({ pathname: '/write', params: mine ? { kural: String(k.n), id: mine.id } : { kural: String(k.n) } });
           }}
         />
-      </View>
+      </Rise>
       {thread.days > 0 ? (
         <Pressable
           onPress={() => router.navigate('/journey')}

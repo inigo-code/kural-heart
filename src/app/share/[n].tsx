@@ -188,8 +188,9 @@ function Card({ k, story, line, tamil, translation, W, H, theme }: { k: Kural; s
             paddingBottom: 40 * u,
           }}>
           <LinearGradient colors={['#F3E7C6', '#E7D4A2']} style={StyleSheet.absoluteFill} />
-          {[0.334, 0.614, 0.854].map((f) => (
-            <View key={f} style={{ position: 'absolute', left: 6 * u, right: 6 * u, top: `${f * 100}%`, height: 3 * u, backgroundColor: alpha(rib, 0.09) }} />
+          {/* Two ribs by the edges, as on the app's leaf, so none runs through the writing. */}
+          {[{ top: 14 * u }, { bottom: 12 * u }].map((at, i) => (
+            <View key={i} style={{ position: 'absolute', left: 6 * u, right: 6 * u, ...at, height: 3 * u, backgroundColor: alpha(rib, 0.1) }} />
           ))}
           <View style={{ position: 'absolute', top: 25 * u, alignSelf: 'center', width: 30 * u, height: 30 * u, borderRadius: 15 * u, backgroundColor: '#F6F2EA', borderWidth: 4 * u, borderColor: alpha(rib, 0.28) }} />
           <CoupletText a={k.a} b={k.b} max={68 * u} min={36 * u} fixed />

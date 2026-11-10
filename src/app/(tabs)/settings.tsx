@@ -17,7 +17,6 @@ import { askNotify, canNotify, planReminders } from '@/lib/notify';
 import { deleteAllPhotos } from '@/lib/photos';
 import { askLocation } from '@/lib/places';
 import { setSettings, useSettings, wipeSettings } from '@/lib/settings';
-import { BUILT_IN } from '@/lib/speak';
 import { pronounce, scholarly } from '@/lib/translit';
 import type { Accent, Settings } from '@/lib/settings';
 import { english, kural } from '@/lib/pack';
@@ -44,7 +43,7 @@ export default function SettingsScreen() {
   const [sheet, setSheet] = useState<null | 'theme' | 'english' | 'daily' | 'speed' | 'voiceTa' | 'voiceEn' | 'spelling'>(null);
   const sampleK = kural(s.dayLog[today()] ?? 391);
   const translatorName = (t: string) => (t === 'pope' ? 'G. U. Pope, 1886' : t === 'popeprose' ? tr('G. U. Pope, prose', 'போப், உரைநடை') : 'V. V. S. Aiyar, 1916');
-  const voiceSub = (id: string) => (id ? tr('Your choice', 'நீங்கள் தேர்ந்தது') : tr('The best one on this phone', 'இந்த அலைபேசியின் சிறந்த குரல்'));
+  const voiceSub = (id: string) => (id && id !== 'kural-heart' ? tr('Your choice', 'நீங்கள் தேர்ந்தது') : tr('The best one on this phone', 'இந்த அலைபேசியின் சிறந்த குரல்'));
   const speedName = (r: number) => (r <= 0.75 ? tr('Slow', 'மெதுவாக') : r < 1 ? tr('Gentle', 'நிதானமாக') : tr('Normal', 'இயல்பாக'));
   const ways = [s.driveOn ? 'Google Drive' : null, s.hasPassphrase && s.backupFolder ? tr('a folder', 'ஒரு கோப்புறை') : null].filter(Boolean);
   const backupSummary = ways.length ? `${ways.join(' + ')} · ${lastLabel(Math.max(s.lastBackup, s.lastDriveSync), L, tamil)}` : L.notSet;
@@ -160,7 +159,7 @@ export default function SettingsScreen() {
       <Group>
         <Row
           title={tr('Tamil voice', 'தமிழ்க் குரல்')}
-          sub={!s.voiceTa || s.voiceTa === BUILT_IN ? tr('Kural Heart voice · natural, offline', 'Kural Heart குரல் · இயல்பானது, இணையம் தேவையில்லை') : tr('A phone voice', 'அலைபேசிக் குரல்')}
+          sub={voiceSub(s.voiceTa)}
           divider={false}
           onPress={() => setSheet('voiceTa')}
         />
@@ -369,8 +368,8 @@ ${scholarly(sampleK.b)}`,
           },
         ]}
       />
-      <VoiceSheet lang="ta" visible={sheet === 'voiceTa'} onClose={() => setSheet(null)} sample={`${sampleK.a}. ${sampleK.b}.`} n={sampleK.n} />
-      <VoiceSheet lang="en" n={sampleK.n} visible={sheet === 'voiceEn'} onClose={() => setSheet(null)} sample={english(sampleK, s.translation).replace(/\n/g, ' ')} />
+      <VoiceSheet lang="ta" visible={sheet === 'voiceTa'} onClose={() => setSheet(null)} sample={`${sampleK.a}. ${sampleK.b}.`} />
+      <VoiceSheet lang="en" visible={sheet === 'voiceEn'} onClose={() => setSheet(null)} sample={english(sampleK, s.translation).replace(/\n/g, ' ')} />
       <Dialog visible={lockMissing} title={L.sLock} onClose={() => setLockMissing(false)} actions={[{ label: L.close, onPress: () => setLockMissing(false) }]}>
         <T v="bodyM" color={c.ink2}>
           {tamil ? 'முதலில் அலைபேசியின் அமைப்புகளில் திரைப் பூட்டை அமைக்கவும்.' : 'Set a screen lock in your phone’s settings first. The app lock uses it.'}

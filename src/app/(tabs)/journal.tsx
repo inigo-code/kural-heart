@@ -11,7 +11,7 @@ import { allTags, searchEntries, useJournal } from '@/lib/journal';
 import { PARTS, partOf } from '@/lib/pack';
 import type { Part } from '@/lib/pack';
 import type { Entry } from '@/lib/types';
-import { ArchValluvar, EntryCard, MOODS, MoodChip, PhotoThumb, Sheet, Wrap, plainMarkdown, usePhoto } from '@/ui/common';
+import { ArchValluvar, EntryCard, MOODS, MoodChip, PhotoThumb, Rise, Sheet, Wrap, plainMarkdown, usePhoto } from '@/ui/common';
 import { AtlasMap } from '@/ui/atlas';
 import { VideoTile } from '@/ui/media';
 import { Button, Chip, Icon, IconButton, SectionLabel, T, TextLink } from '@/ui/parts';
@@ -202,7 +202,12 @@ export default function JournalScreen() {
         keyExtractor={(e) => e.id}
         ListHeaderComponent={header}
         keyboardShouldPersistTaps="handled"
-        renderItem={({ item }) => <EntryCard e={item} />}
+        renderItem={({ item, index }) => (
+          // The first screenful of pages rises in, one after another.
+          <Rise i={index}>
+            <EntryCard e={item} />
+          </Rise>
+        )}
         contentContainerStyle={{ paddingBottom: 24 }}
       />
       <FilterSheet visible={open} filter={filter} entries={entries} onClose={(f) => {

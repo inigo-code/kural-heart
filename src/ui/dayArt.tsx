@@ -1,5 +1,5 @@
-import { Circle, Group, Path, PathOp, Skia } from '@shopify/react-native-skia';
-import { useMemo, useState } from 'react';
+import { Circle, DashPathEffect, Group, Path, Skia } from '@shopify/react-native-skia';
+import { LinearGradient } from 'expo-linear-gradient';
 import { View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -9,121 +9,64 @@ import { SkiaStill } from './still';
 import { alpha } from './theme';
 import { useUI } from './ui';
 
+/** The sky's two tones, top to bottom, for each time of day: [Ivory, Midnight]. */
+const SKY: Record<Period, [[string, string], [string, string]]> = {
+  vaigarai: [['#DCD5EC', '#F1EAE3'], ['#2D2A47', '#1F1B22']],
+  kaalai: [['#FBDDBF', '#F4ECDF'], ['#4B3424', '#251F1A']],
+  nanpagal: [['#D9E8F1', '#F2EEE6'], ['#26343F', '#1F1D1B']],
+  erpadu: [['#F6D5A8', '#F2EADB'], ['#4A3620', '#241F19']],
+  maalai: [['#F0C4B3', '#EEE1D9'], ['#47282B', '#221B1B']],
+  yaamam: [['#CCD0E6', '#ECE8EF'], ['#1E2342', '#19171E']],
+};
+
+/** The app's heart (the line icon's outline), 24 by 24. */
+const HEART = 'M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20Z';
+
 /**
- * The sky of the six Tamil times of day, drawn faintly behind Today's greeting in the manner of a kolam: dots and
- * single lines. Before dawn a fading crescent and the morning star; morning a sun rising over the threshold line,
- * its rays made of pulli; midday a full sun ringed with dots; late afternoon the sun lower, rays lengthening; evening
- * a half sun setting, with birds going home; deep night a crescent and scattered stars. Decoration only.
+ * The sky of the six Tamil times of day, inside the arch behind Valluvar on Today: a wash of that hour's colour, a
+ * soft heart (the app's) that he sits in, his head in its cleft and never ringed by it, and at night a few stars in
+ * the arch's far corners. The sun and moon are not drawn here, where they would crowd his
+ * head (or read as a halo); a small sun or moon sits by the time of day's name instead.
  */
-export function DayArt({ period, style }: { period: Period; style?: StyleProp<ViewStyle> }) {
+export function ArchSky({ period, width, height, style }: { period: Period; width: number; height: number; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
-  const [box, setBox] = useState({ w: 0, h: 0 });
-  const sun = alpha(c.gold, c.isNight ? 0.34 : 0.42);
-  const soft = alpha(c.gold, c.isNight ? 0.2 : 0.26);
-  const moon = alpha(c.isNight ? '#E8DCC4' : '#8A7A62', c.isNight ? 0.3 : 0.32);
-  const star = alpha(c.isNight ? '#F3E7C6' : '#8A7A62', c.isNight ? 0.45 : 0.4);
-  const ink = alpha(c.primary, c.isNight ? 0.22 : 0.2);
-
-  const art = useMemo(() => {
-    const { w, h } = box;
-    if (!w || !h) return null;
-    const f = (n: number) => n.toFixed(1);
-    // A crescent: a disc with a second, shifted disc cut out of it.
-    // A circle as two half arcs (centre cx, cy).
-    const circle = (cx: number, cy: number, r: number) =>
-      Skia.Path.MakeFromSVGString(`M${f(cx - r)} ${f(cy)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0Z`)!;
-    const crescent = (cx: number, cy: number, r: number) => {
-      const p = circle(cx, cy, r);
-      return Skia.Path.MakeFromOp(p, circle(cx + r * 0.42, cy - r * 0.28, r * 0.86), PathOp.Difference) ?? p;
-    };
-    // Dotted rays around a centre, every [step] degrees, from [r0] outwards.
-    const rays = (cx: number, cy: number, r0: number, n: number, from: number, to: number, step: number) => {
-      const out: { x: number; y: number; r: number }[] = [];
-      for (let a = from; a <= to + 0.1; a += step) {
-        const rad = (a * Math.PI) / 180;
-        for (let i = 0; i < n; i++) {
-          const d = r0 + i * 9;
-          out.push({ x: cx + Math.cos(rad) * d, y: cy - Math.sin(rad) * d, r: 2.4 - i * 0.5 });
-        }
-      }
-      return out;
-    };
-    const stars = (seed: number, count: number) => {
-      const out: { x: number; y: number; r: number }[] = [];
-      let s = seed;
-      const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
-      // Stars stay in the sky above the greeting, not over its letters.
-      for (let i = 0; i < count; i++) out.push({ x: w * 0.45 + rnd() * w * 0.53, y: 4 + rnd() * h * 0.4, r: 1.2 + rnd() * 1.6 });
-      return out;
-    };
-    // The sky keeps to the clear corner above and right of the greeting, so it never sits behind the words.
-    const horizon = h * 0.42;
-    const line = Skia.Path.MakeFromSVGString(`M${f(w * 0.62)} ${f(horizon)}L${f(w * 0.99)} ${f(horizon)}`)!;
-    // Small birds going home: two arcs each.
-    const birds = Skia.Path.MakeFromSVGString(
-      [
-        [w * 0.6, h * 0.16, 8],
-        [w * 0.68, h * 0.08, 6],
-        [w * 0.55, h * 0.26, 5],
-      ]
-        .map(([x, y, s]) => `M${f(x - s)} ${f(y)}Q${f(x - s / 2)} ${f(y - s * 0.7)} ${f(x)} ${f(y)}Q${f(x + s / 2)} ${f(y - s * 0.7)} ${f(x + s)} ${f(y)}`)
-        .join(''),
-    )!;
-    switch (period) {
-      case 'vaigarai':
-        return { kind: 'night' as const, moon: crescent(w * 0.78, h * 0.24, h * 0.14), stars: stars(11, 9), venus: { x: w * 0.58, y: h * 0.16 }, horizon };
-      case 'yaamam':
-        return { kind: 'night' as const, moon: crescent(w * 0.78, h * 0.22, h * 0.15), stars: stars(5, 14), venus: null, horizon };
-      case 'kaalai':
-        return { kind: 'sun' as const, cx: w * 0.82, cy: horizon, r: h * 0.13, rays: rays(w * 0.82, horizon, h * 0.13 + 10, 2, 20, 160, 28), half: true, line, birds: null };
-      case 'nanpagal':
-        return { kind: 'sun' as const, cx: w * 0.82, cy: h * 0.22, r: h * 0.09, rays: rays(w * 0.82, h * 0.22, h * 0.09 + 10, 2, 0, 330, 30), half: false, line: null, birds: null };
-      case 'erpadu':
-        return { kind: 'sun' as const, cx: w * 0.84, cy: h * 0.3, r: h * 0.1, rays: rays(w * 0.84, h * 0.3, h * 0.1 + 10, 3, 0, 330, 30), half: false, line: null, birds: null };
-      default:
-        return { kind: 'sun' as const, cx: w * 0.84, cy: horizon, r: h * 0.15, rays: rays(w * 0.84, horizon, h * 0.15 + 10, 2, 25, 155, 26), half: true, line, birds };
-    }
-  }, [box, period]);
-
+  const [top, bottom] = SKY[period][c.isNight ? 1 : 0];
+  const night = period === 'yaamam' || period === 'vaigarai';
+  const heart = Skia.Path.MakeFromSVGString(HEART)!;
+  const k = (width * 0.9) / 14;
+  const star = c.isNight ? alpha('#F3E7C6', 0.75) : alpha('#5F6690', 0.5);
+  // Stars keep to the two outer edges, beside his head and arms, never behind them.
+  const stars = [
+    [0.12, 0.42, 1.6],
+    [0.2, 0.3, 1.1],
+    [0.07, 0.58, 1.0],
+    [0.86, 0.33, 1.5],
+    [0.92, 0.5, 1.1],
+  ].map(([x, y, r]) => ({ x: x * width, y: y * height, r }));
   return (
     <View
-      style={[{ overflow: 'hidden' }, style]}
-      onLayout={(e) => setBox({ w: Math.round(e.nativeEvent.layout.width), h: Math.round(e.nativeEvent.layout.height) })}
       pointerEvents="none"
       accessibilityElementsHidden
-      importantForAccessibility="no-hide-descendants">
-      {art && box.w ? (
-        <SkiaStill width={box.w} height={box.h} sig={`${period} ${sun} ${moon} ${star} ${ink}`}>
-          {art.kind === 'night' ? (
-            <Group>
-              <Path path={art.moon} color={moon} />
-              {art.stars.map((s, i) => (
-                <Circle key={i} cx={s.x} cy={s.y} r={s.r} color={star} />
-              ))}
-              {art.venus ? <Circle cx={art.venus.x} cy={art.venus.y} r={4} color={alpha(c.gold, 0.5)} /> : null}
-            </Group>
-          ) : (
-            <Group>
-              {art.half ? (
-                <Group clip={Skia.XYWHRect(0, 0, box.w, art.cy)}>
-                  <Circle cx={art.cx} cy={art.cy} r={art.r} color={soft} />
-                  <Circle cx={art.cx} cy={art.cy} r={art.r} color={sun} style="stroke" strokeWidth={1.4} />
-                </Group>
-              ) : (
-                <Group>
-                  <Circle cx={art.cx} cy={art.cy} r={art.r} color={soft} />
-                  <Circle cx={art.cx} cy={art.cy} r={art.r} color={sun} style="stroke" strokeWidth={1.4} />
-                </Group>
-              )}
-              {art.rays.filter((d) => !art.half || d.y < art.cy - 2).map((d, i) => (
-                <Circle key={i} cx={d.x} cy={d.y} r={d.r} color={sun} />
-              ))}
-              {art.line ? <Path path={art.line} color={ink} style="stroke" strokeWidth={1.2} /> : null}
-              {art.birds ? <Path path={art.birds} color={alpha(c.ink, 0.28)} style="stroke" strokeWidth={1.4} strokeCap="round" /> : null}
-            </Group>
-          )}
-        </SkiaStill>
-      ) : null}
+      importantForAccessibility="no-hide-descendants"
+      style={[
+        { width, height, overflow: 'hidden', borderTopLeftRadius: width / 2, borderTopRightRadius: width / 2, borderBottomLeftRadius: 18, borderBottomRightRadius: 18 },
+        style,
+      ]}>
+      <LinearGradient colors={[top, bottom]} locations={[0, 0.85]} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} />
+      <SkiaStill width={width} height={height} sig={`${period} ${width} ${height} ${c.isNight} ${c.primary}`}>
+        <Group>
+          {/* The heart's 14-wide outline scaled to most of the arch, its point on the threshold. */}
+          <Group transform={[{ translateX: width / 2 - 12 * k }, { translateY: height * 0.98 - 20 * k }, { scale: k }]}>
+            <Path path={heart} color={alpha(c.primary, c.isNight ? 0.16 : 0.1)} />
+            <Path path={heart} color={alpha(c.primary, c.isNight ? 0.5 : 0.38)} style="stroke" strokeWidth={2.2 / k} strokeCap="round">
+              <DashPathEffect intervals={[0.01, 6 / k]} />
+            </Path>
+          </Group>
+          {night
+            ? stars.map((s, i) => <Circle key={i} cx={s.x} cy={s.y} r={s.r} color={star} />)
+            : null}
+        </Group>
+      </SkiaStill>
     </View>
   );
 }

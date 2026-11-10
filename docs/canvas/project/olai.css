@@ -1,8 +1,8 @@
 /* Kural Heart v6, "Olai". An editorial journal on warm ivory: serif voice, one clay accent, rounded cards,
    the palm leaf as the hero object, Valluvar as a companion. Material 3 structure, 8dp grid, measured contrast. */
 
-.o{--bg:#F6F2EA;--surface:#FFFDF9;--surface2:#EFE8DC;--surface3:#E7DECF;--ink:#1E1A16;--ink2:#564D44;--ink3:#73695E;--line:#E4DACA;
-  --primary:#B4492A;--onprimary:#FFF8F2;--primary-soft:#F6E2D7;--onsoft:#7A2E17;
+.o{--bg:#F6F2EA;--surface:#FFFDF9;--surface2:#EFE8DC;--surface3:#E7DECF;--ink:#1E1A16;--ink2:#564D44;--ink3:#6B6156;--line:#E0D4C1;
+  --primary:#B4492A;--onprimary:#FFF8F2;--primary-soft:#F1D2C1;--onsoft:#6E2610;
   --aram:#2F6B53;--porul:#3A4E86;--inbam:#A8475C;--aram-soft:#E1EDE6;--porul-soft:#E2E6F2;--inbam-soft:#F4E1E5;
   --heart:#D63B58;--gold:#C9A45C;--leaf1:#F3E7C6;--leaf2:#E7D4A2;--leafink:#2B1E10;--leafnote:#6A4B22;
   --sans:"Anek Tamil","Noto Sans Tamil",system-ui,sans-serif;--serif:"Literata","Noto Serif Tamil",Georgia,serif;
@@ -518,12 +518,12 @@
 .tv .tv-beard{transform-origin:82px 98px;animation:tvBeardStroke 2.4s ease-in-out infinite}
 .tv .tv-tamil{animation:tvTamilFloat 2.4s ease-in-out infinite}
 .tv .tv-teach{transform-origin:158px 98px;animation:tvTeachArmWave 1.8s ease-in-out infinite}
-.tv .tv-walk{animation:tvWalkBounce 1.6s linear infinite}
-.tv .tv-legL{transform-origin:104px 154px;animation:tvWalkLegLeft 1.6s ease-in-out infinite}
-.tv .tv-legR{transform-origin:132px 154px;animation:tvWalkLegRight 1.6s ease-in-out infinite}
-.tv .tv-billow{transform-origin:120px 132px;animation:tvClothBillow 1.6s ease-in-out infinite}
-.tv .tv-staff{transform-origin:142px 84px;animation:tvWalkLegLeft 1.6s ease-in-out infinite}
-.tv .tv-carry{transform-origin:90px 86px;animation:tvWalkLegRight 1.6s ease-in-out infinite}
+.tv .tv-walk{transform-origin:120px 200px;animation:tvWalkBounce 1.8s ease-in-out infinite}
+.tv .tv-legL{transform-origin:104px 154px;animation:tvWalkStepLeft 1.8s ease-in-out infinite}
+.tv .tv-legR{transform-origin:132px 154px;animation:tvWalkStepRight 1.8s ease-in-out infinite}
+.tv .tv-billow{transform-origin:120px 132px;animation:tvClothBillow .9s ease-in-out infinite}
+.tv .tv-staff{transform-origin:142px 84px;animation:tvWalkStaff 1.8s ease-in-out infinite}
+.tv .tv-carry{transform-origin:90px 86px;animation:tvWalkCarry 1.8s ease-in-out infinite}
 .tv .tv-bounce{transform-origin:120px 180px;animation:tvCelebrateBounce 1.2s ease-in-out infinite}
 .tv .tv-confetti{animation:tvStarTwinkle 1.2s ease-in-out infinite}
 .tv .tv-armsL{transform-origin:80px 100px;animation:tvCelebrateArms 1.2s ease-in-out infinite}
@@ -546,7 +546,7 @@
 @keyframes tvBrowGentle{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.8px)}}
 @keyframes tvBrowFocus{0%,100%{transform:translateY(1px)}50%{transform:translateY(-1px)}}
 @keyframes tvClothSway{0%,100%{transform:skewX(0)}50%{transform:skewX(-2.2deg)}}
-@keyframes tvClothBillow{0%,100%{transform:rotate(0) skewX(0)}50%{transform:rotate(-5deg) skewX(-6deg)}}
+@keyframes tvClothBillow{0%,100%{transform:rotate(0) skewX(0)}50%{transform:rotate(-3deg) skewX(-4deg)}}
 @keyframes tvLeafFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3.5px) rotate(-2deg)}}
 @keyframes tvStylusWrite{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(9px,-3px) rotate(-6deg)}50%{transform:translate(18px,1px) rotate(3deg)}75%{transform:translate(26px,-2px) rotate(-4deg)}100%{transform:translate(0,0) rotate(0)}}
 @keyframes tvEtchSpark{0%,100%{opacity:.2;transform:scale(.6) translateY(0)}50%{opacity:1;transform:scale(1.25) translateY(-6px)}}
@@ -556,9 +556,11 @@
 @keyframes tvTeachArmWave{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg) translateY(-4px)}}
 @keyframes tvMouthChant{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1.15)}}
 @keyframes tvTamilFloat{0%,100%{transform:translateY(0) translateX(0);opacity:.75}50%{transform:translateY(-9px) translateX(3px);opacity:1}}
-@keyframes tvWalkLegLeft{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
-@keyframes tvWalkLegRight{0%,100%{transform:rotate(14deg)}50%{transform:rotate(-14deg)}}
-@keyframes tvWalkBounce{0%,50%,100%{transform:translateY(0)}25%,75%{transform:translateY(-4px)}}
+@keyframes tvWalkStepLeft{0%,50%,100%{transform:none}25%{transform:translateY(-4px) scaleY(.92)}}
+@keyframes tvWalkStepRight{0%,50%,100%{transform:none}75%{transform:translateY(-4px) scaleY(.92)}}
+@keyframes tvWalkStaff{0%,100%{transform:rotate(4deg)}50%{transform:rotate(-4deg)}}
+@keyframes tvWalkCarry{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes tvWalkBounce{0%,50%,100%{transform:none}25%{transform:translateY(-3px) rotate(1.2deg)}75%{transform:translateY(-3px) rotate(-1.2deg)}}
 @keyframes tvCelebrateBounce{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-6px) scaleY(1.03)}}
 @keyframes tvCelebrateArms{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg) translateY(-4px)}}
 @keyframes tvSonarRipple{0%{r:36px;opacity:.75}100%{r:86px;opacity:0}}

@@ -30,12 +30,6 @@ export default function SourcesScreen() {
       ok: true,
     },
     {
-      title: tamil ? 'Kural Heart குரல்' : 'The Kural Heart voice',
-      body: tamil
-        ? 'ஒவ்வொரு குறளும் Piper "ta_IN rasa female" என்ற திறந்த தமிழ்க் குரலில் ஒருமுறை பதிவுசெய்யப்பட்டது. AI4Bharat-இன் Rasa தரவுத்தொகுப்பில் பயிற்றுவிக்கப்பட்டது, CC BY 4.0.'
-        : 'Every couplet recorded once with Piper’s open Tamil voice “ta_IN rasa female” (huggingface.co/tinisoft), trained on AI4Bharat’s Rasa dataset. CC BY 4.0.',
-    },
-    {
       title: tamil ? 'பிற உரைகள்' : 'Other commentaries',
       body: 'Kalaignar Karunanidhi’s and Solomon Pappaiah’s commentaries are under copyright and aren’t included. Parimelazhagar’s classic commentary may follow when a checked digital text is found.',
     },

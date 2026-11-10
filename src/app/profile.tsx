@@ -54,7 +54,7 @@ export default function ProfileScreen() {
         {s.startedOn ? <Row title={tr('With Valluvar since', 'வள்ளுவருடன் தொடங்கியது')} sub={longDate(s.startedOn, tamil, true)} /> : null}
       </Group>
       <Group style={{ marginTop: 12 }}>
-        <Row title={tr('Insights', 'புள்ளிவிவரங்கள்')} sub={tr('Words, feelings, times and chapters', 'சொற்கள், உணர்வுகள், நேரங்கள், அதிகாரங்கள்')} icon="chart" divider={false} onPress={() => router.push('/insights')} />
+        <Row title={tr('Insights', 'புள்ளிவிவரங்கள்')} sub={tr('Words, feelings, times and chapters', 'சொற்கள், உணர்வுகள், நேரங்கள், அதிகாரங்கள்')} icon="chart" divider={false} onPress={() => router.push('/journey/insights')} />
         <Row title={tr('Atlas', 'வரைபடம்')} sub={tr('Your pages on a map', 'வரைபடத்தில் உங்கள் பக்கங்கள்')} icon="map" onPress={() => router.push('/atlas')} />
       </Group>
       <Button label={L.save} onPress={save} style={{ marginTop: 16 }} />

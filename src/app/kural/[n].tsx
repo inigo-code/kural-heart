@@ -7,7 +7,7 @@ import { useJournal } from '@/lib/journal';
 import { chapterOf, english, kural } from '@/lib/pack';
 import { markRead, toggleSaved, useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker, voiceSettings } from '@/lib/speak';
-import { ActionGrid, EntryCard, MUVA_BY, kuralRef, partColor, questionText } from '@/ui/common';
+import { ActionRow, EntryCard, MUVA_BY, kuralRef, partColor, questionText } from '@/ui/common';
 import { CoupletText, Leaf, LeafNote, Pronounce } from '@/ui/leaf';
 import { Button, IconButton, Note, Page, SectionLabel, T, TextLink } from '@/ui/parts';
 import { F } from '@/ui/theme';
@@ -45,9 +45,8 @@ export default function KuralScreen() {
         <Pronounce a={k.a} b={k.b} />
         <LeafNote>{ch.ta}</LeafNote>
       </Leaf>
-      <View style={{ height: 12, marginHorizontal: -20 }} />
-      <View style={{ marginHorizontal: -20 }}>
-        <ActionGrid
+      <View style={{ marginHorizontal: -20, marginTop: 18 }}>
+        <ActionRow
           items={[
             { icon: playing ? 'stop' : 'play', label: playing ? tr('Stop', 'நிறுத்து') : tr('Listen', 'கேள்'), on: playing, onPress: () => readAloud(k, english(k, s.translation)) },
             { icon: 'share', label: L.share, onPress: () => router.push({ pathname: '/share/[n]', params: { n: String(n) } }) },
@@ -83,12 +82,12 @@ export default function KuralScreen() {
           // Readers who lead in English but know some Tamil find the Tamil explanation last.
           ...(!tamil && k.ta ? [[MUVA_BY.en, k.ta, false] as const] : []),
         ]
-      ).map(([by, text, italic]) => (
-        <View key={by} style={{ marginTop: 18 }}>
-          <T v="label" color={c.ink3}>
+      ).map(([by, text, italic], i) => (
+        <View key={by} style={{ marginTop: i === 0 ? 22 : 0, paddingVertical: 16, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: c.line }}>
+          <T v="small" color={c.primary} style={{ letterSpacing: 0.2 }}>
             {by}
           </T>
-          <Text style={[type.body, { color: c.ink, marginTop: 4 }, italic ? { fontFamily: F.serifItalic } : null]}>{text}</Text>
+          <Text style={[type.body, { color: c.ink, marginTop: 6 }, italic ? { fontFamily: F.serifItalic } : null]}>{text}</Text>
         </View>
       ))}
       <SectionLabel>{tr('A question to write about', 'எழுதுவதற்கு ஒரு கேள்வி')}</SectionLabel>

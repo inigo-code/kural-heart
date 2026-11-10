@@ -11,7 +11,6 @@ const EASE_IN_OUT: Easing = [0.42, 0, 0.58, 1];
 const EASE: Easing = [0.25, 0.1, 0.25, 1];
 const EASE_OUT: Easing = [0, 0, 0.58, 1];
 const BURST: Easing = [0.2, 0.6, 0.3, 1];
-const LINEAR: Easing = [0, 0, 1, 1];
 
 export type Motion = {
   keys: Key[];
@@ -44,8 +43,12 @@ const loop = (mid: Partial<Key>, rest: Partial<Key> = {}) => [K(0, rest), K(0.5,
 export const ONCE = ['tv-bounce', 'tv-confetti', 'tv-armsL', 'tv-armsR'];
 
 const head: [number, number] = [120, 76];
-const legLeft = [K(0, { rot: -14 }), K(0.5, { rot: 14 }), K(1, { rot: -14 })];
-const legRight = [K(0, { rot: 14 }), K(0.5, { rot: -14 }), K(1, { rot: 14 })];
+// Walking, seen from the front: each foot lifts in turn (left in the first half of the stride, right in the second),
+// the body rises a little over the planted foot and leans its weight onto it, and the staff and the leaf arm sway
+// gently against the step. (It used to swing both legs side to side like a pendulum, which read as a scissor.)
+const stepLeft = [K(0), K(0.25, { ty: -4, sy: 0.92 }), K(0.5), K(1)];
+const stepRight = [K(0), K(0.5), K(0.75, { ty: -4, sy: 0.92 }), K(1)];
+const STRIDE = 1800;
 const twinkle = loop({ sx: 1.2, sy: 1.2, rot: 18 }, { sx: 0.85, sy: 0.85, alpha: 0.65 });
 const leafFloat = loop({ ty: -3.5, rot: -2 }, { rot: -5 });
 
@@ -86,12 +89,12 @@ const table: Record<string, Motion> = {
   'tv-beard': M(loop({ ty: 4, rot: -4 }), 2400, 'TR', [82, 98]),
   'tv-tamil': M(loop({ ty: -9, tx: 3 }, { alpha: 0.75 }), 2400, 'T', [0, 0]),
   'tv-teach': M(loop({ rot: -14, ty: -4 }), 1800, 'RT', [158, 98]),
-  'tv-walk': M([K(0), K(0.25, { ty: -4 }), K(0.5), K(0.75, { ty: -4 }), K(1)], 1600, 'T', [0, 0], { easing: LINEAR }),
-  'tv-legL': M(legLeft, 1600, 'R', [104, 154]),
-  'tv-legR': M(legRight, 1600, 'R', [132, 154]),
-  'tv-billow': M(loop({ rot: -5, skew: -6 }), 1600, 'RK', [120, 132]),
-  'tv-staff': M(legLeft, 1600, 'R', [142, 84]),
-  'tv-carry': M(legRight, 1600, 'R', [90, 86]),
+  'tv-walk': M([K(0), K(0.25, { ty: -3, rot: 1.2 }), K(0.5), K(0.75, { ty: -3, rot: -1.2 }), K(1)], STRIDE, 'TR', [120, 200]),
+  'tv-legL': M(stepLeft, STRIDE, 'TS', [104, 154]),
+  'tv-legR': M(stepRight, STRIDE, 'TS', [132, 154]),
+  'tv-billow': M(loop({ rot: -3, skew: -4 }), STRIDE / 2, 'RK', [120, 132]),
+  'tv-staff': M(loop({ rot: -4 }, { rot: 4 }), STRIDE, 'R', [142, 84]),
+  'tv-carry': M(loop({ rot: 3 }, { rot: -3 }), STRIDE, 'R', [90, 86]),
   'tv-bounce': M(loop({ ty: -6, sy: 1.03 }), 1200, 'TS', [120, 180]),
   'tv-confetti': M(twinkle, 1200, 'SR', null),
   'tv-armsL': M(loop({ rot: -12, ty: -4 }), 1200, 'RT', [80, 100]),

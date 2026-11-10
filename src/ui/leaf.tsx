@@ -34,13 +34,9 @@ export function Leaf({ children, mini, style }: { children: ReactNode; mini?: bo
       ]}>
       <View style={{ borderRadius: 14, overflow: 'hidden', minHeight: mini ? 0 : 138, paddingHorizontal: 14, paddingTop: mini ? 20 : 26, paddingBottom: mini ? 12 : 16, justifyContent: 'center' }}>
         <LinearGradient colors={[c.leaf1, c.leaf2]} style={StyleSheet.absoluteFill} />
-        {[
-          [0.334, 0.09],
-          [0.614, 0.08],
-          [0.854, 0.07],
-        ].map(([at, a]) => (
-          <View key={at} style={{ position: 'absolute', left: 0, right: 0, top: `${at * 100}%`, height: 1, backgroundColor: alpha(rib, a) }} />
-        ))}
+        {/* Two faint ribs by the edges, at fixed places, so they never run through a line of writing. */}
+        <View style={{ position: 'absolute', left: 0, right: 0, top: mini ? 6 : 7, height: 1, backgroundColor: alpha(rib, 0.1) }} />
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: mini ? 5 : 6, height: 1, backgroundColor: alpha(rib, 0.1) }} />
         <LinearGradient
           colors={[alpha(rib, 0.09), 'transparent', 'transparent', alpha(rib, 0.09)]}
           locations={[0, 0.06, 0.94, 1]}
@@ -77,11 +73,11 @@ export function fitSize(available: number, widestAtMax: number, max: number, min
 }
 
 /**
- * A couplet's two lines, each kept on one line and never wrapped mid-word. The size comes down together for both
- * lines until the longer one fits, as a scribe would write smaller, and stops at [min]. If a line still cannot fit
- * there (very large text), it wraps between words.
+ * A couplet's two lines, each always on one line: never wrapped, never cut with "…". The size comes down together for
+ * both lines until the longer one fits, as a scribe would write smaller. Measuring is a little generous, and Android
+ * shrinks a line further itself if it still runs over, so a line can never spill.
  */
-export function CoupletText({ a, b, max = 27, min = 17, color, bold, fixed }: { a: string; b: string; max?: number; min?: number; color?: string; bold?: boolean; fixed?: boolean }) {
+export function CoupletText({ a, b, max = 27, min = 14, color, bold, fixed }: { a: string; b: string; max?: number; min?: number; color?: string; bold?: boolean; fixed?: boolean }) {
   const { c, scale: textScale } = useUI();
   // Share images keep their own sizes, whatever the text-size setting.
   const scale = fixed ? 1 : textScale;
@@ -90,8 +86,8 @@ export function CoupletText({ a, b, max = 27, min = 17, color, bold, fixed }: { 
   const top = max * scale;
   const bottom = min * scale;
   const widest = Math.max(natural[0], natural[1]);
-  const size = width && widest ? fitSize(width - 2, widest, top, bottom) : top;
-  const fits = !widest || (widest * size) / top <= width - 2;
+  // 6% to spare: Tamil shaping does not scale exactly with the size.
+  const size = width && widest ? fitSize(width * 0.94, widest, top, bottom) : top;
   const family = bold ? F.coupletBold : F.couplet;
   const measure = (i: 0 | 1) => (e: { nativeEvent: { lines: { width: number }[] } }) => {
     const w = Math.max(...e.nativeEvent.lines.map((l) => l.width), 0);
@@ -111,7 +107,9 @@ export function CoupletText({ a, b, max = 27, min = 17, color, bold, fixed }: { 
         <Text
           key={i}
           allowFontScaling={false}
-          numberOfLines={fits ? 1 : 3}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.6}
           style={{ fontFamily: family, fontSize: size, lineHeight: Math.round(size * 1.5), color: color ?? c.leafInk, textAlign: 'left' }}>
           {line}
         </Text>
@@ -126,14 +124,16 @@ export function Pronounce({ a, b, color, size = 14.5 }: { a: string; b: string; 
   const s = useSettings();
   if (!s.pronounce) return null;
   const spell = s.pronounceStyle === 'scholarly' ? scholarly : pronounce;
+  // Each line of the couplet keeps to one line here too, coming down a little in size when it is long.
+  const style = { fontFamily: F.serifItalic, fontSize: size * scale, lineHeight: Math.round(size * scale * 1.45), color: color ?? c.leafNote, textAlign: 'left' as const };
   return (
-    <Text
-      maxFontSizeMultiplier={1.4}
-      accessibilityLabel={`Pronunciation: ${pronounce(a)}. ${pronounce(b)}`}
-      style={{ fontFamily: F.serifItalic, fontSize: size * scale, lineHeight: Math.round(size * scale * 1.45), color: color ?? c.leafNote, marginTop: 8, textAlign: 'left' }}>
-      {`${spell(a)}
-${spell(b)}`}
-    </Text>
+    <View style={{ alignSelf: 'stretch', marginTop: 8 }} accessible accessibilityLabel={`Pronunciation: ${pronounce(a)}. ${pronounce(b)}`}>
+      {[a, b].map((line, i) => (
+        <Text key={i} allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={style}>
+          {spell(line)}
+        </Text>
+      ))}
+    </View>
   );
 }
 
