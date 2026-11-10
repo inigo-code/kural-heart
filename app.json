@@ -168,7 +168,8 @@
         "expo-audio",
         {
           "microphonePermission": "Kural Heart records a voice note for your page when you ask.",
-          "recordAudioAndroid": true
+          "recordAudioAndroid": true,
+          "enableBackgroundPlayback": false
         }
       ],
       "expo-video"
