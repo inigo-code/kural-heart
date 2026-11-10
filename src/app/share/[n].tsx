@@ -1,3 +1,4 @@
+import { STRINGS } from '@/i18n/strings';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
@@ -219,12 +220,13 @@ function Card({ k, story, line, tamil, translation, W, H, theme }: { k: Kural; s
       {!story && valluvar ? <Image source={{ uri: valluvar }} style={{ position: 'absolute', right: margin - 30 * u, bottom: 40 * u, width: 330 * u, height: 302 * u }} /> : null}
       <View style={{ position: 'absolute', left: margin, bottom: 96 * u, flexDirection: 'row', alignItems: 'center' }}>
         <Image source={ICON} style={{ width: 84 * u, height: 84 * u, borderRadius: 20 * u }} />
-        <View style={{ marginLeft: 24 * u }}>
+        {/* Clear of Valluvar on the post, whose figure takes the corner to the right. */}
+        <View style={{ marginLeft: 24 * u, maxWidth: story ? 820 * u : 470 * u }}>
           <Text allowFontScaling={false} style={{ fontFamily: F.serif, fontSize: 44 * u, color: theme.brand }}>
             Kural Heart
           </Text>
-          <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 28 * u, color: theme.quiet }}>
-            {tamil ? 'குறளுடன் நாட்குறிப்பு' : 'A journal with the Kural'}
+          <Text allowFontScaling={false} numberOfLines={2} style={{ fontFamily: F.sans, fontSize: 28 * u, lineHeight: 38 * u, color: theme.quiet }}>
+            {tamil ? STRINGS.ta.tagline : STRINGS.en.tagline}
           </Text>
         </View>
       </View>

@@ -6,7 +6,7 @@ Default language: **English (India), en-IN**. Release notes go between `<en-IN>`
 
 ## App name (30 max)
 
-Kural Heart: Thirukkural Diary
+Kural Heart
 
 ## Short description (80 max)
 

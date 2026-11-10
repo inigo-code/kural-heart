@@ -31,7 +31,7 @@ what the app actually does. If the app changes (new data, a new library, ads), u
 ### 1. Create the app
 
 Play Console → **Home → Create app**.
-- App name: **Kural Heart: Thirukkural Diary**
+- App name: **Kural Heart**
 - Default language: **English (India) – en-IN**
 - App or game: **App**. Free or paid: **Free** (this can't be changed to paid later).
 - Tick the declarations (Developer Program Policies, US export laws) and **Create app**.
