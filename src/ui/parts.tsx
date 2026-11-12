@@ -3,13 +3,13 @@ import Svg, { Path as SvgPath } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import type { ScrollViewProps, StyleProp, TextProps, TextStyle, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { alpha, mix } from './theme';
-import type { Variant } from './theme';
+import type { Colors, Variant } from './theme';
 import { useUI } from './ui';
 
 /** The canvas's line icons, 24 by 24, drawn with a 1.8 stroke. */
@@ -95,6 +95,47 @@ export function T({ v = 'body', color, style, children, ...rest }: TextProps & {
     <Text maxFontSizeMultiplier={1.6} textBreakStrategy="simple" {...rest} style={[type[v], { color: color ?? c.ink }, style]}>
       {children}
     </Text>
+  );
+}
+
+/** The gold of a starred page or a saved couplet: deep enough to read on Ivory, warm enough on Midnight. */
+export const starInk = (c: Colors) => (c.isNight ? '#E9BE5E' : '#A8761A');
+
+/**
+ * Star a page or save a couplet. Off, an outline star; on, a filled gold star in a soft gold disc, with a small pop as
+ * it fills. [disc] gives it the round backing of the header buttons, so it pairs with Back.
+ */
+export function StarButton({ on, onPress, label, size = 24, disc }: { on: boolean; onPress: () => void; label: string; size?: number; disc?: boolean }) {
+  const { c, still } = useUI();
+  const gold = starInk(c);
+  const pop = useSharedValue(1);
+  const popping = useAnimatedStyle(() => ({ transform: [{ scale: pop.value }] }));
+  const side = disc ? 44 : 40;
+  return (
+    <Pressable
+      onPress={() => {
+        if (!on && !still) pop.set(withSequence(withTiming(1.28, { duration: 110 }), withSpring(1, { damping: 9, stiffness: 260 })));
+        onPress();
+      }}
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      accessibilityState={{ selected: on }}
+      hitSlop={6}
+      style={({ pressed }) => ({
+        width: side,
+        height: side,
+        borderRadius: side / 2,
+        margin: disc ? 2 : 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: on ? alpha(gold, c.isNight ? 0.2 : 0.14) : disc ? (pressed ? c.surface3 : c.surface2) : pressed ? c.surface2 : 'transparent',
+        borderWidth: on ? 1 : 0,
+        borderColor: alpha(gold, 0.45),
+      })}>
+      <Animated.View style={popping}>
+        <Icon name="star" size={size} color={on ? gold : c.ink2} fill={on} stroke={on ? 1.4 : 1.8} />
+      </Animated.View>
+    </Pressable>
   );
 }
 

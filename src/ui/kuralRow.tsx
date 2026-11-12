@@ -8,7 +8,7 @@ import { toggleSaved, useSettings } from '@/lib/settings';
 import { kuralRef, partColor } from './common';
 import { alpha } from './theme';
 import { CoupletText } from './leaf';
-import { IconButton, T } from './parts';
+import { StarButton, T } from './parts';
 import { useUI } from './ui';
 
 /**
@@ -38,13 +38,7 @@ export function KuralRow({ k, inChapter }: { k: Kural; inChapter?: boolean }) {
             {kuralRef(k, tamil)}
           </T>
         )}
-        <IconButton
-          name="star"
-          label={saved ? tr('Remove from saved', 'சேமிப்பிலிருந்து நீக்கு') : tr('Save', 'சேமி')}
-          onPress={() => toggleSaved(k.n)}
-          color={saved ? c.gold : c.ink3}
-          size={22}
-        />
+        <StarButton on={saved} label={saved ? tr('Remove from saved', 'சேமிப்பிலிருந்து நீக்கு') : tr('Save', 'சேமி')} onPress={() => toggleSaved(k.n)} size={21} />
       </View>
       <CoupletText a={k.a} b={k.b} max={20} min={15} color={c.ink} />
     </Pressable>

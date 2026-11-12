@@ -309,9 +309,9 @@ export default function SettingsScreen() {
         onChange={(v) => set({ translation: v })}
         onClose={() => setSheet(null)}
         options={[
-          { value: 'aiyar', title: 'V. V. S. Aiyar, 1916', sub: tr('Plain prose, the easiest to read', 'எளிய உரைநடை'), sample: english(sampleK, 'aiyar') },
+          { value: 'popeprose', title: tr('G. U. Pope, prose', 'போப், உரைநடை'), sub: tr('Pope’s literal prose rendering; the default', 'போப்பின் நேரடி உரைநடை; இயல்பு'), sample: english(sampleK, 'popeprose') },
           { value: 'pope', title: 'G. U. Pope, 1886', sub: tr('Rhyming verse in two lines, like the Tamil', 'தமிழைப் போல இரண்டு வரிச் செய்யுள்'), sample: english(sampleK, 'pope') },
-          { value: 'popeprose', title: tr('G. U. Pope, prose', 'போப், உரைநடை'), sub: tr('Pope’s literal prose rendering', 'போப்பின் நேரடி உரைநடை'), sample: english(sampleK, 'popeprose') },
+          { value: 'aiyar', title: 'V. V. S. Aiyar, 1916', sub: tr('Plain prose, the easiest to read', 'எளிய உரைநடை'), sample: english(sampleK, 'aiyar') },
         ]}
       />
       <OptionSheet

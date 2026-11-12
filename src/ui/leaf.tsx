@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -82,16 +82,33 @@ export function CoupletText({ a, b, max = 27, min = 14, color, bold, fixed }: { 
   // Share images keep their own sizes, whatever the text-size setting.
   const scale = fixed ? 1 : textScale;
   const [width, setWidth] = useState(0);
-  const [natural, setNatural] = useState<[number, number]>([0, 0]);
+  // The two lines' widths at the top size, remembered with the couplet they belong to: a new couplet in the same place
+  // must not be sized by the last one's widths.
+  const lines = `${a}
+${b}`;
+  const [natural, setNatural] = useState<{ of: string; w: [number, number] }>({ of: '', w: [0, 0] });
   const top = max * scale;
   const bottom = min * scale;
-  const widest = Math.max(natural[0], natural[1]);
+  const fresh = natural.of === lines;
+  const widest = fresh ? Math.max(natural.w[0], natural.w[1]) : 0;
   // 6% to spare: Tamil shaping does not scale exactly with the size.
   const size = width && widest ? fitSize(width * 0.94, widest, top, bottom) : top;
+  // Unseen until its size is known, so a couplet never shows large and then shrinks (the jitter on a new couplet).
+  // If a measurement never comes (it shouldn't), show it anyway after a moment rather than leave a blank leaf.
+  const [late, setLate] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setLate(lines), 400);
+    return () => clearTimeout(t);
+  }, [lines]);
+  const ready = (width > 0 && fresh && natural.w[0] > 0 && natural.w[1] > 0) || late === lines;
   const family = bold ? F.coupletBold : F.couplet;
   const measure = (i: 0 | 1) => (e: { nativeEvent: { lines: { width: number }[] } }) => {
     const w = Math.max(...e.nativeEvent.lines.map((l) => l.width), 0);
-    setNatural((n) => (n[i] === w ? n : i === 0 ? [w, n[1]] : [n[0], w]));
+    setNatural((n) => {
+      const base: [number, number] = n.of === lines ? n.w : [0, 0];
+      if (n.of === lines && base[i] === w) return n;
+      return { of: lines, w: i === 0 ? [w, base[1]] : [base[0], w] };
+    });
   };
   return (
     <View style={{ alignSelf: 'stretch' }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)} accessible accessibilityLabel={`${a} ${b}`}>
@@ -110,7 +127,7 @@ export function CoupletText({ a, b, max = 27, min = 14, color, bold, fixed }: { 
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.6}
-          style={{ fontFamily: family, fontSize: size, lineHeight: Math.round(size * 1.5), color: color ?? c.leafInk, textAlign: 'left' }}>
+          style={{ fontFamily: family, fontSize: size, lineHeight: Math.round(size * 1.5), color: color ?? c.leafInk, textAlign: 'left', opacity: ready ? 1 : 0 }}>
           {line}
         </Text>
       ))}

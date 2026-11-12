@@ -512,7 +512,7 @@
 .tv .tv-twinkle{animation:tvStarTwinkle 3.2s ease-in-out infinite}
 .tv .tv-twinkle2{animation:tvStarTwinkle 2.6s ease-in-out infinite}
 .tv .tv-cloud{animation:tvThoughtPulse 2.8s ease-in-out infinite}
-.tv .tv-stylus{transform-origin:84px 96px;animation:tvStylusWrite 1.4s ease-in-out infinite}
+.tv .tv-stylus{transform-origin:82px 94px;animation:tvStylusWrite 1.4s ease-in-out infinite}
 .tv.typing .tv-stylus{animation-duration:.8s}
 .tv .tv-spark{transform-origin:125px 154px;animation:tvEtchSpark .7s ease-in-out infinite}
 .tv .tv-beard{transform-origin:82px 98px;animation:tvBeardStroke 2.4s ease-in-out infinite}
@@ -526,7 +526,7 @@
 .tv .tv-carry{transform-origin:90px 86px;animation:tvWalkCarry 1.8s ease-in-out infinite}
 .tv .tv-bounce{transform-origin:120px 180px;animation:tvCelebrateBounce 1.2s ease-in-out infinite}
 .tv .tv-confetti{animation:tvStarTwinkle 1.2s ease-in-out infinite}
-.tv .tv-armsL{transform-origin:80px 100px;animation:tvCelebrateArms 1.2s ease-in-out infinite}
+.tv .tv-armsL{transform-origin:80px 100px;animation:tvCelebrateArmsL 1.2s ease-in-out infinite}
 .tv .tv-armsR{transform-origin:160px 100px;animation:tvCelebrateArms 1.2s ease-in-out infinite}
 .tv .tv-sonar{animation:tvSonarRipple 2s ease-out infinite}
 .tv .tv-sonar.s2{animation-delay:.9s}
@@ -547,13 +547,13 @@
 @keyframes tvBrowFocus{0%,100%{transform:translateY(1px)}50%{transform:translateY(-1px)}}
 @keyframes tvClothSway{0%,100%{transform:skewX(0)}50%{transform:skewX(-2.2deg)}}
 @keyframes tvClothBillow{0%,100%{transform:rotate(0) skewX(0)}50%{transform:rotate(-3deg) skewX(-4deg)}}
-@keyframes tvLeafFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-3.5px) rotate(-2deg)}}
-@keyframes tvStylusWrite{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(9px,-3px) rotate(-6deg)}50%{transform:translate(18px,1px) rotate(3deg)}75%{transform:translate(26px,-2px) rotate(-4deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes tvLeafFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-1.5px) rotate(-4deg)}}
+@keyframes tvStylusWrite{0%,100%{transform:rotate(0)}25%{transform:rotate(-5deg)}50%{transform:rotate(1.5deg)}75%{transform:rotate(-6deg)}}
 @keyframes tvEtchSpark{0%,100%{opacity:.2;transform:scale(.6) translateY(0)}50%{opacity:1;transform:scale(1.25) translateY(-6px)}}
-@keyframes tvBeardStroke{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(4px) rotate(-4deg)}}
+@keyframes tvBeardStroke{0%,100%{transform:rotate(0)}50%{transform:rotate(5deg)}}
 @keyframes tvThoughtPulse{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.07) translateY(-3px)}}
 @keyframes tvStarTwinkle{0%,100%{transform:scale(.85) rotate(0);opacity:.65}50%{transform:scale(1.2) rotate(18deg);opacity:1}}
-@keyframes tvTeachArmWave{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg) translateY(-4px)}}
+@keyframes tvTeachArmWave{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
 @keyframes tvMouthChant{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1.15)}}
 @keyframes tvTamilFloat{0%,100%{transform:translateY(0) translateX(0);opacity:.75}50%{transform:translateY(-9px) translateX(3px);opacity:1}}
 @keyframes tvWalkStepLeft{0%,50%,100%{transform:none}25%{transform:translateY(-4px) scaleY(.92)}}
@@ -562,7 +562,8 @@
 @keyframes tvWalkCarry{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
 @keyframes tvWalkBounce{0%,50%,100%{transform:none}25%{transform:translateY(-3px) rotate(1.2deg)}75%{transform:translateY(-3px) rotate(-1.2deg)}}
 @keyframes tvCelebrateBounce{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-6px) scaleY(1.03)}}
-@keyframes tvCelebrateArms{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg) translateY(-4px)}}
+@keyframes tvCelebrateArms{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+@keyframes tvCelebrateArmsL{0%,100%{transform:rotate(0)}50%{transform:rotate(12deg)}}
 @keyframes tvSonarRipple{0%{r:36px;opacity:.75}100%{r:86px;opacity:0}}
 @keyframes tvScrollShimmer{0%{transform:translateX(-45px);opacity:0}50%{opacity:.9}100%{transform:translateX(45px);opacity:0}}
 @keyframes tvWaveHand{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}

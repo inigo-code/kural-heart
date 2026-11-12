@@ -50,7 +50,8 @@ const stepLeft = [K(0), K(0.25, { ty: -4, sy: 0.92 }), K(0.5), K(1)];
 const stepRight = [K(0), K(0.5), K(0.75, { ty: -4, sy: 0.92 }), K(1)];
 const STRIDE = 1800;
 const twinkle = loop({ sx: 1.2, sy: 1.2, rot: 18 }, { sx: 0.85, sy: 0.85, alpha: 0.65 });
-const leafFloat = loop({ ty: -3.5, rot: -2 }, { rot: -5 });
+// The held leaf only stirs: the hands hold it, and the arms they belong to don't float.
+const leafFloat = loop({ ty: -1.5, rot: -4 }, { rot: -5 });
 
 const heads: Record<string, Motion> = {
   'h-scan': M(loop({ rot: 3.2, ty: 2 }, { rot: -2.5 }), 3600, 'RT', head),
@@ -79,16 +80,12 @@ const table: Record<string, Motion> = {
   'tv-twinkle': M(twinkle, 3200, 'SR', null),
   'tv-twinkle2': M(twinkle, 2600, 'SR', null),
   'tv-cloud': M(loop({ sx: 1.07, sy: 1.07, ty: -3 }), 2800, 'ST', null),
-  'tv-stylus': M(
-    [K(0), K(0.25, { tx: 9, ty: -3, rot: -6 }), K(0.5, { tx: 18, ty: 1, rot: 3 }), K(0.75, { tx: 26, ty: -2, rot: -4 }), K(1)],
-    1400,
-    'TR',
-    [84, 96],
-  ),
+  // Writing strokes turn the whole arm at the shoulder, so the hand moves along the leaf and the shoulder stays put.
+  'tv-stylus': M([K(0), K(0.25, { rot: -5 }), K(0.5, { rot: 1.5 }), K(0.75, { rot: -6 }), K(1)], 1400, 'R', [82, 94]),
   'tv-spark': M(loop({ sx: 1.25, sy: 1.25, ty: -6 }, { sx: 0.6, sy: 0.6, alpha: 0.2 }), 700, 'ST', [125, 154]),
-  'tv-beard': M(loop({ ty: 4, rot: -4 }), 2400, 'TR', [82, 98]),
+  'tv-beard': M(loop({ rot: 5 }), 2400, 'R', [82, 98]),
   'tv-tamil': M(loop({ ty: -9, tx: 3 }, { alpha: 0.75 }), 2400, 'T', [0, 0]),
-  'tv-teach': M(loop({ rot: -14, ty: -4 }), 1800, 'RT', [158, 98]),
+  'tv-teach': M(loop({ rot: -14 }), 1800, 'R', [158, 98]),
   'tv-walk': M([K(0), K(0.25, { ty: -3, rot: 1.2 }), K(0.5), K(0.75, { ty: -3, rot: -1.2 }), K(1)], STRIDE, 'TR', [120, 200]),
   'tv-legL': M(stepLeft, STRIDE, 'TS', [104, 154]),
   'tv-legR': M(stepRight, STRIDE, 'TS', [132, 154]),
@@ -97,8 +94,9 @@ const table: Record<string, Motion> = {
   'tv-carry': M(loop({ rot: 3 }, { rot: -3 }), STRIDE, 'R', [90, 86]),
   'tv-bounce': M(loop({ ty: -6, sy: 1.03 }), 1200, 'TS', [120, 180]),
   'tv-confetti': M(twinkle, 1200, 'SR', null),
-  'tv-armsL': M(loop({ rot: -12, ty: -4 }), 1200, 'RT', [80, 100]),
-  'tv-armsR': M(loop({ rot: -12, ty: -4 }), 1200, 'RT', [160, 100]),
+  // Arms turn at the shoulder only (a lift would pull them off the body), mirrored, so both pump towards the head.
+  'tv-armsL': M(loop({ rot: 12 }), 1200, 'R', [80, 100]),
+  'tv-armsR': M(loop({ rot: -12 }), 1200, 'R', [160, 100]),
   // The canvas animates the ring's radius from 36 to 86 on a 42 ring; here that is a scale about its centre.
   'tv-sonar': M([K(0, { sx: 36 / 42, sy: 36 / 42, alpha: 0.75 }), K(1, { sx: 86 / 42, sy: 86 / 42, alpha: 0 })], 2000, 'S', [120, 68], { easing: EASE_OUT }),
   'tv-shimmer': M([K(0, { tx: -45, alpha: 0 }), K(0.5, { alpha: 0.9 }), K(1, { tx: 45, alpha: 0 })], 2400, 'T', [0, 0]),

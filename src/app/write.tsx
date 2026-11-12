@@ -22,7 +22,7 @@ import { Dialog, Field, HScroll, MOODS, MoodChip, PhotoThumb, WEATHER_NAMES, Wra
 import { KeyboardSafe } from '@/ui/keyboard';
 import { AudioNote, VideoNote, VoiceRecorder } from '@/ui/media';
 import { CoupletText, Pronounce } from '@/ui/leaf';
-import { BackButton, Button, Chip, Icon, IconButton, Note, T, TextLink } from '@/ui/parts';
+import { BackButton, Button, Chip, Icon, IconButton, Note, StarButton, T, TextLink } from '@/ui/parts';
 import { F } from '@/ui/theme';
 import { toast } from '@/ui/toast';
 import { useUI } from '@/ui/ui';
@@ -277,12 +277,7 @@ export default function WriteScreen() {
           <T v="headline" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ flex: 1, marginLeft: 4 }}>
             {existing ? L.edit : tr('New page', 'புதிய பக்கம்')}
           </T>
-          <IconButton
-            name="star"
-            label={tr('Star this page', 'இந்தப் பக்கத்தை நட்சத்திரமிடு')}
-            color={starred ? c.gold : c.ink2}
-            onPress={() => setStarred(!starred)}
-          />
+          <StarButton on={starred} label={starred ? tr('Remove the star', 'நட்சத்திரத்தை நீக்கு') : tr('Star this page', 'இந்தப் பக்கத்தை நட்சத்திரமிடு')} onPress={() => setStarred(!starred)} />
           <IconButton name="keyboard" label={L.kbTitle} color={c.ink2} onPress={() => setDialog('kb')} />
         </View>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 20 }}>

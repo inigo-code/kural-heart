@@ -20,8 +20,10 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b36 tv-breath-follow|-|1
 P|M76 96C62 112 62 136 86 140L106 138|-|#E08250|18|round|round|1|-
 P|M164 96C178 112 178 136 154 140L134 138|-|#D17140|18|round|round|1|-
+E
 G|tv-head h-scan d36|-|1
 G||1,0,0,1,0,0|1
 G|tv-bun|-|1
@@ -62,6 +64,7 @@ P|M113 75Q120 79 127 75|-|#E08250|2.800|round|miter|1|-
 E
 E
 E
+G|tv-breath b36 tv-breath-follow|-|1
 G|tv-float|-|1
 G||1,0,0,1,82,118|1
 P|M4 0h70a4 4 0 0 1 4 4v14a4 4 0 0 1 -4 4h-70a4 4 0 0 1 -4 -4v-14a4 4 0 0 1 4 -4z|#B88746|-|0|butt|miter|1|-
@@ -73,6 +76,7 @@ P|M66 11a2 2 0 1 0 4 0a2 2 0 1 0 -4 0z|#6E4726|-|0|butt|miter|1|-
 E
 P|M78 134a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 P|M146 128a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
+E
 E
 G|tv-twinkle|-|1
 P|M49 64a3 3 0 1 0 6 0a3 3 0 1 0 -6 0z|#D4AF37|-|0|butt|miter|1|-
@@ -95,6 +99,7 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b22 tv-breath-follow|-|1
 P|M158 94C172 114 174 136 162 152|-|#D17140|16|round|miter|1|-
 P|M154 152a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 G||0.99,-0.139,0.139,0.99,94,152|1
@@ -112,6 +117,7 @@ G|tv-spark|-|1
 P|M119.2 150a2.8 2.8 0 1 0 5.6 0a2.8 2.8 0 1 0 -5.6 0z|#D4AF37|-|0|butt|miter|1|-
 P|M129.8 146a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0z|#C86446|-|0|butt|miter|1|-
 P|M126 154a2 2 0 1 0 4 0a2 2 0 1 0 -4 0z|#D4AF37|-|0|butt|miter|1|-
+E
 E
 G|tv-head h-write d14|-|1
 G||0.995,0.105,-0.105,0.995,7.138,-12.204|1
@@ -185,7 +191,9 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b32 tv-breath-follow|-|1
 P|M158 98C168 118 168 140 162 156|-|#D17140|16|round|miter|1|-
+E
 G|tv-head h-cont d32|-|1
 G||1,0,0,1,0,0|1
 G|tv-bun|-|1
@@ -226,9 +234,11 @@ P|M113 75Q120 79 127 75|-|#E08250|2.800|round|miter|1|-
 E
 E
 E
+G|tv-breath b32 tv-breath-follow|-|1
 G|tv-beard|-|1
 P|M82 98C72 118 78 136 92 132L114 100|-|#E08250|16|round|round|1|-
 P|M107.5 96a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0z|#E08250|-|0|butt|miter|1|-
+E
 E
 E
 G|s s-teaching|-|1
@@ -255,11 +265,13 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b24 tv-breath-follow|-|1
 P|M80 98C68 116 70 138 98 144|-|#E08250|16|round|miter|1|-
 P|M94 144a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 G|tv-teach|-|1
 P|M158 98C168 118 176 130 192 110|-|#E08250|16|round|round|1|-
 P|M186.5 105a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0z|#E08250|-|0|butt|miter|1|-
+E
 E
 G|tv-head h-scan d24|-|1
 G||1,0,0,1,0,0|1
@@ -400,6 +412,7 @@ E
 P|M40 96a4 4 0 1 0 8 0a4 4 0 1 0 -8 0z|#D4AF37|-|0|butt|miter|1|-
 P|M192 92a4 4 0 1 0 8 0a4 4 0 1 0 -8 0z|#C86446|-|0|butt|miter|1|-
 E
+G|tv-breath b12 tv-breath-follow|-|1
 G|tv-armsL|-|1
 P|M80 100C60 88 52 70 46 52|-|#E08250|16|round|miter|1|-
 P|M36.5 46a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0z|#E08250|-|0|butt|miter|1|-
@@ -410,6 +423,7 @@ P|M187 48a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 G||0.883,0.469,-0.469,0.883,174,26|1
 P|M4 0h38a4 4 0 0 1 4 4v7a4 4 0 0 1 -4 4h-38a4 4 0 0 1 -4 -4v-7a4 4 0 0 1 4 -4z|#B88746|-|0|butt|miter|1|-
 P|M5 2h36a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h-36a3 3 0 0 1 -3 -3v-5a3 3 0 0 1 3 -3z|#DAB06C|-|0|butt|miter|1|-
+E
 E
 E
 P|M56 168C56 150 85 146 120 146 155 146 184 150 184 168 184 182 158 188 120 188 82 188 56 182 56 168Z|#F4F1EA|-|0|butt|miter|1|-
@@ -489,10 +503,12 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b22 tv-breath-follow|-|1
 P|M78 98C64 116 68 140 94 146|-|#E08250|16|round|miter|1|-
 P|M162 98C176 116 172 140 146 146|-|#D17140|16|round|miter|1|-
 P|M88 146a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 P|M136 146a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
+E
 G|tv-head h-listen d22|-|1
 G||0.996,-0.087,0.087,0.996,-4.947,10.695|1
 G|tv-bun|-|1
@@ -680,6 +696,7 @@ E
 E
 E
 E
+G|tv-breath b24 tv-breath-follow|-|1
 P|M80 86C60 100 62 122 85 128|-|#E08250|15|round|miter|1|-
 P|M160 86C180 100 178 122 155 128|-|#D17140|15|round|miter|1|-
 G|tv-heldseal|-|1
@@ -689,6 +706,7 @@ P|M120 137C111 131 106 127 106 121 106 117 109 115 112 115 116 115 118 117 120 1
 E
 P|M76.5 128a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0z|#E08250|-|0|butt|miter|1|-
 P|M146.5 128a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0z|#D17140|-|0|butt|miter|1|-
+E
 E
 G|s s-greeting|-|1
 P|M56 168C56 150 85 146 120 146 155 146 184 150 184 168 184 182 158 188 120 188 82 188 56 182 56 168Z|#F4F1EA|-|0|butt|miter|1|-
@@ -705,11 +723,13 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b24 tv-breath-follow|-|1
 P|M80 98C68 116 70 138 98 144|-|#E08250|16|round|miter|1|-
 P|M94 144a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 G|tv-wave|-|1
 P|M160 100C180 88 188 70 194 52|-|#E08250|16|round|miter|1|-
 P|M186.5 46a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0z|#E08250|-|0|butt|miter|1|-
+E
 E
 G|tv-head h-scan d24|-|1
 G||1,0,0,1,0,0|1
@@ -767,10 +787,12 @@ P|M138 84L154 155|-|#E2DDD0|3.500|round|miter|1|-
 P|M118 118L140 155|-|#E2DDD0|3|round|miter|1|-
 E
 E
+G|tv-breath b56 tv-breath-follow|-|1
 P|M78 98C64 116 68 140 94 146|-|#E08250|16|round|miter|1|-
 P|M162 98C176 116 172 140 146 146|-|#D17140|16|round|miter|1|-
 P|M102 148a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#E08250|-|0|butt|miter|1|-
 P|M122 148a8 8 0 1 0 16 0a8 8 0 1 0 -16 0z|#D17140|-|0|butt|miter|1|-
+E
 G|tv-head h-rest d56|-|1
 G||0.999,-0.052,0.052,0.999,-3.08,6.365|1
 G|tv-bun|-|1

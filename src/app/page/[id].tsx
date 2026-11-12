@@ -10,7 +10,7 @@ import { wordCount } from '@/lib/types';
 import { MOODS, Markdown, PhotoGallery, moodTint, plainMarkdown, questionText, timeOf, weatherLabel } from '@/ui/common';
 import { MayilBorder } from '@/ui/kolam';
 import { CoupletText, Leaf, LeafNote } from '@/ui/leaf';
-import { Button, Icon, IconButton, Page, T, raised } from '@/ui/parts';
+import { Button, Icon, Page, StarButton, T, raised } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
 import { F, alpha } from '@/ui/theme';
 import { AudioNote, VideoNote } from '@/ui/media';
@@ -61,12 +61,7 @@ export default function PageScreen() {
           </View>
         }
         actions={
-          <IconButton
-            name="star"
-            label={tr('Star', 'நட்சத்திரம்')}
-            color={e.starred ? c.gold : c.ink2}
-            onPress={() => toggleStar(e)}
-          />
+          <StarButton disc on={e.starred} label={e.starred ? tr('Remove the star', 'நட்சத்திரத்தை நீக்கு') : tr('Star this page', 'இந்தப் பக்கத்தை நட்சத்திரமிடு')} onPress={() => toggleStar(e)} />
         }>
         {/* The page's circumstances at a glance: how you felt, when, the weather and the place. */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>

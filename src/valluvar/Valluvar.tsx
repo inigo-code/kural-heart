@@ -2,7 +2,8 @@ import { Canvas, Group, ImageFormat, Picture, Skia, useClock, useFont } from '@s
 import type { SkCanvas, SkFont, SkPicture } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { useDerivedValue } from 'react-native-reanimated';
+import { useAnimatedReaction, useDerivedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import type { SharedValue } from 'react-native-reanimated';
 
 import { useUI } from '@/ui/ui';
@@ -202,6 +203,8 @@ type Props = {
   wink?: boolean;
   /** Room above the art, as a share of its height, for poses that rise out of the frame. */
   headroom?: number;
+  /** Called once the moving drawing is on screen (the splash hides its still stand-in then). */
+  onDrawn?: () => void;
 };
 
 /** Valluvar at [size] wide (the art is 240 by 220). */
@@ -239,6 +242,14 @@ function MovingValluvar(props: Props) {
   const clock = useClock();
   const top = Math.round((props.headroom ?? DEFAULT_HEADROOM) * h);
   const picture = useDerivedValue(() => record(list, p, clock.value, k, w, h, font, top));
+  // A few frames in, the moving drawing is certainly showing.
+  const onDrawn = props.onDrawn;
+  useAnimatedReaction(
+    () => clock.value > 80,
+    (now, before) => {
+      if (now && !before && onDrawn) scheduleOnRN(onDrawn);
+    },
+  );
   return <Frame props={props} w={w} h={h} picture={picture} />;
 }
 

@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, PixelRatio, StyleSheet, Text, View, useColorScheme } from 'react-native';
 
 import { Valluvar, valluvarImage } from '@/valluvar/Valluvar';
@@ -22,13 +22,15 @@ export function SplashOverlay({ ready, shown, onDone }: { ready: boolean; shown:
   }, [shown]);
   // A still Valluvar drawn at once, under the moving one, for the moment before the first animated frame.
   const [still0] = useState(() => valluvarImage('greeting', Math.round(220 * PixelRatio.get())));
+  // The still goes the moment the moving Valluvar draws: left under him, his waving arm showed twice, like an
+  // after-image. A late fallback covers a canvas that never reports.
   const [showStill, setShowStill] = useState(true);
-  // The still stays until the moving Valluvar has had time to draw, counted from when the splash can be seen.
+  const hideStill = useCallback(() => setShowStill(false), []);
   useEffect(() => {
     if (!shown) return;
-    const t = setTimeout(() => setShowStill(false), 1200);
+    const t = setTimeout(hideStill, 1500);
     return () => clearTimeout(t);
-  }, [shown]);
+  }, [shown, hideStill]);
   // Android's own start screen follows the phone's light or dark mode; the app follows the time of day. Start in the
   // phone's colour and fade into the app's, so there is no jump between the two.
   const system = useColorScheme();
@@ -51,7 +53,7 @@ export function SplashOverlay({ ready, shown, onDone }: { ready: boolean; shown:
       <View style={{ width: 230, height: 230, alignItems: 'center', justifyContent: 'flex-end' }}>
         <View style={{ position: 'absolute', left: 14, right: 14, top: 10, bottom: 0, backgroundColor: c.surface2, borderTopLeftRadius: 110, borderTopRightRadius: 110, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }} />
         {showStill && still0 ? <Image source={{ uri: still0 }} style={{ position: 'absolute', bottom: 0, width: 220, height: (220 * 220) / 240 }} /> : null}
-        <Valluvar state="greeting" face="greet" size={220} wink />
+        <Valluvar state="greeting" face="greet" size={220} wink onDrawn={hideStill} />
       </View>
       <SikkuThreshold height={18} style={{ width: 200, marginTop: 8 }} />
       <Text allowFontScaling={false} textBreakStrategy="simple" style={{ fontFamily: F.serifMedium, fontSize: 34, color: c.ink, marginTop: 16 }}>

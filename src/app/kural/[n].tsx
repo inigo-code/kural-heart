@@ -9,7 +9,7 @@ import { markRead, toggleSaved, useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker, voiceSettings } from '@/lib/speak';
 import { ActionRow, EntryCard, MUVA_BY, kuralRef, partColor, questionText } from '@/ui/common';
 import { CoupletText, Leaf, LeafNote, Pronounce } from '@/ui/leaf';
-import { Button, IconButton, Note, Page, SectionLabel, T, TextLink } from '@/ui/parts';
+import { Button, Note, Page, SectionLabel, StarButton, T, TextLink } from '@/ui/parts';
 import { F } from '@/ui/theme';
 import { useUI } from '@/ui/ui';
 import { refreshWidget } from '@/widget/widgets';
@@ -35,7 +35,7 @@ export default function KuralScreen() {
   return (
     <Page
       title={tr(`Kural ${n}`, `குறள் ${n}`)}
-      actions={<IconButton name="star" label={saved ? tr('Remove from saved', 'சேமிப்பிலிருந்து நீக்கு') : tr('Save', 'சேமி')} onPress={() => toggleSaved(n)} color={saved ? c.gold : c.ink2} />}>
+      actions={<StarButton disc on={saved} label={saved ? tr('Remove from saved', 'சேமிப்பிலிருந்து நீக்கு') : tr('Save', 'சேமி')} onPress={() => toggleSaved(n)} />}>
       <T v="label" color={partColor(ch.part, c)}>
         {kuralRef(k, tamil)}
       </T>

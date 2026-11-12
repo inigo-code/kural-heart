@@ -88,7 +88,7 @@ export const DEFAULTS: Settings = {
   textScale: 100,
   accent: 'clay',
   promptMode: 'daily',
-  translation: 'aiyar',
+  translation: 'popeprose',
   pronounce: true,
   pronounceStyle: 'simple',
   shareTheme: 'dawn',

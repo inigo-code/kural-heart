@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Animated as RNAnimated, Easing as RNEasing, FlatList, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
-import Animated, { Easing, FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { clock, longDate } from '@/lib/dates';
+import { dayOf, longDate } from '@/lib/dates';
 import { LENS, chapterOf, english, questionFor } from '@/lib/pack';
 import type { Kural, Part } from '@/lib/pack';
 import { photoUri } from '@/lib/photos';
@@ -19,7 +19,7 @@ import type { ValluvarState } from '@/valluvar/Valluvar';
 
 import { MayilBorder, SikkuThreshold } from './kolam';
 import { CoupletText, Leaf, LeafNote, Pronounce } from './leaf';
-import { Icon, T, TextLink, raised, timeLabel } from './parts';
+import { Icon, T, TextLink, raised, starInk, timeLabel } from './parts';
 import type { IconName } from './parts';
 import { F, alpha } from './theme';
 import type { Colors } from './theme';
@@ -123,71 +123,118 @@ export const timeOf = (e: Entry) => {
 /**
  * The couplet on its leaf. Turned, it shows Pope's verse on the back: the leaf tips over on its long side, as an
  * olai is turned in the hand, and comes back up showing the other face.
+ *
+ * Both faces stay mounted in fixed places and only their opacity changes, so turning never re-lays out the couplet
+ * (which used to flicker as its size was measured afresh) and the leaf keeps the taller face's height throughout.
  */
 export function KuralLeaf({ k, turned = false, onPress, max }: { k: Kural; turned?: boolean; onPress?: () => void; max?: number }) {
   const { c, tamil, type, still } = useUI();
   const ch = chapterOf(k);
-  // Both faces are measured and the leaf keeps the taller one's height, so turning it never moves the page.
-  const [heights, setHeights] = useState<[number, number]>([0, 0]);
-  const measure = (i: 0 | 1) => (e: { nativeEvent: { layout: { height: number } } }) => {
-    const h = Math.ceil(e.nativeEvent.layout.height);
-    setHeights((hs) => (hs[i] === h ? hs : i === 0 ? [h, hs[1]] : [hs[0], h]));
-  };
+  const [backH, setBackH] = useState(0);
   // The face on show trails [turned] by half a turn: it changes while the leaf is edge-on.
-  const [flipped, setShown] = useState(turned);
+  const [flipped, setFlipped] = useState(turned);
   // With motion reduced the face simply changes.
   const shown = still ? turned : flipped;
   const tip = useSharedValue(0);
   useEffect(() => {
-    if (still || turned === flipped) return;
-    tip.value = withTiming(90, { duration: 170, easing: Easing.in(Easing.quad) }, (done) => {
+    if (still) return;
+    if (turned === flipped) {
+      // Turned straight back before reaching edge-on: settle flat again.
+      tip.value = withTiming(0, { duration: 180, easing: Easing.out(Easing.cubic) });
+      return;
+    }
+    tip.value = withTiming(90, { duration: 190, easing: Easing.in(Easing.cubic) }, (done) => {
       if (!done) return;
-      scheduleOnRN(setShown, turned);
+      scheduleOnRN(setFlipped, turned);
       tip.value = -90;
-      tip.value = withTiming(0, { duration: 260, easing: Easing.out(Easing.back(1.4)) });
+      tip.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.cubic) });
     });
-    // tip is a shared value and stays the same object.
+    // Only a new [turned] starts a turn; [flipped] catching up must not restart it. tip is a stable shared value.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [turned, still]);
-  const tipping = useAnimatedStyle(() => ({ transform: [{ perspective: 900 }, { rotateX: `${tip.value}deg` }] }));
-  const front = (
-    <>
-      <CoupletText a={k.a} b={k.b} max={max} />
-      <Pronounce a={k.a} b={k.b} />
-      <LeafNote>{tamil ? `அதிகாரம் ${ch.n} · ${ch.ta} · குறள் ${k.n}` : `Chapter ${ch.n} · ${ch.ta} · Kural ${k.n}`}</LeafNote>
-    </>
-  );
-  const back = (
-    <>
-      {[k.pa, k.pb].map((line, i) => (
-        <Text key={i} style={[type.body, { fontFamily: F.serifItalic, color: c.leafInk, marginTop: i ? 4 : 0 }]}>
-          {line}
-        </Text>
-      ))}
-      <LeafNote>{`G. U. Pope, 1886 · ${ch.en} · ${k.n}`}</LeafNote>
-    </>
-  );
+  // A touch of lift as it turns: it comes slightly towards you and its shadow eases off.
+  const tipping = useAnimatedStyle(() => {
+    const edge = Math.abs(tip.value) / 90;
+    return { transform: [{ perspective: 1200 }, { rotateX: `${tip.value}deg` }, { scale: 1 + edge * 0.03 }] };
+  });
   return (
     <Pressable onPress={onPress} disabled={!onPress} accessibilityRole={onPress ? 'button' : undefined}>
       <Animated.View style={tipping}>
         <Leaf>
-          <View style={{ alignSelf: 'stretch', minHeight: Math.max(heights[0], heights[1]), justifyContent: 'center' }}>
-            <View onLayout={measure(shown ? 1 : 0)} style={{ alignItems: 'flex-start' }}>
-              {shown ? back : front}
-            </View>
-            {/* The hidden face, laid out unseen, only to know its height. */}
+          <View style={{ alignSelf: 'stretch', minHeight: backH, justifyContent: 'center' }}>
             <View
-              onLayout={measure(shown ? 0 : 1)}
-              style={{ position: 'absolute', left: 0, right: 0, top: 0, opacity: 0, alignItems: 'flex-start' }}
+              style={{ alignItems: 'flex-start', opacity: shown ? 0 : 1 }}
+              accessibilityElementsHidden={shown}
+              importantForAccessibility={shown ? 'no-hide-descendants' : 'auto'}>
+              <CoupletText a={k.a} b={k.b} max={max} />
+              <Pronounce a={k.a} b={k.b} />
+              <LeafNote>{tamil ? `அதிகாரம் ${ch.n} · ${ch.ta} · குறள் ${k.n}` : `Chapter ${ch.n} · ${ch.ta} · Kural ${k.n}`}</LeafNote>
+            </View>
+            <View
               pointerEvents="none"
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants">
-              {shown ? front : back}
+              style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'center', opacity: shown ? 1 : 0 }}
+              accessibilityElementsHidden={!shown}
+              importantForAccessibility={shown ? 'auto' : 'no-hide-descendants'}>
+              <View onLayout={(e) => setBackH(Math.ceil(e.nativeEvent.layout.height))} style={{ alignItems: 'flex-start' }}>
+                {[k.pa, k.pb].map((line, i) => (
+                  <Text key={i} style={[type.body, { fontFamily: F.serifItalic, color: c.leafInk, marginTop: i ? 4 : 0 }]}>
+                    {line}
+                  </Text>
+                ))}
+                <LeafNote>{`G. U. Pope, 1886 · ${ch.en} · ${k.n}`}</LeafNote>
+              </View>
             </View>
           </View>
         </Leaf>
       </Animated.View>
     </Pressable>
+  );
+}
+
+/**
+ * A value that changes behind a soft fade: when [value] changes, what was showing fades out, the new value takes its
+ * place while nothing is visible, and it fades in. Returns the value to draw and the style for the fading view. It
+ * animates opacity directly, not with an entering animation, which Android could leave stuck unshown (the empty leaf).
+ */
+export function useCrossfade<V>(value: V): [V, ReturnType<typeof useAnimatedStyle>] {
+  const { still } = useUI();
+  const [shown, setShown] = useState(value);
+  const o = useSharedValue(1);
+  useEffect(() => {
+    if (still) return;
+    if (value === shown) {
+      o.value = withTiming(1, { duration: 240, easing: Easing.out(Easing.quad) });
+      return;
+    }
+    o.value = withTiming(0, { duration: 140, easing: Easing.in(Easing.quad) }, (done) => {
+      if (done) scheduleOnRN(setShown, value);
+    });
+    // o is a stable shared value.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, shown, still]);
+  const style = useAnimatedStyle(() => ({ opacity: o.value }));
+  return [still ? value : shown, style];
+}
+
+/**
+ * Holds its height and eases to the new one when its content grows or shrinks (a longer meaning, a taller leaf), so
+ * what sits below glides instead of jumping. [bleed] leaves room for a shadow that would otherwise be clipped.
+ */
+export function SmoothHeight({ children, style, bleed = 0 }: { children: ReactNode; style?: StyleProp<ViewStyle>; bleed?: number }) {
+  const { still } = useUI();
+  const h = useSharedValue(-1);
+  const box = useAnimatedStyle(() => (h.value < 0 ? {} : { height: h.value }));
+  return (
+    <Animated.View style={[{ overflow: 'hidden', margin: -bleed }, box]}>
+      <View
+        style={[{ padding: bleed }, style]}
+        onLayout={(e) => {
+          const v = e.nativeEvent.layout.height;
+          h.set(h.get() < 0 || still ? v : withTiming(v, { duration: 260, easing: Easing.out(Easing.cubic) }));
+        }}>
+        {children}
+      </View>
+    </Animated.View>
   );
 }
 
@@ -205,16 +252,6 @@ export function Rise({ i = 0, children, style }: { i?: number; children: ReactNo
       entering={still || i >= 10 ? undefined : FadeInDown.duration(420).delay(80 + Math.min(i, 8) * 70).easing(Easing.out(Easing.cubic)).withInitialValues({ transform: [{ translateY: 14 }] })}>
       {/* The look sits on an inner view: Android can leave an animating view with a background unshown. */}
       <View style={style}>{children}</View>
-    </Animated.View>
-  );
-}
-
-/** Text that fades in afresh whenever [k] changes (a new question, a new count). */
-export function FadeSwap({ k, children, style }: { k: string | number; children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  const { still } = useUI();
-  return (
-    <Animated.View key={k} entering={still ? undefined : FadeIn.duration(320)} style={style}>
-      {children}
     </Animated.View>
   );
 }
@@ -408,7 +445,6 @@ export function EntryCard({ e }: { e: Entry }) {
   const router = useRouter();
   const ch = chapterOf(e.kural);
   const bits = [
-    e.starred ? '★' : null,
     moodLabel(e.mood, tamil),
     e.weather ? weatherLabel(e.weather, tamil) : null,
     e.place?.name,
@@ -433,8 +469,9 @@ export function EntryCard({ e }: { e: Entry }) {
         </T>
         {e.photos[0] ? <PhotoThumb id={e.photos[0]} size={64} /> : null}
       </View>
-      {bits.length || e.audio.length || e.videos.length ? (
+      {bits.length || e.audio.length || e.videos.length || e.starred ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
+          {e.starred ? <Icon name="star" size={15} fill color={starInk(c)} stroke={1.4} /> : null}
           {e.audio.length ? <MediaMark icon="mic" n={e.audio.length} /> : null}
           {e.videos.length ? <MediaMark icon="play" n={e.videos.length} /> : null}
           <T v="labelM" color={c.ink3} numberOfLines={2} style={{ flex: 1 }}>
@@ -763,5 +800,6 @@ export function DetailLine({ icon, text }: { icon: Parameters<typeof Icon>[0]['n
 export function lastLabel(at: number, L: { backupNever: string; backupLast: (s: string) => string }, tamil: boolean): string {
   if (!at) return L.backupNever;
   const d = new Date(at);
-  return L.backupLast(`${longDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, tamil)}, ${clock(at)}`);
+  // The 12-hour clock, as everywhere else in the app.
+  return L.backupLast(`${longDate(dayOf(d), tamil)}, ${timeLabel(d.getHours() * 60 + d.getMinutes())}`);
 }

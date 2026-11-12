@@ -1008,7 +1008,9 @@ share, About with Heart Apps, Sources and credits, delete everything, notificati
 largest system font, Tamil-first and Midnight variants of Journal, Write, Journey and Settings, the widgets
 redrawn in Olai, a brand board (notification glyph, animated splash, store icon), the 1024 by 500 feature
 graphic, and English and Tamil store screenshots. The heavy-days board shows empty lines on purpose: no
-helpline number is shown until it comes from a checked list for the reader's country.
+helpline number is shown until it comes from a checked list for the reader's country. Since 1.0.6 that list is
+`src/lib/helplines.ts` (India, Sri Lanka, Singapore, Malaysia, UK and Ireland, US, Canada, Australia, each checked
+against the service's own site), with findahelpline.com for everywhere else.
 
 The content track runs alongside. Chapter approval and the launch pack land in
 `assets/prompts/pack_v1.json`, and it can start now.

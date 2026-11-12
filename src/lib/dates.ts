@@ -65,11 +65,3 @@ export function weekdayShort(s: Day, tamil: boolean): string {
   return tamil ? TA_DAYS[d].slice(0, 2) : EN_DAYS[d].slice(0, 3);
 }
 
-export function clock(ms: number): string {
-  const d = new Date(ms);
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-export function minutesLabel(minutes: number): string {
-  return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
-}

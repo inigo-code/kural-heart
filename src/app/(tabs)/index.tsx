@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import type { ComponentRef } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { currentThread } from '@/lib/actions';
@@ -12,7 +13,7 @@ import { useJournal } from '@/lib/journal';
 import { english, kural } from '@/lib/pack';
 import { setSettings, useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
-import { ActionRow, Avatar, FadeSwap, KuralLeaf, LinkPills, MeaningUnder, Rise, questionText } from '@/ui/common';
+import { ActionRow, Avatar, KuralLeaf, LinkPills, MeaningUnder, Rise, SmoothHeight, questionText, useCrossfade } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
 import { KolamBand, KolamRing, SikkuThreshold } from '@/ui/kolam';
 import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
@@ -40,10 +41,16 @@ export default function TodayScreen() {
   }, [day]);
   const written = entries.some((e) => e.date === day);
   const thread = currentThread();
-  const [turned, setTurned] = useState(false);
+  // Turned belongs to the couplet it was turned on: a new day's or another couplet starts face up.
+  const [turnedFor, setTurnedFor] = useState<number | null>(null);
+  const turned = turnedFor === k.n;
   const lens = s.lastLens;
   const p = PERIODS[period];
   const playing = speaker.speaking === k.n;
+  // A new couplet fades out and in on the leaf and under it together, and the space they take eases to its new size.
+  const [shownN, leafFade] = useCrossfade(k.n);
+  const shownK = kural(shownN);
+  const [question, questionFade] = useCrossfade(questionText(k, lens, tamil));
   // A new couplet on screen: whatever was being read stops, so Listen always reads what you see.
   useEffect(() => {
     stopReading();
@@ -90,28 +97,30 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
         </View>
       </Rise>
       <Rise i={1} style={{ paddingHorizontal: 20, paddingTop: 30 }}>
-        {/* A new couplet fades onto the leaf. */}
-        <FadeSwap k={k.n}>
-          <KuralLeaf k={k} turned={turned} onPress={() => router.push({ pathname: '/kural/[n]', params: { n: String(k.n) } })} />
-        </FadeSwap>
+        <SmoothHeight bleed={10}>
+          <Animated.View style={leafFade}>
+            <KuralLeaf k={shownK} turned={turned} onPress={() => router.push({ pathname: '/kural/[n]', params: { n: String(shownK.n) } })} />
+          </Animated.View>
+        </SmoothHeight>
       </Rise>
-      <Rise i={2} style={{ paddingHorizontal: 24, paddingVertical: 12 }}>
-        <FadeSwap k={k.n}>
-          <MeaningUnder k={k} />
-        </FadeSwap>
+      <Rise i={2} style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+        <SmoothHeight style={{ paddingBottom: 12 }}>
+          <Animated.View style={leafFade}>
+            <MeaningUnder k={shownK} />
+          </Animated.View>
+        </SmoothHeight>
       </Rise>
       <Rise i={3}>
         <ActionRow
           style={{ marginTop: 18 }}
           items={[
             { icon: playing ? 'stop' : 'play', label: playing ? tr('Stop', 'நிறுத்து') : tr('Listen', 'கேள்'), on: playing, onPress: () => readAloud(k, english(k, s.translation)) },
-            { icon: 'turn', label: L.turn, on: turned, onPress: () => setTurned(!turned) },
+            { icon: 'turn', label: L.turn, on: turned, onPress: () => setTurnedFor(turned ? null : k.n) },
             {
               icon: 'shuffle',
               label: tr('Another', 'வேறு குறள்'),
               onPress: () => {
                 stopReading();
-                setTurned(false);
                 anotherToday();
               },
             },
@@ -147,11 +156,13 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
             );
           })}
         </View>
-        <FadeSwap k={`${k.n}-${lens}`}>
-          <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.88 }}>
-            {questionText(k, lens, tamil)}
-          </T>
-        </FadeSwap>
+        <SmoothHeight>
+          <Animated.View style={questionFade}>
+            <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.88 }}>
+              {question}
+            </T>
+          </Animated.View>
+        </SmoothHeight>
         <Button
           label={written ? L.keep : L.write}
           icon="pen"

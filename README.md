@@ -5,7 +5,7 @@
 <p align="center">
   <a href="../../releases/latest/download/kuralheart.apk"><img alt="Download APK" src="https://img.shields.io/badge/Download-Android%20APK-B4492A?style=for-the-badge&logo=android&logoColor=white&labelColor=1E1A16"></a>
   <a href="https://inigo-code.github.io/kural-heart-site/"><img alt="Website" src="https://img.shields.io/badge/Website-Kural%20Heart-C9A45C?style=for-the-badge&logo=githubpages&logoColor=white&labelColor=1E1A16"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.5-B4492A?style=for-the-badge&labelColor=1E1A16">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.6-B4492A?style=for-the-badge&labelColor=1E1A16">
   <img alt="Expo SDK 58" src="https://img.shields.io/badge/Expo-SDK%2058-000020?style=for-the-badge&logo=expo&logoColor=white">
   <img alt="React Native" src="https://img.shields.io/badge/React%20Native-0.88-61DAFB?style=for-the-badge&logo=react&logoColor=black">
   <img alt="No account" src="https://img.shields.io/badge/Account-none-2F6B53?style=for-the-badge&labelColor=1E1A16">
