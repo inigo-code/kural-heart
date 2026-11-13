@@ -54,6 +54,8 @@ cd /c/kh/android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v
 
 For a Google Play bundle, the same short copy with `updates.requestHeaders` set to `{"expo-channel-name": "production"}` and the next versionCode, signed with the EAS key (the upload key; Play keeps the app signing key), then `./gradlew :app:bundleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a,x86_64`. GitHub APKs and Play bundles share one versionCode sequence. See `store/play-console.md`.
 
+A release: the APK goes on a GitHub release of inigo-code/kural-heart as `kuralheart.apk` and `kuralheart-X.Y.Z.apk` (the site's buttons use `releases/latest/download/kuralheart.apk`), then into the F-Droid repo with `./publish.sh path/to/kuralheart.apk` in `..\Kural Heart F-Droid` (see its README). That script also publishes the site: Pages serves `gh-pages`, so pushing the site's `main` alone changes nothing live.
+
 `modules/kural-crypto` is a local native module: Android's PBKDF2 for backups (JavaScript's took about 50 seconds). Its `android/` folder must reach the short copy: excluding every folder named `android` (robocopy `/XD android`) drops it, the app quietly falls back to JavaScript, and every backup, restore and Drive sync seems to hang (1.0.6 and 1.0.7 shipped like this). After each build, check the APK or bundle has it:
 
 ```bash

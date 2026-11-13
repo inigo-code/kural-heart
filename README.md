@@ -4,8 +4,9 @@
 
 <p align="center">
   <a href="../../releases/latest/download/kuralheart.apk"><img alt="Download APK" src="https://img.shields.io/badge/Download-Android%20APK-B4492A?style=for-the-badge&logo=android&logoColor=white&labelColor=1E1A16"></a>
+  <a href="https://inigo-code.github.io/kural-heart-site/fdroid.html"><img alt="Get it with F-Droid" src="https://img.shields.io/badge/F--Droid-Add%20the%20repo-1976D2?style=for-the-badge&logo=fdroid&logoColor=white&labelColor=1E1A16"></a>
   <a href="https://inigo-code.github.io/kural-heart-site/"><img alt="Website" src="https://img.shields.io/badge/Website-Kural%20Heart-C9A45C?style=for-the-badge&logo=githubpages&logoColor=white&labelColor=1E1A16"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.6-B4492A?style=for-the-badge&labelColor=1E1A16">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.7-B4492A?style=for-the-badge&labelColor=1E1A16">
   <img alt="Expo SDK 58" src="https://img.shields.io/badge/Expo-SDK%2058-000020?style=for-the-badge&logo=expo&logoColor=white">
   <img alt="React Native" src="https://img.shields.io/badge/React%20Native-0.88-61DAFB?style=for-the-badge&logo=react&logoColor=black">
   <img alt="No account" src="https://img.shields.io/badge/Account-none-2F6B53?style=for-the-badge&labelColor=1E1A16">
@@ -78,6 +79,14 @@ with a question to write about and a page that stays on your phone. Free, with n
 1. On your Android phone (Android 7 or later), tap **[Download APK](../../releases/latest/download/kuralheart.apk)** (or open the [latest release](../../releases/latest)).
 2. Open the file. If Android asks, allow your browser to install apps. If Play Protect warns, choose **Install anyway**.
 3. New versions install over the old one and keep your journal. Smaller updates also arrive inside the app.
+
+**Or with F-Droid**, so new versions arrive like any other update: add Kural Heart's own repository from the [F-Droid page](https://inigo-code.github.io/kural-heart-site/fdroid.html), or in F-Droid go to Settings → Repositories → **+** and enter
+
+```
+https://inigo-code.github.io/kural-heart-site/fdroid/repo?fingerprint=366D96642FFC7D10B833AFE29F9AAC8A10B592E4DEA81AF43FC5CF7BACF0B4B2
+```
+
+It serves the same signed APK as the releases, so it also updates a copy installed from here. F-Droid marks the app *NonFreeDep* and *NonFreeNet* for the optional Google Drive sync.
 
 > Kural Heart asks only for what you use: **Internet**, for the place, weather, maps, Drive and updates; **Location**, only to add a place to a page; **Camera** and **Microphone**, only for a photo, video or voice note; **Notifications**, for the morning couplet.
 
