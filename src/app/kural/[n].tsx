@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Text, View } from 'react-native';
 
 import { setToday } from '@/lib/daily';
@@ -7,7 +7,7 @@ import { useJournal } from '@/lib/journal';
 import { chapterOf, english, kural } from '@/lib/pack';
 import { markRead, toggleSaved, useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker, voiceSettings } from '@/lib/speak';
-import { ActionRow, EntryCard, MUVA_BY, kuralRef, partColor, questionText } from '@/ui/common';
+import { ActionRow, EntryCard, LensQuestion, MUVA_BY, WisdomNote, kuralRef, partColor } from '@/ui/common';
 import { CoupletText, Leaf, LeafNote, Pronounce } from '@/ui/leaf';
 import { Button, Note, Page, SectionLabel, StarButton, T, TextLink } from '@/ui/parts';
 import { F } from '@/ui/theme';
@@ -83,17 +83,19 @@ export default function KuralScreen() {
           ...(!tamil && k.ta ? [[MUVA_BY.en, k.ta, false] as const] : []),
         ]
       ).map(([by, text, italic], i) => (
-        <View key={by} style={{ marginTop: i === 0 ? 22 : 0, paddingVertical: 16, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: c.line }}>
-          <T v="small" color={c.primary} style={{ letterSpacing: 0.2 }}>
-            {by}
-          </T>
-          <Text style={[type.body, { color: c.ink, marginTop: 6 }, italic ? { fontFamily: F.serifItalic } : null]}>{text}</Text>
-        </View>
+        <Fragment key={by}>
+          <View style={{ marginTop: i === 0 ? 22 : 0, paddingVertical: 16, borderTopWidth: i === 0 || (i === 1 && k.w) ? 0 : 1, borderTopColor: c.line }}>
+            <T v="small" color={c.primary} style={{ letterSpacing: 0.2 }}>
+              {by}
+            </T>
+            <Text style={[type.body, { color: c.ink, marginTop: 6 }, italic ? { fontFamily: F.serifItalic } : null]}>{text}</Text>
+          </View>
+          {/* Living it comes right after the meaning in the reader's language, before the other renderings. */}
+          {i === 0 ? <WisdomNote k={k} style={{ marginBottom: 4 }} /> : null}
+        </Fragment>
       ))}
-      <SectionLabel>{tr('A question to write about', 'எழுதுவதற்கு ஒரு கேள்வி')}</SectionLabel>
-      <T v="headline" style={{ fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.88 }}>
-        {questionText(k, 0, tamil)}
-      </T>
+      <SectionLabel style={{ marginBottom: 0 }}>{tr('A question to write about', 'எழுதுவதற்கு ஒரு கேள்வி')}</SectionLabel>
+      <LensQuestion k={k} />
       <Button label={L.write} icon="pen" style={{ marginTop: 12 }} onPress={() => router.push({ pathname: '/write', params: { kural: String(n) } })} />
       {pages.length ? (
         <>

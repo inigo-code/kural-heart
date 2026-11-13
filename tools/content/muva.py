@@ -26,6 +26,9 @@ NUMBER = re.compile(r"^\s*(\d{1,4})\s*\.?\s*$")
 
 def _lines(path):
     s = path.read_text(encoding="utf-8")
+    # Stylesheets and scripts are page furniture: their text would otherwise end up inside an explanation (kural 1280
+    # carried a block of Wikisource CSS).
+    s = re.sub(r"<(style|script)\b[^>]*>.*?</\1>", "", s, flags=re.I | re.S)
     s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
     s = re.sub(r"</(p|div|li|h\d|tr)>", "\n", s, flags=re.I)
     s = re.sub(r"<[^>]+>", "", s)
@@ -116,11 +119,35 @@ def parse(kurals, chapter_names, distance):
                 expl.append((num, tidy(" ".join(lines))))
         if ch <= last:
             problems.append(f"{name}: stopped at chapter {ch}, expected to reach {last}")
+    problems += mend(found)
     return found, problems
+
+
+# Transcription slips in the Wikisource text, by couplet: (as transcribed, as printed). Each must match once.
+SLIPS = {
+    1: ("அதுபோல அதுபோல", "அதுபோல"),
+    6: ("ஒழுக்க தெறியில்", "ஒழுக்க நெறியில்"),
+    9: ("பார்க்கர்த", "பார்க்காத"),
+    10: ("கடடலை", "கடலை"),
+    1007: ("ஒரு ஒரு", "ஒரு"),
+}
 
 
 def tidy(s):
     s = re.sub(r"\s+", " ", s).strip()
-    # Lines broken at the page edge leave a space before punctuation.
+    # Lines broken at the page edge leave a space before punctuation, and sometimes none after it.
     s = re.sub(r"\s+([,.;:?!])", r"\1", s)
+    s = re.sub(r"([,;:])(?=[^\s\d])", r"\1 ", s)
+    s = re.sub(r"(?<=[஀-௿])\.(?=[஀-௿(])", ". ", s)
     return s
+
+
+def mend(found):
+    """Correct the known slips; a slip that no longer matches is reported, so the list stays true."""
+    problems = []
+    for n, (was, right) in SLIPS.items():
+        if found.get(n, "").count(was) == 1:
+            found[n] = found[n].replace(was, right)
+        else:
+            problems.append(f"kural {n}: slip '{was}' not found once; check tools/content/muva.py SLIPS")
+    return problems

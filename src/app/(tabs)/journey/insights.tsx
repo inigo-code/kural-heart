@@ -7,7 +7,7 @@ import { Pressable, View } from 'react-native';
 
 import { currentThread } from '@/lib/actions';
 import { PERIODS, PERIOD_ORDER, asPeriod } from '@/lib/daily';
-import { addDays, dayOf, epochDay, mondayOf, monthName, parseDay, shortDate, today, weekdayShort } from '@/lib/dates';
+import { addDays, dayOf, epochDay, mondayOf, monthName, parseDay, shortDate, weekdayShort } from '@/lib/dates';
 import type { Day } from '@/lib/dates';
 import { useJournal } from '@/lib/journal';
 import { CHAPTERS, PARTS, chapter, kural } from '@/lib/pack';
@@ -20,7 +20,7 @@ import { AthangudiCorner, MayilBorder } from '@/ui/kolam';
 import { Card, Icon, Page, SectionLabel, T, raised } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
 import { alpha } from '@/ui/theme';
-import { useUI } from '@/ui/ui';
+import { useToday, useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
 
 type Range = '30' | '365' | 'all';
@@ -212,7 +212,7 @@ function Columns({ values, labels, color }: { values: number[]; labels: string[]
 function Heatmap({ words, written, weeks, onPick, picked }: { words: Map<Day, number>; written: Set<Day>; weeks: number; onPick: (d: Day | null) => void; picked: Day | null }) {
   const { c, tamil } = useUI();
   const [width, setWidth] = useState(0);
-  const t = today();
+  const t = useToday();
   const first = addDays(mondayOf(t), -7 * (weeks - 1));
   const labelW = 22;
   const gap = 3;
@@ -334,7 +334,7 @@ function BookRings({ done }: { done: Record<Part, number> }) {
                 {tamil ? PARTS[p].ta : PARTS[p].en}
               </T>
               <T v="small" color={c.ink3}>
-                {tr(`${done[p]} of ${total(p)} chapters`, `${total(p)} இல் ${done[p]} அதிகாரங்கள்`)}
+                {tr(`${done[p]} of ${total(p)} chapters`, `${total(p)}-இல் ${done[p]} அதிகாரங்கள்`)}
               </T>
             </View>
           </View>
@@ -386,8 +386,8 @@ export default function InsightsScreen() {
   const { c, tr, tamil } = useUI();
   const s = useSettings();
   const { entries } = useJournal();
-  const thread = currentThread();
-  const t = today();
+  const t = useToday();
+  const thread = currentThread(t);
   const [range, setRange] = useState<Range>('30');
   const [trendPick, setTrendPick] = useState<number | null>(null);
   const [dayPick, setDayPick] = useState<Day | null>(null);
@@ -486,7 +486,7 @@ export default function InsightsScreen() {
     };
   }, [entries]);
 
-  const rangeName = range === '30' ? tr('Last 30 days', 'கடந்த 30 நாள்') : range === '365' ? tr('Last 12 months', 'கடந்த 12 மாதம்') : tr('All time', 'எல்லாக் காலமும்');
+  const rangeName = range === '30' ? tr('Last 30 days', 'கடந்த 30 நாட்கள்') : range === '365' ? tr('Last 12 months', 'கடந்த 12 மாதங்கள்') : tr('All time', 'எல்லாக் காலமும்');
   const trendHead =
     trendPick != null && trendPick < data.values.length
       ? { big: data.values[trendPick].toLocaleString(), small: data.labels[trendPick] }
@@ -497,7 +497,7 @@ export default function InsightsScreen() {
   const dayNote = (d: Day) => {
     if (!allTime.written.has(d)) return tr('no page', 'பக்கம் இல்லை');
     const w = allTime.words.get(d) ?? 0;
-    return tr(`${w} ${plural(w, 'word', 'words')}`, `${w} சொற்கள்`);
+    return tr(`${w} ${plural(w, 'word', 'words')}`, `${w} ${w === 1 ? 'சொல்' : 'சொற்கள்'}`);
   };
   const bestPeriod = Math.max(...data.periods) > 0 ? PERIOD_ORDER[data.periods.indexOf(Math.max(...data.periods))] : null;
   const moodTotal = data.moods.reduce((a, m) => a + m.n, 0);
@@ -508,8 +508,8 @@ export default function InsightsScreen() {
         {(
           [
             ['30', tr('30 days', '30 நாட்கள்')],
-            ['365', tr('12 months', '12 மாதம்')],
-            ['all', tr('All time', 'எல்லாம்')],
+            ['365', tr('12 months', '12 மாதங்கள்')],
+            ['all', tr('All time', 'எல்லாக் காலமும்')],
           ] as const
         ).map(([v, label]) => {
           const on = range === v;
@@ -547,7 +547,7 @@ export default function InsightsScreen() {
           <View style={{ flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center', gap: 4, marginTop: 4, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: c.surface2 }}>
             <T v="small" color={c.ink2}>
               {data.change > 0 ? '▲' : data.change < 0 ? '▼' : '•'} {Math.abs(data.change)}%{' '}
-              {range === '30' ? tr('on the 30 days before', 'முந்தைய 30 நாளை விட') : tr('on the year before', 'முந்தைய ஆண்டை விட')}
+              {range === '30' ? tr('on the 30 days before', 'முந்தைய 30 நாட்களை விட') : tr('on the year before', 'முந்தைய ஆண்டை விட')}
             </T>
           </View>
         ) : null}
@@ -565,7 +565,7 @@ export default function InsightsScreen() {
         <Tile icon="pen" value={String(data.longest)} label={tr(plural(data.longest, 'word, longest page', 'words, longest page'), 'சொற்கள், நீண்ட பக்கம்')} />
       </Rise>
 
-      <Section title={tr('Writing days', 'எழுதிய நாட்கள்')} note={dayPick ? `${weekdayShort(dayPick, tamil)} ${shortDate(dayPick, tamil)} · ${dayNote(dayPick)}` : tr('Last 18 weeks', 'கடந்த 18 வாரம்')}>
+      <Section title={tr('Writing days', 'எழுதிய நாட்கள்')} note={dayPick ? `${weekdayShort(dayPick, tamil)} ${shortDate(dayPick, tamil)} · ${dayNote(dayPick)}` : tr('Last 18 weeks', 'கடந்த 18 வாரங்கள்')}>
         <Card>
           <Heatmap words={allTime.words} written={allTime.written} weeks={18} picked={dayPick} onPick={setDayPick} />
         </Card>
@@ -631,7 +631,7 @@ export default function InsightsScreen() {
                         {tamil ? ch.ta : ch.en}
                       </T>
                       <T v="labelM" color={c.ink3}>
-                        {tr(`${count} ${plural(count, 'page', 'pages')}`, `${count} பக்கம்`)}
+                        {tr(`${count} ${plural(count, 'page', 'pages')}`, `${count} ${count === 1 ? 'பக்கம்' : 'பக்கங்கள்'}`)}
                       </T>
                     </View>
                     <View style={{ height: 6, borderRadius: 3, backgroundColor: alpha(ink, 0.15), overflow: 'hidden' }}>

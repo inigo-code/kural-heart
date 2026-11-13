@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Backups hold every photo, voice note and video, and are sealed and opened whole. Without the large heap, a
+       backup of about 90 MB runs Android out of memory while opening (192 MB limit on a Pixel 7). Merged into the app. -->
+  <application android:largeHeap="true" />
+</manifest>

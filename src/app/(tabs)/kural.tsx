@@ -62,6 +62,11 @@ export default function LibraryScreen() {
           k.en.toLowerCase().includes(ql) ||
           k.pa.toLowerCase().includes(ql) ||
           k.pb.toLowerCase().includes(ql) ||
+          // Everyday words: Mu. Va.'s modern Tamil, Pope's prose and the daily-life note find what the couplet's old
+          // words wouldn't.
+          k.ta.includes(q) ||
+          k.pp.toLowerCase().includes(ql) ||
+          (k.w ? k.w.ta.includes(q) || k.w.en.toLowerCase().includes(ql) : false) ||
           (num != null && num >= 1 && num <= 133 && ch.n === num);
         const passes =
           filter === 'saved'
@@ -98,7 +103,7 @@ export default function LibraryScreen() {
       <View style={{ paddingHorizontal: 20, paddingTop: insets.top + 12 }}>
         {from ? (
           <View style={{ marginLeft: -6, marginBottom: 8 }}>
-            <BackButton onPress={goBack} label={from === 'settings' ? tr('Back to Settings', 'அமைப்புகளுக்குத் திரும்பு') : tr('Back to Today', 'இன்றைக்குத் திரும்பு')} />
+            <BackButton onPress={goBack} label={from === 'settings' ? tr('Back to Settings', 'அமைப்புகளுக்குத் திரும்பு') : tr('Back to Today', 'இன்று திரைக்குத் திரும்பு')} />
           </View>
         ) : null}
         <T v="label" color={c.ink3}>

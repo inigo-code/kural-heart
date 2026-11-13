@@ -44,6 +44,8 @@ export type Settings = {
   pronounceStyle: 'simple' | 'scholarly';
   /** The share card's look, remembered between shares. */
   shareTheme: string;
+  /** What the share card shows under the couplet: its meaning, or its "For daily life" note. */
+  shareUnder: 'meaning' | 'life';
   /** Read-aloud voices (Android voice ids, '' for the best one found) and speed. */
   voiceTa: string;
   voiceEn: string;
@@ -66,6 +68,8 @@ export type Settings = {
   /** Seals earned, by id, with the day earned. */
   seals: Record<string, Day>;
   hasPassphrase: boolean;
+  /** "Not now" on the Journal's card about setting up a backup: it isn't shown again. */
+  backupNudgeDismissed: boolean;
 };
 
 export const DEFAULTS: Settings = {
@@ -92,6 +96,7 @@ export const DEFAULTS: Settings = {
   pronounce: true,
   pronounceStyle: 'simple',
   shareTheme: 'dawn',
+  shareUnder: 'meaning',
   voiceTa: '',
   voiceEn: '',
   speechRate: 0.85,
@@ -108,6 +113,7 @@ export const DEFAULTS: Settings = {
   dayLog: {},
   seals: {},
   hasPassphrase: false,
+  backupNudgeDismissed: false,
 };
 
 const KEY = 'kuralheart/settings';
@@ -195,7 +201,10 @@ export function exportPrefs(): Record<string, unknown> {
     journal_title: s.journalTitle,
     // The profile photo's id; its picture travels in the backup's photos with the pages' own.
     avatar: s.avatar,
+    pronounce: s.pronounce,
     pronounce_style: s.pronounceStyle,
+    read_english: s.readEnglish,
+    speech_rate: s.speechRate,
     text_scale: s.textScale,
     accent: s.accent,
     prompt_mode: s.promptMode,
@@ -245,6 +254,10 @@ export function mergeHistory(incoming: Record<string, unknown>, fresh = false) {
           ...(str(incoming.translation) ? { translation: str(incoming.translation) } : {}),
           ...(str(incoming.prompt_mode) ? { promptMode: str(incoming.prompt_mode) } : {}),
           ...(str(incoming.pronounce_style) ? { pronounceStyle: str(incoming.pronounce_style) } : {}),
+          ...(typeof incoming.pronounce === 'boolean' ? { pronounce: incoming.pronounce } : {}),
+          ...(typeof incoming.reduce_motion === 'boolean' ? { reduceMotion: incoming.reduce_motion } : {}),
+          ...(typeof incoming.read_english === 'boolean' ? { readEnglish: incoming.read_english } : {}),
+          ...(typeof incoming.speech_rate === 'number' ? { speechRate: incoming.speech_rate } : {}),
           ...(theme ? { theme } : {}),
           ...(typeof incoming.reminder_on === 'boolean' ? { reminderOn: incoming.reminder_on } : {}),
           ...(typeof incoming.reminder_minutes === 'number' ? { reminderMinutes: incoming.reminder_minutes } : {}),

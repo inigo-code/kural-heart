@@ -75,7 +75,7 @@ export function AudioNote({ id, onRemove }: { id: string; onRemove?: () => void 
       <Pressable
         onPress={toggle}
         accessibilityRole="button"
-        accessibilityLabel={st.playing ? tr('Pause voice note', 'குரல் குறிப்பை நிறுத்து') : tr('Play voice note', 'குரல் குறிப்பை இயக்கு')}
+        accessibilityLabel={st.playing ? tr('Pause voice note', 'குரல் குறிப்பை இடைநிறுத்து') : tr('Play voice note', 'குரல் குறிப்பை இயக்கு')}
         style={({ pressed }) => ({ width: 46, height: 46, borderRadius: 23, backgroundColor: c.primary, alignItems: 'center', justifyContent: 'center', transform: [{ scale: pressed ? 0.93 : 1 }] })}>
         {opening ? <ActivityIndicator color={c.onPrimary} /> : <Icon name={st.playing ? 'stop' : 'play'} size={20} color={c.onPrimary} fill />}
       </Pressable>

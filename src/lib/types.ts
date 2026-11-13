@@ -26,6 +26,8 @@ export type Entry = {
   /** Voice notes and videos, sealed the same way. */
   audio: string[];
   videos: string[];
+  /** The question as it was asked, in both languages (pages written before 1.0.7 have none). */
+  q?: { en: string; ta: string };
 };
 
 export const isTamil = (text: string) => /[஀-௿]/.test(text);

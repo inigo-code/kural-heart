@@ -17,7 +17,8 @@ export const Ico = {
   today: 'M3.5 12a4 4 0 0 1 4-4h9a4 4 0 0 1 0 8h-9a4 4 0 0 1-4-4ZM10.5 10.8h6M10.5 13.3h3.5M7.3 12h.01',
   journal: 'M6 5h11.5a2.5 2.5 0 0 1 0 5H6a2.5 2.5 0 0 1 0-5ZM6 14h11.5a2.5 2.5 0 0 1 0 5H6a2.5 2.5 0 0 1 0-5ZM7.5 2.5v19',
   journey: 'M4 18c3-1 4-4 7-4s4 3 7 2 2-6 2-6M4 18h.01M20 10h.01M12 3l1.2 2.5L16 6l-2 2 .5 2.8L12 9.5 9.5 10.8 10 8 8 6l2.8-.5Z',
-  settings: 'M17.2 3.8a2.3 2.3 0 0 1 3.2 3.2L9 18.4 4.5 19.5 5.6 15ZM15 6l3 3M5.6 15l3.4 3.4',
+  // Two sliders: the canvas drew a stylus, which read as "write" next to the Write button's pen.
+  settings: 'M4 7h8.5M17.5 7H20M4 17h2.5M11.5 17H20M17.5 7a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM11.5 17a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z',
   back: 'M15 5l-7 7 7 7',
   close: 'M6 6l12 12M18 6L6 18',
   chevron: 'M9 5l7 7-7 7',

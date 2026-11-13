@@ -1,0 +1,578 @@
+{
+  "_note": "The three questions for each chapter: Mind (what it stirs), Speech (what to say or leave unsaid), Action (one thing to do). Pool chapters take their Mind question from questions.json's \"chapter\" (which also defines the daily pool); every other chapter has its own here. Court and war chapters are read for everyday life: leading, boundaries, courage. Drafted by Claude on 12 Nov 2026, awaiting the owner's review.",
+  "1": {
+    "mind": {"en": "What do you hold as the first and highest thing in your life?", "ta": "உங்கள் வாழ்வில் முதன்மையானதாக, உயர்ந்ததாக எதைக் கருதுகிறீர்கள்?"},
+    "speech": {"en": "Whom would you thank for the beginning of who you are?", "ta": "நீங்கள் இன்று இருப்பதன் தொடக்கத்துக்காக யாருக்கு நன்றி சொல்வீர்கள்?"},
+    "action": {"en": "What small act today could honour what you hold highest?", "ta": "நீங்கள் உயர்வாகக் கருதுவதை மதிக்க இன்று என்ன சிறு செயல் செய்யலாம்?"}
+  },
+  "2": {
+    "mind": {"en": "What in your life arrives quietly, like rain, and keeps everything else alive?", "ta": "மழையைப் போல அமைதியாக வந்து, மற்ற அனைத்தையும் வாழவைப்பது உங்கள் வாழ்வில் எது?"},
+    "speech": {"en": "Who keeps you going without being thanked? What would you say to them?", "ta": "நன்றி எதிர்பாராமல் உங்களைத் தாங்குபவர் யார்? அவரிடம் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "How could you be a little rain for someone this week?", "ta": "இந்த வாரம் ஒருவருக்கு நீங்கள் எப்படிச் சிறு மழையாக இருக்கலாம்?"}
+  },
+  "3": {
+    "mind": {"en": "Whose quiet self-discipline do you admire?", "ta": "யாருடைய அமைதியான கட்டுப்பாட்டை நீங்கள் மதிக்கிறீர்கள்?"},
+    "speech": {"en": "Which wise person's words come back to you most often?", "ta": "எந்தச் சான்றோரின் சொற்கள் அடிக்கடி உங்கள் நினைவுக்கு வருகின்றன?"},
+    "action": {"en": "What could you do without this week, just to see how it feels?", "ta": "இந்த வாரம் எதை இல்லாமல் வாழ்ந்து பார்க்கலாம்?"}
+  },
+  "4": {
+    "speech": {"en": "When did you say what was right, even though it was hard?", "ta": "கடினமாக இருந்தும் சரியானதை நீங்கள் சொன்னது எப்போது?"},
+    "action": {"en": "What is one right thing you have been putting off?", "ta": "நீங்கள் தள்ளிப்போட்டு வரும் ஒரு சரியான செயல் எது?"}
+  },
+  "5": {
+    "speech": {"en": "What would you like to say to the people you live with, but rarely do?", "ta": "உடன் வாழ்பவர்களிடம் சொல்ல நினைத்தும் அரிதாகவே சொல்வது எது?"},
+    "action": {"en": "What small thing could make home easier for someone tomorrow?", "ta": "நாளை வீட்டில் ஒருவருக்கு எளிதாக்க என்ன சிறு செயல் செய்யலாம்?"}
+  },
+  "6": {
+    "mind": {"en": "What makes someone a good companion in life, to you?", "ta": "நல்ல வாழ்க்கைத் துணை என்பவர் உங்களுக்கு யார்?"},
+    "speech": {"en": "What should your closest companion hear from you that you haven't said?", "ta": "உங்கள் நெருங்கிய துணை உங்களிடமிருந்து கேட்க வேண்டிய, இன்னும் நீங்கள் சொல்லாதது எது?"},
+    "action": {"en": "How could you be a better companion to someone this week?", "ta": "இந்த வாரம் ஒருவருக்கு நீங்கள் எப்படி இன்னும் நல்ல துணையாக இருக்கலாம்?"}
+  },
+  "7": {
+    "speech": {"en": "What do you wish someone older had told you when you were young?", "ta": "சிறுவயதில் பெரியவர் ஒருவர் உங்களிடம் சொல்லியிருக்கலாம் என்று நினைப்பது எது?"},
+    "action": {"en": "What could you teach a younger person this week, by doing rather than telling?", "ta": "இந்த வாரம் இளையவர் ஒருவருக்குச் சொல்லாமல், செய்து காட்டிக் கற்பிக்கக்கூடியது எது?"}
+  },
+  "8": {
+    "speech": {"en": "Who needs to hear that you love them?", "ta": "நீங்கள் அன்பு கொண்டிருப்பதைக் கேட்க வேண்டியவர் யார்?"},
+    "action": {"en": "What small act of love could you do without being asked?", "ta": "யாரும் கேட்காமலே நீங்கள் செய்யக்கூடிய சிறு அன்புச் செயல் எது?"}
+  },
+  "9": {
+    "speech": {"en": "How do you greet the people who come to your door?", "ta": "உங்களைத் தேடி வருபவர்களை எப்படி வரவேற்கிறீர்கள்?"},
+    "action": {"en": "Whom could you invite, feed or welcome this week?", "ta": "இந்த வாரம் யாரை அழைத்து, உணவளித்து, வரவேற்கலாம்?"}
+  },
+  "10": {
+    "speech": {"en": "Which harsh word today could you have said more kindly?", "ta": "இன்று சொன்ன எந்தக் கடுஞ்சொல்லை இனிமையாகச் சொல்லியிருக்கலாம்?"},
+    "action": {"en": "Whom could you tell something kind and true tomorrow?", "ta": "நாளை யாரிடம் ஓர் இனிய, உண்மையான சொல்லைச் சொல்லலாம்?"}
+  },
+  "11": {
+    "speech": {"en": "What thanks have you left unsaid?", "ta": "சொல்லாமல் விட்ட நன்றி எது?"},
+    "action": {"en": "How could you repay a kindness this week, even in a small way?", "ta": "இந்த வாரம் சிறிதளவிலாவது ஒரு நன்மைக்குக் கைம்மாறு எப்படிச் செய்யலாம்?"}
+  },
+  "12": {
+    "speech": {"en": "When did you take a side before hearing both?", "ta": "இரு பக்கமும் கேட்பதற்கு முன்பே ஒரு பக்கம் சாய்ந்தது எப்போது?"},
+    "action": {"en": "Where could you be a little more even-handed tomorrow?", "ta": "நாளை எங்கே இன்னும் சற்று நடுநிலையாக இருக்கலாம்?"}
+  },
+  "13": {
+    "speech": {"en": "Which words do you wish you could take back?", "ta": "திரும்பப் பெற முடிந்தால் நல்லது என்று நினைக்கும் சொற்கள் எவை?"},
+    "action": {"en": "Where could you pause for one breath before reacting tomorrow?", "ta": "நாளை எதிர்வினையாற்றும் முன் எங்கே ஒரு மூச்சு நிதானிக்கலாம்?"}
+  },
+  "14": {
+    "speech": {"en": "What do you say to yourself when you slip?", "ta": "நீங்கள் தவறும்போது உங்களுக்கு நீங்களே என்ன சொல்லிக்கொள்கிறீர்கள்?"},
+    "action": {"en": "Which good habit could you begin tomorrow with just five minutes?", "ta": "நாளை ஐந்தே நிமிடங்களில் தொடங்கக்கூடிய நல்ல பழக்கம் எது?"}
+  },
+  "15": {
+    "mind": {"en": "What does faithfulness mean to you?", "ta": "உண்மையாக இருத்தல் என்பது உங்களுக்கு என்ன பொருள்?"},
+    "speech": {"en": "How do you speak of the people you are committed to when they aren't there?", "ta": "நீங்கள் உறுதிகொண்டவர்கள் இல்லாதபோது அவர்களைப் பற்றி எப்படிப் பேசுகிறீர்கள்?"},
+    "action": {"en": "What could you do this week to honour a promise of the heart?", "ta": "மனதால் தந்த ஒரு வாக்கை மதிக்க இந்த வாரம் என்ன செய்யலாம்?"}
+  },
+  "16": {
+    "speech": {"en": "Is there a sharp reply you are glad you never sent?", "ta": "அனுப்பாமல் விட்டது நல்லது என்று நினைக்கும் கடுமையான பதில் ஏதேனும் உண்டா?"},
+    "action": {"en": "Which grudge could you put down, just for one day?", "ta": "ஒரு நாளுக்கு மட்டுமாவது எந்த மனக்கசப்பை இறக்கி வைக்கலாம்?"}
+  },
+  "17": {
+    "speech": {"en": "Whom could you congratulate sincerely this week?", "ta": "இந்த வாரம் யாரை மனதாரப் பாராட்டலாம்?"},
+    "action": {"en": "How could you turn envy into effort of your own?", "ta": "பொறாமையை உங்கள் சொந்த முயற்சியாக எப்படி மாற்றலாம்?"}
+  },
+  "18": {
+    "speech": {"en": "When did you ask for more than was fair?", "ta": "நியாயத்துக்கு மேல் நீங்கள் கேட்டது எப்போது?"},
+    "action": {"en": "Which wanting could you let go of, starting today?", "ta": "இன்றிலிருந்து எந்த ஆசையை விட்டுவிடலாம்?"}
+  },
+  "19": {
+    "speech": {"en": "Is there something you said behind someone's back that you'd rather say to their face?", "ta": "ஒருவர் இல்லாதபோது சொன்னதை அவர் முன்னிலையிலேயே சொல்வது நல்லது என்று தோன்றுகிறதா?"},
+    "action": {"en": "Next time talk turns to someone who isn't there, what will you do?", "ta": "அடுத்த முறை இல்லாத ஒருவரைப் பற்றிப் பேச்சு திரும்பும்போது என்ன செய்வீர்கள்?"}
+  },
+  "20": {
+    "speech": {"en": "Which conversation today was truly worth having?", "ta": "இன்றைய எந்த உரையாடல் உண்மையில் பயனுள்ளதாக இருந்தது?"},
+    "action": {"en": "Where could you say less, and mean more, tomorrow?", "ta": "நாளை எங்கே குறைவாகப் பேசி, நிறைவாகப் பொருள்படச் சொல்லலாம்?"}
+  },
+  "21": {
+    "speech": {"en": "Have you ever talked someone out of doing harm, or been talked out of it?", "ta": "தீங்கு செய்யாமல் ஒருவரைத் தடுத்ததுண்டா, அல்லது நீங்கள் தடுக்கப்பட்டதுண்டா?"},
+    "action": {"en": "What small harm could you take care not to do this week?", "ta": "இந்த வாரம் எந்தச் சிறு தீங்கையும் செய்யாமல் இருக்க எதைக் கவனிக்கலாம்?"}
+  },
+  "22": {
+    "speech": {"en": "Whose need do you notice but never mention?", "ta": "யாருடைய தேவையைக் கவனித்தும் நீங்கள் பேசாமல் இருக்கிறீர்கள்?"},
+    "action": {"en": "What could you do for your street, building or village this week?", "ta": "இந்த வாரம் உங்கள் தெருவுக்கோ ஊருக்கோ என்ன செய்யலாம்?"}
+  },
+  "23": {
+    "speech": {"en": "How do you ask for help when you need it?", "ta": "உதவி தேவைப்படும்போது நீங்கள் எப்படிக் கேட்கிறீர்கள்?"},
+    "action": {"en": "What could you give this week, quietly, without being asked?", "ta": "இந்த வாரம் கேட்காமலே, அமைதியாக எதைக் கொடுக்கலாம்?"}
+  },
+  "24": {
+    "speech": {"en": "What would you want the people who know you best to say about you?", "ta": "உங்களை நன்கு அறிந்தவர்கள் உங்களைப் பற்றி என்ன சொல்ல வேண்டும் என்று விரும்புகிறீர்கள்?"},
+    "action": {"en": "What could you do this month that you'd be glad to be remembered for?", "ta": "நினைவுகூரப்பட மகிழும் எதை இந்த மாதம் செய்யலாம்?"}
+  },
+  "25": {
+    "speech": {"en": "What gentle word could you offer someone who is struggling?", "ta": "சிரமப்படும் ஒருவருக்கு நீங்கள் சொல்லக்கூடிய மென்மையான சொல் எது?"},
+    "action": {"en": "How could you be kind this week to a person or creature who can't repay you?", "ta": "கைம்மாறு செய்ய இயலாத ஓர் உயிருக்கு இந்த வாரம் எப்படிக் கருணை காட்டலாம்?"}
+  },
+  "26": {
+    "mind": {"en": "How do you think about the lives behind what you eat and use?", "ta": "நீங்கள் உண்பதற்கும் பயன்படுத்துவதற்கும் பின்னால் உள்ள உயிர்களை எப்படி எண்ணுகிறீர்கள்?"},
+    "speech": {"en": "Have you ever spoken up for an animal, or for someone without a voice?", "ta": "ஒரு விலங்குக்காகவோ குரலற்ற ஒருவருக்காகவோ நீங்கள் பேசியதுண்டா?"},
+    "action": {"en": "What one choice this week could be gentler on other lives?", "ta": "இந்த வாரம் பிற உயிர்களுக்கு மென்மையான ஒரு தேர்வு எது?"}
+  },
+  "27": {
+    "mind": {"en": "What hardship would you bear for something you believe in?", "ta": "நீங்கள் நம்பும் ஒன்றுக்காக எந்தச் சிரமத்தைத் தாங்கத் தயாராக இருக்கிறீர்கள்?"},
+    "speech": {"en": "When could silence serve you better than talk?", "ta": "எப்போது பேச்சை விட மௌனம் உங்களுக்கு நல்லது?"},
+    "action": {"en": "What small discipline could you keep for seven days?", "ta": "ஏழு நாட்கள் கடைப்பிடிக்கக்கூடிய ஒரு சிறு ஒழுங்கு எது?"}
+  },
+  "28": {
+    "mind": {"en": "Where does how you appear differ from how you are?", "ta": "நீங்கள் தோன்றுவதற்கும் உண்மையில் இருப்பதற்கும் எங்கே வேறுபாடு உள்ளது?"},
+    "speech": {"en": "When did you say something you didn't believe, to look good?", "ta": "நல்லவராகத் தோன்றுவதற்காக, நம்பாத ஒன்றைச் சொன்னது எப்போது?"},
+    "action": {"en": "Where could you be more plainly yourself this week?", "ta": "இந்த வாரம் எங்கே இன்னும் இயல்பாக நீங்களாகவே இருக்கலாம்?"}
+  },
+  "29": {
+    "speech": {"en": "Have you ever taken credit that belonged to someone else?", "ta": "இன்னொருவருக்குச் சேர வேண்டிய பாராட்டை நீங்கள் பெற்றதுண்டா?"},
+    "action": {"en": "What could you return, repay or set right this week?", "ta": "இந்த வாரம் எதைத் திருப்பித் தரலாம், சரிசெய்யலாம்?"}
+  },
+  "30": {
+    "speech": {"en": "Which small lie do you tell most often, and why?", "ta": "நீங்கள் அடிக்கடி சொல்லும் சிறு பொய் எது? ஏன்?"},
+    "action": {"en": "Where could you be honest tomorrow, and gentle with it?", "ta": "நாளை எங்கே மென்மையாக, உண்மையாக இருக்கலாம்?"}
+  },
+  "31": {
+    "speech": {"en": "What did you say in anger that you would say differently now?", "ta": "கோபத்தில் சொன்னதில் இப்போது வேறு விதமாகச் சொல்ல விரும்புவது எது?"},
+    "action": {"en": "What will you do the next time anger rises?", "ta": "அடுத்த முறை கோபம் எழும்போது என்ன செய்வீர்கள்?"}
+  },
+  "32": {
+    "speech": {"en": "Is someone you hurt still waiting for a word from you?", "ta": "நீங்கள் புண்படுத்திய யாராவது உங்களிடமிருந்து ஒரு சொல்லுக்காக இன்னும் காத்திருக்கிறார்களா?"},
+    "action": {"en": "How could you answer a hurt with good this week?", "ta": "இந்த வாரம் ஒரு தீங்குக்கு நன்மையால் எப்படிப் பதில் தரலாம்?"}
+  },
+  "33": {
+    "mind": {"en": "What does it mean to you to respect every life?", "ta": "எல்லா உயிர்களையும் மதித்தல் என்பது உங்களுக்கு என்ன பொருள்?"},
+    "speech": {"en": "Which words have you used that wound, even as a joke?", "ta": "நகைச்சுவையாக என்றாலும், புண்படுத்தும் எந்தச் சொற்களைப் பயன்படுத்தியிருக்கிறீர்கள்?"},
+    "action": {"en": "How could you protect a life, however small, this week?", "ta": "இந்த வாரம் சிறியதேயாயினும் ஓர் உயிரை எப்படிக் காக்கலாம்?"}
+  },
+  "34": {
+    "speech": {"en": "What would you say to someone if you knew time was short?", "ta": "நேரம் குறைவு எனத் தெரிந்தால் ஒருவரிடம் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "Knowing nothing lasts, what could you stop postponing?", "ta": "எதுவும் நிலைக்காது என அறிந்து, எதைத் தள்ளிப்போடுவதை நிறுத்தலாம்?"}
+  },
+  "35": {
+    "mind": {"en": "What do you own that has started to own you?", "ta": "நீங்கள் வைத்திருப்பதில் எது உங்களையே ஆளத் தொடங்கியிருக்கிறது?"},
+    "speech": {"en": "What could you say no to, so you can say yes to something better?", "ta": "சிறந்த ஒன்றுக்கு ஆம் சொல்ல, எதற்கு இல்லை சொல்லலாம்?"},
+    "action": {"en": "What could you give away or clear out this week?", "ta": "இந்த வாரம் எதைக் கொடுத்துவிடலாம், அகற்றலாம்?"}
+  },
+  "36": {
+    "speech": {"en": "Which truth did you refuse to hear for a long time?", "ta": "நெடுநாள் கேட்க மறுத்த உண்மை எது?"},
+    "action": {"en": "What could you look at clearly tomorrow, instead of looking away?", "ta": "நாளை எதைத் தவிர்க்காமல் தெளிவாகப் பார்க்கலாம்?"}
+  },
+  "37": {
+    "speech": {"en": "What do you keep telling yourself you need?", "ta": "உங்களுக்குத் தேவை என்று நீங்களே சொல்லிக்கொண்டிருப்பது எது?"},
+    "action": {"en": "What could you enjoy tomorrow without wanting more of it?", "ta": "நாளை எதை மேலும் வேண்டாமல், உள்ளதை மட்டும் அனுபவிக்கலாம்?"}
+  },
+  "38": {
+    "speech": {"en": "What would you tell a friend facing the same thing you can't change?", "ta": "மாற்ற முடியாத இதே நிலையில் இருக்கும் ஒரு நண்பரிடம் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "Among what you can't change, what is one thing you still can?", "ta": "மாற்ற முடியாதவற்றுக்கு நடுவே, நீங்கள் இன்னும் மாற்றக்கூடிய ஒன்று எது?"}
+  },
+  "39": {
+    "mind": {"en": "Where in your life are you the one others look to?", "ta": "உங்கள் வாழ்வில் மற்றவர்கள் எங்கே உங்களை நம்பி நோக்குகிறார்கள்?"},
+    "speech": {"en": "How do you speak to the people who depend on you?", "ta": "உங்களைச் சார்ந்திருப்பவர்களிடம் எப்படிப் பேசுகிறீர்கள்?"},
+    "action": {"en": "Which responsibility could you carry a little better this week?", "ta": "இந்த வாரம் எந்தப் பொறுப்பை இன்னும் சற்று நன்றாகச் சுமக்கலாம்?"}
+  },
+  "40": {
+    "speech": {"en": "What have you learned that you could share with someone?", "ta": "நீங்கள் கற்றதில் ஒருவருடன் பகிரக்கூடியது எது?"},
+    "action": {"en": "What will you read or learn for twenty minutes this week?", "ta": "இந்த வாரம் இருபது நிமிடம் எதைப் படிக்கலாம், கற்கலாம்?"}
+  },
+  "41": {
+    "speech": {"en": "When did you pretend to know something you didn't?", "ta": "தெரியாத ஒன்றைத் தெரிந்ததுபோல் காட்டிக்கொண்டது எப்போது?"},
+    "action": {"en": "What question could you ask tomorrow instead of guessing?", "ta": "நாளை ஊகிக்காமல் எந்தக் கேள்வியைக் கேட்கலாம்?"}
+  },
+  "42": {
+    "speech": {"en": "Whom do you listen to least, who might teach you most?", "ta": "நீங்கள் மிகக் குறைவாகச் செவிமடுப்பவர்களில், அதிகம் கற்றுத் தரக்கூடியவர் யார்?"},
+    "action": {"en": "Whom could you listen to tomorrow without interrupting?", "ta": "நாளை யார் சொல்வதை இடைமறிக்காமல் கேட்கலாம்?"}
+  },
+  "43": {
+    "speech": {"en": "Whose advice did you ignore, and later wish you hadn't?", "ta": "யாருடைய அறிவுரையைப் புறக்கணித்துப் பின்னர் வருந்தினீர்கள்?"},
+    "action": {"en": "Which decision could you think over once more before acting?", "ta": "செயல்படும் முன் எந்த முடிவை இன்னொருமுறை யோசிக்கலாம்?"}
+  },
+  "44": {
+    "speech": {"en": "Who points out your faults kindly, and do you thank them?", "ta": "உங்கள் குறைகளை அன்புடன் சுட்டிக்காட்டுபவர் யார்? அவருக்கு நன்றி சொல்கிறீர்களா?"},
+    "action": {"en": "What one step could you take against that fault tomorrow?", "ta": "அந்தக் குறைக்கு எதிராக நாளை எடுக்கக்கூடிய ஒரு படி எது?"}
+  },
+  "45": {
+    "speech": {"en": "What would you like to ask someone wiser than you?", "ta": "உங்களை விட அறிவுடைய ஒருவரிடம் கேட்க விரும்பும் கேள்வி எது?"},
+    "action": {"en": "Whom could you spend an hour with this month, just to learn?", "ta": "கற்பதற்காகவே இந்த மாதம் யாருடன் ஒரு மணி நேரம் செலவிடலாம்?"}
+  },
+  "46": {
+    "speech": {"en": "Which conversations leave you feeling smaller?", "ta": "எந்த உரையாடல்கள் உங்களைச் சிறுமைப்பட்டதாக உணர வைக்கின்றன?"},
+    "action": {"en": "Whose company could you seek more of, and whose less?", "ta": "யாருடைய உறவை அதிகம் நாடலாம், யாருடையதைக் குறைக்கலாம்?"}
+  },
+  "47": {
+    "speech": {"en": "Whom could you talk your plan through with?", "ta": "உங்கள் திட்டத்தை யாரிடம் கலந்து பேசலாம்?"},
+    "action": {"en": "What could you write down about your plan before you begin?", "ta": "தொடங்கும் முன் உங்கள் திட்டத்தைப் பற்றி எதை எழுதி வைக்கலாம்?"}
+  },
+  "48": {
+    "speech": {"en": "What could you say 'not now' to, without guilt?", "ta": "குற்றவுணர்வின்றி எதற்கு 'இப்போது வேண்டாம்' என்று சொல்லலாம்?"},
+    "action": {"en": "What could you hand over, share or set down this week?", "ta": "இந்த வாரம் எதைப் பகிர்ந்து, ஒப்படைத்து, இறக்கி வைக்கலாம்?"}
+  },
+  "49": {
+    "speech": {"en": "Is there something you said too soon, or too late?", "ta": "மிக முன்னதாகவோ மிகத் தாமதமாகவோ சொன்னது ஏதேனும் உண்டா?"},
+    "action": {"en": "What are you waiting for, and what will tell you the time has come?", "ta": "எதற்காகக் காத்திருக்கிறீர்கள்? நேரம் வந்துவிட்டதை எது உணர்த்தும்?"}
+  },
+  "50": {
+    "speech": {"en": "Where do your words carry the most weight?", "ta": "உங்கள் சொற்களுக்கு எங்கே மிகுந்த மதிப்பு உண்டு?"},
+    "action": {"en": "How could you spend more time where you are at your best?", "ta": "நீங்கள் சிறப்பாக இருக்கும் இடத்தில் எப்படி இன்னும் அதிக நேரம் செலவிடலாம்?"}
+  },
+  "51": {
+    "speech": {"en": "What do you ask before you trust someone new?", "ta": "புதியவரை நம்பும் முன் எதைக் கேட்கிறீர்கள்?"},
+    "action": {"en": "Whom could you get to know better before relying on them?", "ta": "ஒருவரைச் சார்ந்திருக்கும் முன் யாரை இன்னும் நன்றாக அறியலாம்?"}
+  },
+  "52": {
+    "speech": {"en": "Whose work could you praise for suiting them so well?", "ta": "யாருடைய வேலை அவருக்கு மிகப் பொருத்தமாக இருக்கிறது எனப் பாராட்டலாம்?"},
+    "action": {"en": "Which task could you give to the person best suited to it?", "ta": "எந்த வேலையை அதற்கு மிகப் பொருத்தமானவரிடம் ஒப்படைக்கலாம்?"}
+  },
+  "53": {
+    "speech": {"en": "What would you like to say to a relative you've drifted from?", "ta": "விலகிப்போன உறவினரிடம் என்ன சொல்ல விரும்புகிறீர்கள்?"},
+    "action": {"en": "Whom in your family could you call or visit this week?", "ta": "இந்த வாரம் குடும்பத்தில் யாரை அழைக்கலாம், சந்திக்கலாம்?"}
+  },
+  "54": {
+    "speech": {"en": "What promise have you made and forgotten?", "ta": "தந்து மறந்துபோன வாக்குறுதி எது?"},
+    "action": {"en": "What could you note down now, so it isn't forgotten?", "ta": "மறக்காமல் இருக்க இப்போதே எதைக் குறித்து வைக்கலாம்?"}
+  },
+  "55": {
+    "mind": {"en": "Where do you hold power over others, however small?", "ta": "சிறிதளவாயினும், எங்கே பிறர் மீது உங்களுக்கு அதிகாரம் உள்ளது?"},
+    "speech": {"en": "When you must correct someone, how do you say it?", "ta": "ஒருவரைத் திருத்த வேண்டியிருக்கும்போது எப்படிச் சொல்கிறீர்கள்?"},
+    "action": {"en": "What could you do to be fairer to those in your care?", "ta": "உங்கள் பொறுப்பில் உள்ளவர்களிடம் இன்னும் நியாயமாக இருக்க என்ன செய்யலாம்?"}
+  },
+  "56": {
+    "mind": {"en": "When have you seen power used harshly, and how did it feel?", "ta": "அதிகாரம் கடுமையாகப் பயன்படுத்தப்பட்டதை எப்போது பார்த்தீர்கள்? அது எப்படி இருந்தது?"},
+    "speech": {"en": "Is there a voice around you that isn't being heard?", "ta": "உங்களைச் சுற்றிக் கேட்கப்படாமல் இருக்கும் குரல் ஏதேனும் உண்டா?"},
+    "action": {"en": "How could you use whatever power you have more gently?", "ta": "உங்களிடம் உள்ள அதிகாரத்தை எப்படி இன்னும் மென்மையாகப் பயன்படுத்தலாம்?"}
+  },
+  "57": {
+    "mind": {"en": "Do the people around you feel safe telling you the truth?", "ta": "உங்களைச் சுற்றியுள்ளவர்கள் உங்களிடம் உண்மையைச் சொல்லப் பாதுகாப்பாக உணர்கிறார்களா?"},
+    "speech": {"en": "When has your tone frightened someone more than you meant?", "ta": "நீங்கள் நினைத்ததை விட உங்கள் தொனி ஒருவரை அச்சுறுத்தியது எப்போது?"},
+    "action": {"en": "How could you be easier to approach this week?", "ta": "இந்த வாரம் உங்களை அணுகுவதை எப்படி எளிதாக்கலாம்?"}
+  },
+  "58": {
+    "mind": {"en": "Whose struggles do you tend to overlook?", "ta": "யாருடைய சிரமங்களை நீங்கள் கவனிக்காமல் விடுகிறீர்கள்?"},
+    "speech": {"en": "When could a gentle word have done more than a rule?", "ta": "ஒரு விதியை விட மென்மையான சொல் அதிகம் செய்திருக்கக்கூடியது எப்போது?"},
+    "action": {"en": "With whom could you go a little easier this week?", "ta": "இந்த வாரம் யாரிடம் சற்று இளகி நடக்கலாம்?"}
+  },
+  "59": {
+    "mind": {"en": "What is really going on around you that you might be missing?", "ta": "உங்களைச் சுற்றி உண்மையில் நடப்பதில் நீங்கள் கவனிக்காமல் விடுவது எது?"},
+    "speech": {"en": "Whom could you ask how things really are?", "ta": "நிலைமை உண்மையில் எப்படி என்று யாரிடம் கேட்கலாம்?"},
+    "action": {"en": "What could you check for yourself instead of trusting hearsay?", "ta": "கேள்விப்பட்டதை நம்பாமல், எதை நீங்களே சரிபார்க்கலாம்?"}
+  },
+  "60": {
+    "speech": {"en": "Whose spirit lifts yours when you talk?", "ta": "பேசும்போது யாருடைய உற்சாகம் உங்களை உயர்த்துகிறது?"},
+    "action": {"en": "What could you put your full energy into tomorrow?", "ta": "நாளை எதில் உங்கள் முழு ஆற்றலையும் செலுத்தலாம்?"}
+  },
+  "61": {
+    "speech": {"en": "Which excuse do you hear yourself making most often?", "ta": "நீங்கள் அடிக்கடி சொல்லிக்கொள்ளும் சாக்கு எது?"},
+    "action": {"en": "What could you do first thing tomorrow, before anything else?", "ta": "நாளை எல்லாவற்றுக்கும் முன், முதலில் எதைச் செய்யலாம்?"}
+  },
+  "62": {
+    "speech": {"en": "Whom could you thank for their hard work this week?", "ta": "இந்த வாரம் யாருடைய உழைப்புக்கு நன்றி சொல்லலாம்?"},
+    "action": {"en": "Which effort could you keep up a little longer than feels easy?", "ta": "எளிதாகத் தோன்றுவதை விடச் சற்று நீண்ட நேரம் எந்த முயற்சியைத் தொடரலாம்?"}
+  },
+  "63": {
+    "speech": {"en": "Whom could you tell about your trouble, so you don't carry it alone?", "ta": "தனியாகச் சுமக்காமல் இருக்க உங்கள் சிரமத்தை யாரிடம் சொல்லலாம்?"},
+    "action": {"en": "What small thing could you do today to lighten it?", "ta": "இன்று அதைக் குறைக்க என்ன சிறு செயல் செய்யலாம்?"}
+  },
+  "64": {
+    "mind": {"en": "When did advice you gave someone truly help?", "ta": "நீங்கள் தந்த அறிவுரை ஒருவருக்கு உண்மையில் உதவியது எப்போது?"},
+    "speech": {"en": "Does someone need honest advice from you, even if it's unwelcome?", "ta": "விரும்பாவிட்டாலும், உங்களிடமிருந்து நேர்மையான அறிவுரை தேவைப்படுபவர் யாராவது உண்டா?"},
+    "action": {"en": "Whom could you help think through a decision this week?", "ta": "இந்த வாரம் ஒருவர் முடிவெடுக்க எப்படி உதவலாம்?"}
+  },
+  "65": {
+    "speech": {"en": "What do you want to say well, and to whom?", "ta": "எதை, யாரிடம் நன்றாகச் சொல்ல விரும்புகிறீர்கள்?"},
+    "action": {"en": "What could you practise saying before you need to say it?", "ta": "சொல்ல வேண்டிய நேரத்துக்கு முன், எதைச் சொல்லிப் பழகலாம்?"}
+  },
+  "66": {
+    "speech": {"en": "Has anyone asked you to cut a corner? What did you say?", "ta": "குறுக்குவழியில் செல்லும்படி யாராவது உங்களிடம் கேட்டதுண்டா? என்ன சொன்னீர்கள்?"},
+    "action": {"en": "What could you do this week cleanly, with nothing to hide?", "ta": "இந்த வாரம் மறைக்க எதுவுமின்றித் தூய்மையாக எதைச் செய்யலாம்?"}
+  },
+  "67": {
+    "speech": {"en": "Whom could you tell about your goal, so you keep going?", "ta": "தொடர்ந்து செல்ல, உங்கள் இலக்கை யாரிடம் சொல்லலாம்?"},
+    "action": {"en": "What is the next small step, and when will you take it?", "ta": "அடுத்த சிறு படி எது? அதை எப்போது எடுப்பீர்கள்?"}
+  },
+  "68": {
+    "speech": {"en": "What would you ask before starting, so it's done right?", "ta": "சரியாகச் செய்ய, தொடங்கும் முன் எதைக் கேட்பீர்கள்?"},
+    "action": {"en": "Which one task could you finish fully tomorrow?", "ta": "நாளை முழுமையாக முடிக்கக்கூடிய ஒரு வேலை எது?"}
+  },
+  "69": {
+    "mind": {"en": "When have you had to speak on someone else's behalf?", "ta": "இன்னொருவர் சார்பாக நீங்கள் பேச வேண்டியிருந்தது எப்போது?"},
+    "speech": {"en": "Is there a message you've been asked to pass on? How could you say it well?", "ta": "ஒருவர் சேர்க்கச் சொன்ன செய்தி ஏதேனும் உண்டா? அதை எப்படி நன்றாகச் சொல்லலாம்?"},
+    "action": {"en": "Which two people who should be talking could you bring together?", "ta": "பேசிக்கொள்ள வேண்டிய எந்த இருவரை ஒன்று சேர்க்கலாம்?"}
+  },
+  "70": {
+    "mind": {"en": "How do you carry yourself around people with power over you?", "ta": "உங்கள் மீது அதிகாரம் உள்ளவர்களிடையே நீங்கள் எப்படி நடந்துகொள்கிறீர்கள்?"},
+    "speech": {"en": "What do you need to say, respectfully, to someone above you?", "ta": "உங்களுக்கு மேலுள்ள ஒருவரிடம் மரியாதையுடன் சொல்ல வேண்டியது எது?"},
+    "action": {"en": "How could you be both respectful and honest at work this week?", "ta": "இந்த வாரம் வேலையில் மரியாதையாகவும் நேர்மையாகவும் எப்படி இருக்கலாம்?"}
+  },
+  "71": {
+    "speech": {"en": "Whom could you ask, 'Are you all right?'", "ta": "யாரிடம் 'நீங்கள் நலமா?' என்று கேட்கலாம்?"},
+    "action": {"en": "Whose face could you watch more closely tomorrow, to understand them?", "ta": "நாளை யாரைப் புரிந்துகொள்ள அவர் முகத்தை இன்னும் கவனிக்கலாம்?"}
+  },
+  "72": {
+    "speech": {"en": "When did you say the right thing to the wrong people?", "ta": "சரியானதைத் தவறான அவையில் சொன்னது எப்போது?"},
+    "action": {"en": "Before your next gathering, what could you think about your listeners?", "ta": "அடுத்த கூட்டத்துக்கு முன், கேட்பவர்களைப் பற்றி என்ன யோசிக்கலாம்?"}
+  },
+  "73": {
+    "speech": {"en": "What would you say if you weren't afraid?", "ta": "அச்சம் இல்லாவிட்டால் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "Where could you speak up once this week, even briefly?", "ta": "இந்த வாரம் சுருக்கமாகவேனும் ஒருமுறை எங்கே பேசலாம்?"}
+  },
+  "74": {
+    "mind": {"en": "What do you love about the place you come from?", "ta": "நீங்கள் வந்த இடத்தில் எதை நேசிக்கிறீர்கள்?"},
+    "speech": {"en": "What would you tell a visitor about your town?", "ta": "உங்கள் ஊரைப் பற்றி வருகையாளரிடம் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "What could you do this week to make your neighbourhood a little better?", "ta": "இந்த வாரம் உங்கள் சுற்றுப்புறத்தைச் சற்று மேம்படுத்த என்ன செய்யலாம்?"}
+  },
+  "75": {
+    "mind": {"en": "What keeps you steady and safe when things are hard?", "ta": "கடினமான நேரங்களில் உங்களை நிலையாக, பாதுகாப்பாக வைப்பது எது?"},
+    "speech": {"en": "Which boundary do you need to say out loud?", "ta": "நீங்கள் வெளிப்படையாகச் சொல்ல வேண்டிய எல்லை எது?"},
+    "action": {"en": "How could you strengthen your own defences this week: rest, savings, friends?", "ta": "ஓய்வு, சேமிப்பு, நட்பு: இந்த வாரம் உங்கள் அரண்களை எப்படி வலுப்படுத்தலாம்?"}
+  },
+  "76": {
+    "speech": {"en": "How do you talk about money with the people close to you?", "ta": "நெருங்கியவர்களிடம் பணத்தைப் பற்றி எப்படிப் பேசுகிறீர்கள்?"},
+    "action": {"en": "What one honest step could you take with your money this week?", "ta": "இந்த வாரம் உங்கள் பணம் குறித்து எடுக்கக்கூடிய ஒரு நேர்மையான படி எது?"}
+  },
+  "77": {
+    "mind": {"en": "Which team or group do you belong to, and what holds it together?", "ta": "நீங்கள் எந்தக் குழுவைச் சேர்ந்தவர்? அதை ஒன்றாக இணைப்பது எது?"},
+    "speech": {"en": "Whom in your team could you encourage?", "ta": "உங்கள் குழுவில் யாரை ஊக்கப்படுத்தலாம்?"},
+    "action": {"en": "How could you stand by your people this week?", "ta": "இந்த வாரம் உங்களவர்களுக்கு எப்படித் துணை நிற்கலாம்?"}
+  },
+  "78": {
+    "mind": {"en": "When were you braver than you expected to be?", "ta": "நீங்கள் எதிர்பார்த்ததை விடத் துணிவாக இருந்தது எப்போது?"},
+    "speech": {"en": "What brave thing do you need to say?", "ta": "நீங்கள் துணிந்து சொல்ல வேண்டியது எது?"},
+    "action": {"en": "What could you face this week instead of avoiding?", "ta": "இந்த வாரம் தவிர்க்காமல் எதை எதிர்கொள்ளலாம்?"}
+  },
+  "79": {
+    "speech": {"en": "What would you like to tell that friend?", "ta": "அந்த நண்பரிடம் என்ன சொல்ல விரும்புகிறீர்கள்?"},
+    "action": {"en": "How could you be there for a friend this week?", "ta": "இந்த வாரம் ஒரு நண்பருக்கு எப்படித் துணையாக இருக்கலாம்?"}
+  },
+  "80": {
+    "speech": {"en": "Which friend tells you the truth even when it stings?", "ta": "சுருக்கென்று குத்தினாலும் உண்மையைச் சொல்லும் நண்பர் யார்?"},
+    "action": {"en": "What could you do to deepen one friendship worth keeping?", "ta": "காக்கத் தகுந்த ஒரு நட்பை ஆழப்படுத்த என்ன செய்யலாம்?"}
+  },
+  "81": {
+    "speech": {"en": "Which memory would you like to share with an old friend?", "ta": "பழைய நண்பருடன் பகிர விரும்பும் நினைவு எது?"},
+    "action": {"en": "Whom could you message today, just to say hello?", "ta": "இன்று நலம் விசாரிக்கவே யாருக்குச் செய்தி அனுப்பலாம்?"}
+  },
+  "82": {
+    "speech": {"en": "What do you need to say to protect yourself in that friendship?", "ta": "அந்த நட்பில் உங்களைக் காத்துக்கொள்ள என்ன சொல்ல வேண்டும்?"},
+    "action": {"en": "How could you keep a kind distance from what harms you?", "ta": "உங்களுக்குத் தீங்கானவற்றிலிருந்து அன்புடன் எப்படி விலகி இருக்கலாம்?"}
+  },
+  "83": {
+    "speech": {"en": "When did you say something sweet you didn't mean?", "ta": "மனதில் இல்லாமல் இனிமையாகப் பேசியது எப்போது?"},
+    "action": {"en": "How could your words and your heart say the same thing this week?", "ta": "இந்த வாரம் உங்கள் சொல்லும் மனமும் ஒன்றையே சொல்ல என்ன செய்யலாம்?"}
+  },
+  "84": {
+    "speech": {"en": "Whom could you laugh with about a mistake you both made?", "ta": "இருவரும் செய்த தவறைப் பற்றி யாருடன் சேர்ந்து சிரிக்கலாம்?"},
+    "action": {"en": "What will you do differently this time?", "ta": "இந்த முறை என்ன வேறுவிதமாகச் செய்வீர்கள்?"}
+  },
+  "85": {
+    "speech": {"en": "When could you say 'I don't know' or 'I was wrong'?", "ta": "எப்போது 'எனக்குத் தெரியாது' அல்லது 'நான் தவறு செய்தேன்' என்று சொல்லலாம்?"},
+    "action": {"en": "Which view of yours could you test with someone who disagrees?", "ta": "உங்கள் எந்தக் கருத்தை, மாறுபடும் ஒருவருடன் சோதித்துப் பார்க்கலாம்?"}
+  },
+  "86": {
+    "speech": {"en": "What could you say that would soften the quarrel?", "ta": "சண்டையைத் தணிக்க என்ன சொல்லலாம்?"},
+    "action": {"en": "What could you let go of, even if you're right?", "ta": "நீங்கள் சரியாக இருந்தாலும், எதை விட்டுக்கொடுக்கலாம்?"}
+  },
+  "87": {
+    "speech": {"en": "Whom could you ask for help with it?", "ta": "அதற்கு யாரிடம் உதவி கேட்கலாம்?"},
+    "action": {"en": "What could you prepare this week, before it comes?", "ta": "அது வருவதற்கு முன் இந்த வாரம் எதை ஆயத்தம் செய்யலாம்?"}
+  },
+  "88": {
+    "speech": {"en": "What do you say, or leave unsaid, to someone who is against you?", "ta": "உங்களுக்கு எதிரானவரிடம் எதைச் சொல்கிறீர்கள், எதைச் சொல்லாமல் விடுகிறீர்கள்?"},
+    "action": {"en": "How could you protect your peace from someone unkind this week?", "ta": "இந்த வாரம் அன்பில்லாத ஒருவரிடமிருந்து உங்கள் அமைதியை எப்படிக் காக்கலாம்?"}
+  },
+  "89": {
+    "speech": {"en": "If you spoke honestly about it, what would you tell them?", "ta": "அதைப் பற்றி நேர்மையாகப் பேசினால் அவரிடம் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "What could you do to clear the air before it grows?", "ta": "அது வளர்வதற்கு முன் மனத்தைத் தெளிவுபடுத்த என்ன செய்யலாம்?"}
+  },
+  "90": {
+    "mind": {"en": "Whom do you deeply respect, and why?", "ta": "யாரை ஆழமாக மதிக்கிறீர்கள்? ஏன்?"},
+    "speech": {"en": "Have you spoken carelessly to someone who deserved more respect?", "ta": "அதிக மதிப்புக்குரிய ஒருவரிடம் கவனமின்றிப் பேசியதுண்டா?"},
+    "action": {"en": "How could you show respect to an elder or teacher this week?", "ta": "இந்த வாரம் ஒரு பெரியவருக்கோ ஆசிரியருக்கோ எப்படி மதிப்பைக் காட்டலாம்?"}
+  },
+  "91": {
+    "mind": {"en": "In your closest relationship, do you still think for yourself?", "ta": "உங்கள் நெருங்கிய உறவில், நீங்கள் இன்னும் சுயமாகச் சிந்திக்கிறீர்களா?"},
+    "speech": {"en": "What have you agreed to only to keep the peace?", "ta": "அமைதிக்காக மட்டுமே நீங்கள் ஒப்புக்கொண்டது எது?"},
+    "action": {"en": "Which decision could you make together, as equals, this week?", "ta": "இந்த வாரம் இருவரும் சமமாக, சேர்ந்து எடுக்கக்கூடிய முடிவு எது?"}
+  },
+  "92": {
+    "mind": {"en": "Which of your relationships rest on what you get, rather than who they are?", "ta": "உங்கள் உறவுகளில் எவை, அவர் யார் என்பதை விட நீங்கள் பெறுவதைச் சார்ந்திருக்கின்றன?"},
+    "speech": {"en": "When has flattery been used to get something from you?", "ta": "உங்களிடமிருந்து எதையோ பெற முகஸ்துதி பயன்படுத்தப்பட்டது எப்போது?"},
+    "action": {"en": "How could you give your care where it is truly returned?", "ta": "உண்மையாகத் திரும்பக் கிடைக்கும் இடத்தில் உங்கள் அன்பை எப்படிச் செலுத்தலாம்?"}
+  },
+  "93": {
+    "mind": {"en": "Is there a habit you reach for to escape?", "ta": "தப்பிக்க நீங்கள் நாடும் பழக்கம் ஏதேனும் உண்டா?"},
+    "speech": {"en": "Whom could you be honest with about it?", "ta": "அதைப் பற்றி யாரிடம் நேர்மையாகப் பேசலாம்?"},
+    "action": {"en": "What could you do instead, the next time you want to escape?", "ta": "அடுத்த முறை தப்பிக்கத் தோன்றும்போது அதற்குப் பதிலாக என்ன செய்யலாம்?"}
+  },
+  "94": {
+    "speech": {"en": "When has someone talked you into a risk you regretted?", "ta": "நீங்கள் வருந்திய ஓர் இடருக்கு யாராவது உங்களைத் தூண்டியது எப்போது?"},
+    "action": {"en": "What could you protect better this week, so it isn't left to chance?", "ta": "வாய்ப்பின் கையில் விடாமல் இந்த வாரம் எதை இன்னும் நன்றாகக் காக்கலாம்?"}
+  },
+  "95": {
+    "speech": {"en": "What do you need to tell a doctor, or someone close, about your health?", "ta": "உங்கள் உடல்நலம் பற்றி மருத்துவரிடமோ நெருங்கியவரிடமோ சொல்ல வேண்டியது எது?"},
+    "action": {"en": "Could you eat, sleep or move a little better tomorrow? Which one?", "ta": "நாளை உணவு, உறக்கம், உடலசைவு இவற்றில் எதைச் சற்று மேம்படுத்தலாம்?"}
+  },
+  "96": {
+    "speech": {"en": "Which family story do you want to pass on?", "ta": "நீங்கள் அடுத்த தலைமுறைக்குச் சொல்ல விரும்பும் குடும்பக் கதை எது?"},
+    "action": {"en": "How could you honour your family's best qualities this week?", "ta": "இந்த வாரம் உங்கள் குடும்பத்தின் சிறந்த பண்புகளை எப்படிப் போற்றலாம்?"}
+  },
+  "97": {
+    "speech": {"en": "When did you refuse something because it would cost your self-respect?", "ta": "தன்மானத்துக்கு விலையாகும் என்பதால் எதையாவது மறுத்தது எப்போது?"},
+    "action": {"en": "What could you do this week that you'd be proud of even in private?", "ta": "தனிமையிலும் பெருமைப்படக்கூடிய எதை இந்த வாரம் செய்யலாம்?"}
+  },
+  "98": {
+    "speech": {"en": "Where could you let your actions speak instead of your words?", "ta": "எங்கே சொல்லுக்குப் பதில் உங்கள் செயல் பேசட்டும் என்று விடலாம்?"},
+    "action": {"en": "Which humble task could you do gladly this week?", "ta": "இந்த வாரம் எந்த எளிய வேலையை மகிழ்ச்சியுடன் செய்யலாம்?"}
+  },
+  "99": {
+    "speech": {"en": "Whose good character could you tell them you admire?", "ta": "யாருடைய நற்பண்பை நீங்கள் போற்றுவதாக அவரிடமே சொல்லலாம்?"},
+    "action": {"en": "What could you practise this week to grow that quality?", "ta": "அந்தப் பண்பை வளர்க்க இந்த வாரம் எதைப் பழகலாம்?"}
+  },
+  "100": {
+    "speech": {"en": "With whom could you be more courteous, especially when you're tired?", "ta": "களைப்பாக இருக்கும்போதுகூட, யாரிடம் இன்னும் பண்புடன் பேசலாம்?"},
+    "action": {"en": "What small courtesy could you offer a stranger tomorrow?", "ta": "நாளை ஓர் அந்நியருக்கு என்ன சிறு மரியாதை செய்யலாம்?"}
+  },
+  "101": {
+    "speech": {"en": "What do you tell yourself when you hold on to more than you need?", "ta": "தேவைக்கு மேல் பிடித்து வைக்கும்போது உங்களுக்கு நீங்களே என்ன சொல்லிக்கொள்கிறீர்கள்?"},
+    "action": {"en": "What could you put to good use this week instead of keeping it idle?", "ta": "சும்மா வைத்திருக்காமல் இந்த வாரம் எதை நல்ல பயனுக்குப் பயன்படுத்தலாம்?"}
+  },
+  "102": {
+    "speech": {"en": "When did you stop yourself from saying something you'd be ashamed of?", "ta": "வெட்கப்படக்கூடிய ஒன்றைச் சொல்லாமல் உங்களைத் தடுத்துக்கொண்டது எப்போது?"},
+    "action": {"en": "Which line will you hold this week, whatever happens?", "ta": "என்ன நடந்தாலும் இந்த வாரம் எந்த எல்லையைத் தாண்டமாட்டீர்கள்?"}
+  },
+  "103": {
+    "speech": {"en": "What encouragement could you give someone in your family?", "ta": "குடும்பத்தில் ஒருவருக்கு என்ன ஊக்கம் தரலாம்?"},
+    "action": {"en": "What one thing could you start this week for your family's future?", "ta": "உங்கள் குடும்பத்தின் எதிர்காலத்துக்காக இந்த வாரம் எதைத் தொடங்கலாம்?"}
+  },
+  "104": {
+    "speech": {"en": "Whom could you thank for the food on your plate?", "ta": "உங்கள் தட்டில் உள்ள உணவுக்காக யாருக்கு நன்றி சொல்லலாம்?"},
+    "action": {"en": "What could you grow, cook, or waste less of this week?", "ta": "இந்த வாரம் எதை வளர்க்கலாம், சமைக்கலாம், அல்லது வீணாக்காமல் இருக்கலாம்?"}
+  },
+  "105": {
+    "speech": {"en": "Whom could you ask for help, or offer it to, without shame?", "ta": "வெட்கமின்றி யாரிடம் உதவி கேட்கலாம், அல்லது யாருக்கு உதவலாம்?"},
+    "action": {"en": "What could you do this week for someone who is going without?", "ta": "இல்லாமையில் இருக்கும் ஒருவருக்கு இந்த வாரம் என்ன செய்யலாம்?"}
+  },
+  "106": {
+    "mind": {"en": "How do you feel about asking others for help?", "ta": "பிறரிடம் உதவி கேட்பதைப் பற்றி நீங்கள் எப்படி உணர்கிறீர்கள்?"},
+    "speech": {"en": "What do you need to ask for, and whom could you ask?", "ta": "நீங்கள் கேட்க வேண்டியது எது? யாரிடம் கேட்கலாம்?"},
+    "action": {"en": "How could you make it easier for someone to ask you for help?", "ta": "ஒருவர் உங்களிடம் உதவி கேட்பதை எப்படி எளிதாக்கலாம்?"}
+  },
+  "107": {
+    "mind": {"en": "What would you rather struggle with than ask anyone for?", "ta": "யாரிடமும் கேட்பதை விடப் போராடுவதே மேல் என்று எதை நினைக்கிறீர்கள்?"},
+    "speech": {"en": "When did you help someone without making them feel small?", "ta": "ஒருவரைச் சிறுமைப்படுத்தாமல் உதவியது எப்போது?"},
+    "action": {"en": "What could you do this week to stand a little more on your own feet?", "ta": "இந்த வாரம் இன்னும் சற்றுச் சொந்தக் காலில் நிற்க என்ன செய்யலாம்?"}
+  },
+  "108": {
+    "mind": {"en": "When have you seen someone behave well only out of fear?", "ta": "அச்சத்தால் மட்டுமே ஒருவர் நன்றாக நடந்துகொண்டதை எப்போது பார்த்தீர்கள்?"},
+    "speech": {"en": "Have you ever boasted about something you shouldn't have?", "ta": "பெருமைப்படக்கூடாத ஒன்றைப் பற்றிப் பெருமை பேசியதுண்டா?"},
+    "action": {"en": "What good could you do this week with no one watching?", "ta": "இந்த வாரம் யாரும் பார்க்காதபோது என்ன நன்மை செய்யலாம்?"}
+  },
+  "109": {
+    "mind": {"en": "Whose beauty first stopped you in your tracks?", "ta": "யாருடைய அழகு உங்களை முதன்முதலில் திகைக்க வைத்தது?"},
+    "speech": {"en": "What didn't you dare to say when you first met someone you came to love?", "ta": "பின்னர் நேசித்த ஒருவரை முதலில் சந்தித்தபோது சொல்லத் துணியாதது எது?"},
+    "action": {"en": "How could you notice the beauty in someone close to you tomorrow?", "ta": "நாளை உங்களுக்கு நெருங்கிய ஒருவரின் அழகை எப்படிக் கவனிக்கலாம்?"}
+  },
+  "110": {
+    "mind": {"en": "What do the eyes of someone you love tell you without words?", "ta": "நீங்கள் நேசிப்பவரின் கண்கள் சொல்லாமலே உங்களுக்குச் சொல்வது எது?"},
+    "speech": {"en": "What have you said with a look instead of words?", "ta": "சொல்லுக்குப் பதிலாகப் பார்வையால் நீங்கள் சொன்னது எது?"},
+    "action": {"en": "How could you show someone you understand them, without saying it?", "ta": "சொல்லாமலே ஒருவரைப் புரிந்துகொண்டதை எப்படிக் காட்டலாம்?"}
+  },
+  "111": {
+    "mind": {"en": "When do you feel most at ease with the one you love?", "ta": "நேசிப்பவருடன் நீங்கள் மிக நிம்மதியாக உணர்வது எப்போது?"},
+    "speech": {"en": "What does being together give you that you've never put into words?", "ta": "சேர்ந்திருப்பது உங்களுக்குத் தருவதில், நீங்கள் இன்னும் சொல்லில் வடிக்காதது எது?"},
+    "action": {"en": "How could you make time just to be together this week?", "ta": "இந்த வாரம் சேர்ந்திருப்பதற்கென்றே எப்படி நேரம் ஒதுக்கலாம்?"}
+  },
+  "112": {
+    "mind": {"en": "What do you find beautiful in someone you love?", "ta": "நீங்கள் நேசிப்பவரிடம் எதை அழகாகக் காண்கிறீர்கள்?"},
+    "speech": {"en": "What could you praise in them today, plainly and truly?", "ta": "இன்று அவரிடம் எதை எளிமையாக, உண்மையாகப் பாராட்டலாம்?"},
+    "action": {"en": "How could you celebrate someone you love this week?", "ta": "இந்த வாரம் நீங்கள் நேசிப்பவரை எப்படிக் கொண்டாடலாம்?"}
+  },
+  "113": {
+    "speech": {"en": "When did you last tell them?", "ta": "கடைசியாக அதை அவரிடம் சொன்னது எப்போது?"},
+    "action": {"en": "What could you do today that says 'I love you' without words?", "ta": "சொல்லாமலே 'உன்னை நேசிக்கிறேன்' என்று உணர்த்தும் எதை இன்று செய்யலாம்?"}
+  },
+  "114": {
+    "mind": {"en": "When did love make you braver than usual?", "ta": "காதல் உங்களை வழக்கத்தை விடத் துணிவாக்கியது எப்போது?"},
+    "speech": {"en": "Which feeling have you hidden because you were shy?", "ta": "கூச்சத்தால் நீங்கள் மறைத்த உணர்வு எது?"},
+    "action": {"en": "How could you show this week what you've kept hidden too long?", "ta": "நெடுநாள் மறைத்து வைத்ததை இந்த வாரம் எப்படி வெளிப்படுத்தலாம்?"}
+  },
+  "115": {
+    "speech": {"en": "Is there gossip you could stop, simply by not repeating it?", "ta": "திருப்பிச் சொல்லாமலே நிறுத்தக்கூடிய வதந்தி ஏதேனும் உண்டா?"},
+    "action": {"en": "How could you live this week by what you know is true, not by talk?", "ta": "இந்த வாரம் ஊர்ப்பேச்சை விட, உண்மை என நீங்கள் அறிந்ததன்படி எப்படி வாழலாம்?"}
+  },
+  "116": {
+    "speech": {"en": "What would you say to them if they were here now?", "ta": "அவர் இப்போது இங்கே இருந்தால் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "How could you stay close across the distance this week?", "ta": "இந்த வாரம் தொலைவைத் தாண்டி எப்படி நெருக்கமாக இருக்கலாம்?"}
+  },
+  "117": {
+    "speech": {"en": "What is the message you keep writing in your head?", "ta": "மனதுக்குள் நீங்கள் மீண்டும் மீண்டும் எழுதும் செய்தி எது?"},
+    "action": {"en": "Could you send them a few words today?", "ta": "இன்று அவருக்குச் சில சொற்கள் அனுப்பலாமா?"}
+  },
+  "118": {
+    "mind": {"en": "Whom do your eyes look for in a crowd?", "ta": "கூட்டத்தில் உங்கள் கண்கள் யாரைத் தேடுகின்றன?"},
+    "speech": {"en": "Whom have you cried for, and have you told anyone?", "ta": "யாருக்காக அழுதிருக்கிறீர்கள்? அதை யாரிடமாவது சொன்னீர்களா?"},
+    "action": {"en": "What could you look at today that brings them close?", "ta": "அவரை நெருக்கமாக உணர வைக்கும் எதை இன்று பார்க்கலாம்?"}
+  },
+  "119": {
+    "mind": {"en": "How does missing someone show in your body?", "ta": "ஒருவருக்காக ஏங்குவது உங்கள் உடலில் எப்படித் தெரிகிறது?"},
+    "speech": {"en": "Who noticed you weren't yourself, and what did you tell them?", "ta": "நீங்கள் நீங்களாக இல்லை என்பதை யார் கவனித்தார்? அவரிடம் என்ன சொன்னீர்கள்?"},
+    "action": {"en": "How could you look after yourself while you wait?", "ta": "காத்திருக்கும்போது உங்களை எப்படிக் கவனித்துக்கொள்ளலாம்?"}
+  },
+  "120": {
+    "speech": {"en": "Whom could you tell how alone you feel?", "ta": "நீங்கள் எவ்வளவு தனிமையாக உணர்கிறீர்கள் என்பதை யாரிடம் சொல்லலாம்?"},
+    "action": {"en": "What could you do today so loneliness has less room?", "ta": "தனிமைக்கு இடம் குறைய இன்று என்ன செய்யலாம்?"}
+  },
+  "121": {
+    "speech": {"en": "Whom could you share that memory with?", "ta": "அந்த நினைவை யாருடன் பகிரலாம்?"},
+    "action": {"en": "How could you honour that memory this week?", "ta": "இந்த வாரம் அந்த நினைவை எப்படிப் போற்றலாம்?"}
+  },
+  "122": {
+    "mind": {"en": "Who has come to you in a dream, and what did it mean to you?", "ta": "கனவில் யார் உங்களிடம் வந்தார்? அது உங்களுக்கு என்ன பொருள் தந்தது?"},
+    "speech": {"en": "What did you say in a dream that you couldn't say awake?", "ta": "விழித்திருக்கும்போது சொல்ல முடியாத எதைக் கனவில் சொன்னீர்கள்?"},
+    "action": {"en": "What could you write down tonight before you sleep?", "ta": "இன்றிரவு உறங்கும் முன் எதை எழுதி வைக்கலாம்?"}
+  },
+  "123": {
+    "speech": {"en": "What would you tell them at that hour?", "ta": "அந்த நேரத்தில் அவரிடம் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "How could you make that hour gentler for yourself?", "ta": "அந்த நேரத்தை உங்களுக்கு எப்படி இன்னும் மென்மையாக்கலாம்?"}
+  },
+  "124": {
+    "mind": {"en": "When has sorrow worn you down, and what brought you back?", "ta": "துயரம் உங்களைத் தளர்த்தியது எப்போது? உங்களை மீட்டது எது?"},
+    "speech": {"en": "Whom could you tell that you are not doing well?", "ta": "நீங்கள் நலமாக இல்லை என்பதை யாரிடம் சொல்லலாம்?"},
+    "action": {"en": "What is one kind thing you could do for your body today?", "ta": "இன்று உங்கள் உடலுக்குச் செய்யக்கூடிய ஓர் அன்பான செயல் எது?"}
+  },
+  "125": {
+    "mind": {"en": "What is your heart telling you that you keep ignoring?", "ta": "நீங்கள் புறக்கணித்தும் உங்கள் நெஞ்சம் சொல்லிக்கொண்டிருப்பது எது?"},
+    "speech": {"en": "If you spoke to your own heart now, what would you say?", "ta": "இப்போது உங்கள் நெஞ்சோடு பேசினால் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "What has your heart been asking for that you could do today?", "ta": "உங்கள் நெஞ்சம் கேட்டுக்கொண்டிருப்பதில் இன்று எதைச் செய்யலாம்?"}
+  },
+  "126": {
+    "mind": {"en": "When did a feeling overflow, however hard you held it in?", "ta": "எவ்வளவு அடக்கியும் ஓர் உணர்வு பொங்கி வழிந்தது எப்போது?"},
+    "speech": {"en": "Which feeling are you working hard to hide right now?", "ta": "இப்போது எந்த உணர்வை மறைக்கக் கடுமையாக முயல்கிறீர்கள்?"},
+    "action": {"en": "Where could you let a feeling out safely this week?", "ta": "இந்த வாரம் எங்கே ஓர் உணர்வைப் பாதுகாப்பாக வெளிப்படுத்தலாம்?"}
+  },
+  "127": {
+    "speech": {"en": "What will you say first when you meet?", "ta": "சந்திக்கும்போது முதலில் என்ன சொல்வீர்கள்?"},
+    "action": {"en": "What could you prepare for that meeting?", "ta": "அந்தச் சந்திப்புக்கு என்ன ஆயத்தம் செய்யலாம்?"}
+  },
+  "128": {
+    "mind": {"en": "What is someone close trying to tell you without words?", "ta": "நெருங்கிய ஒருவர் சொல்லாமல் உங்களுக்கு உணர்த்த முயல்வது எது?"},
+    "speech": {"en": "What hint have you given that you wish someone would understand?", "ta": "யாராவது புரிந்துகொள்ள வேண்டும் என விரும்பி நீங்கள் தந்த குறிப்பு எது?"},
+    "action": {"en": "How could you say plainly this week what you've only hinted at?", "ta": "இதுவரை குறிப்பால் மட்டும் உணர்த்தியதை இந்த வாரம் எப்படி வெளிப்படையாகச் சொல்லலாம்?"}
+  },
+  "129": {
+    "mind": {"en": "Whom are you longing to see?", "ta": "யாரைக் காண ஏங்குகிறீர்கள்?"},
+    "speech": {"en": "What would you like to tell them about how much you've missed them?", "ta": "அவரை எவ்வளவு எண்ணி ஏங்கினீர்கள் என்பதை அவரிடம் எப்படிச் சொல்ல விரும்புகிறீர்கள்?"},
+    "action": {"en": "What could bring that meeting a little closer?", "ta": "அந்தச் சந்திப்பைச் சற்று அருகில் கொண்டுவர என்ன செய்யலாம்?"}
+  },
+  "130": {
+    "speech": {"en": "If your heart and your head talked it over, what would each say?", "ta": "உங்கள் நெஞ்சும் அறிவும் பேசிக்கொண்டால், ஒவ்வொன்றும் என்ன சொல்லும்?"},
+    "action": {"en": "What small step could honour both your heart and your head?", "ta": "நெஞ்சையும் அறிவையும் ஒருசேர மதிக்கும் ஒரு சிறு படி எது?"}
+  },
+  "131": {
+    "speech": {"en": "What do you say, or leave unsaid, when someone you love hurts you?", "ta": "நேசிப்பவர் புண்படுத்தும்போது எதைச் சொல்கிறீர்கள், எதைச் சொல்லாமல் விடுகிறீர்கள்?"},
+    "action": {"en": "Next time, how could you be the first to make up?", "ta": "அடுத்த முறை முதலில் சமாதானமாக நீங்கள் என்ன செய்யலாம்?"}
+  },
+  "132": {
+    "speech": {"en": "Did you tell them you noticed?", "ta": "நீங்கள் கவனித்ததை அவரிடம் சொன்னீர்களா?"},
+    "action": {"en": "What small thing could you do for them in return?", "ta": "பதிலுக்கு அவருக்கு என்ன சிறு செயல் செய்யலாம்?"}
+  },
+  "133": {
+    "speech": {"en": "Which words help you make peace after a quarrel?", "ta": "சண்டைக்குப் பிறகு சமாதானமாக எந்தச் சொற்கள் உதவுகின்றன?"},
+    "action": {"en": "How could you end a small disagreement with warmth?", "ta": "ஒரு சிறு கருத்துவேறுபாட்டை அன்புடன் எப்படி முடிக்கலாம்?"}
+  }
+}

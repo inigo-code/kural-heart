@@ -29,7 +29,7 @@ type BarProps = {
 };
 
 function NavBar({ state, navigateToTab }: BarProps) {
-  const { c, L, scale } = useUI();
+  const { c, L, scale, tamil } = useUI();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   // At the largest text sizes only the open tab keeps its label.
@@ -80,9 +80,13 @@ function NavBar({ state, navigateToTab }: BarProps) {
                   minimumFontScale={0.75}
                   color={on ? c.ink : c.ink2}
                   style={{
+                    // The whole tab's width, so a long Tamil word in bold isn't cut short.
+                    alignSelf: 'stretch',
+                    textAlign: 'center',
                     marginTop: 4,
+                    paddingHorizontal: 2,
                     fontFamily: on ? F.sansBold : F.sansMedium,
-                    fontSize: 12 * Math.min(scale, 1.15),
+                    fontSize: (tamil ? 11 : 12) * Math.min(scale, 1.15),
                     lineHeight: 16 * Math.min(scale, 1.15),
                   }}>
                   {L[tab.label]}

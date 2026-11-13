@@ -1,19 +1,25 @@
 // "What's new" after every update (Heart Apps rule): bump ID and write its lines with each release or eas update.
 
 export const WHATS_NEW = {
-  id: 17,
+  id: 18,
   en: [
-    'Valluvar moves more naturally: his arms stay with his shoulders as he breathes, writes and waves.',
-    'Turning the leaf and changing the couplet are smooth now, with nothing jumping underneath.',
-    'G. U. Pope’s prose is the English under each couplet unless you choose another.',
-    'Real helplines for a very heavy day, by country, one tap from your phone’s dialler.',
-    'A clearer gold star, backup times on the 12-hour clock, and a cleaner start screen.',
+    'Every chapter now asks its own three questions, for Mind, Speech and Action, in English and Tamil.',
+    'For daily life: a short note under every couplet on living it today. It can go on your share images too.',
+    'Drive sync is surer: a page you delete stays deleted, and editing a synced page no longer leaves a second copy.',
+    'Change your passphrase on the Backup page; your backups are locked again with the new one straight away.',
+    'Restoring from Google Drive is much faster, and Backup sits right under your profile in Settings.',
+    'When writing, photos, voice notes, date, time, weather, place and tags are all right under the page.',
+    'The daily reminder now pops up on screen, and stays quiet on a day you’ve already written. On this day finds any earlier year.',
+    'Tamil text no longer gets cut off, and many Tamil words and phrases read better. The map pinches to zoom.',
   ],
   ta: [
-    'வள்ளுவர் இயல்பாக அசைகிறார்: மூச்சிலும் எழுதும்போதும் கையசைக்கும்போதும் கைகள் தோளோடு இணைந்திருக்கும்.',
-    'ஓலையைப் புரட்டுவதும் குறளை மாற்றுவதும் இப்போது மென்மையானவை; கீழே எதுவும் துள்ளுவதில்லை.',
-    'நீங்கள் வேறொன்றைத் தேர்ந்தெடுக்காவிட்டால், ஒவ்வொரு குறளின் கீழும் ஜி. யு. போப்பின் உரைநடை.',
-    'மிகக் கனமான நாளுக்கு, நாடு வாரியாக உண்மையான உதவி எண்கள், ஒரு தொடுதலில் அழைக்கலாம்.',
-    'தெளிவான பொன் நட்சத்திரம், 12 மணி நேரக் கடிகாரத்தில் காப்பு நேரம், சீரான தொடக்கத் திரை.',
+    'ஒவ்வோர் அதிகாரத்துக்கும் இப்போது மனம், சொல், செயல் என மூன்று தனிக் கேள்விகள், தமிழிலும் ஆங்கிலத்திலும்.',
+    'அன்றாட வாழ்வில்: ஒவ்வொரு குறளையும் இன்று வாழ்வில் கொள்ள ஒரு சிறு குறிப்பு. பகிரும் படங்களிலும் சேர்க்கலாம்.',
+    'Drive ஒத்திசைவு இன்னும் உறுதியானது: நீக்கிய பக்கம் நீக்கியபடியே இருக்கும்; ஒத்திசைந்த பக்கத்தைத் திருத்தினால் இனி இரண்டாவது பிரதி உருவாகாது.',
+    'காப்புப் பக்கத்தில் கடவுச்சொற்றொடரை மாற்றலாம்; உங்கள் காப்புகள் உடனே புதியதால் மீண்டும் பூட்டப்படும்.',
+    'Google Drive-இலிருந்து மீட்பது மிக விரைவாகிறது; காப்பு இப்போது அமைப்புகளில் உங்கள் சுயவிவரத்துக்குக் கீழேயே.',
+    'எழுதும்போது படங்கள், குரல் குறிப்பு, தேதி, நேரம், வானிலை, இடம், குறிச்சொற்கள் எல்லாம் பக்கத்துக்குக் கீழேயே.',
+    'நாள்தோறும் நினைவூட்டல் இப்போது திரையில் தோன்றும்; ஏற்கெனவே எழுதிய நாளில் வராது. “இதே நாள்” முந்தைய எந்த ஆண்டையும் காட்டும்.',
+    'தமிழ் எழுத்துகள் இனி வெட்டுப்படுவதில்லை; பல தமிழ்ச் சொற்களும் தொடர்களும் மேம்பட்டன. வரைபடத்தை இரு விரல்களால் பெரிதாக்கலாம்.',
   ],
 };

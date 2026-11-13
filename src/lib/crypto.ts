@@ -105,7 +105,9 @@ export async function openBackup(file: Uint8Array, pass: string): Promise<Uint8A
   raw.fill(0);
   try {
     return await aesDecryptAsync(AESSealedData.fromCombined(file.slice(24)), k, { additionalData: MAGIC });
-  } catch {
+  } catch (e) {
+    // A backup too big for the phone's memory fails here too; that must not read as a wrong passphrase.
+    if (/Failed to allocate|OutOfMemory/i.test(e instanceof Error ? e.message : String(e))) throw new BackupError('memory');
     throw new BackupError("That passphrase doesn't open this backup.");
   }
 }

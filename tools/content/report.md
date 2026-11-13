@@ -32,4 +32,8 @@ Printed numbers corrected by position in the record: 72 (printed 71), 753 (print
 
 - chapter 69: 9 explanations; none shipped for couplets [2]
 
-The text is the Wikisource transcription of the 1969 scan, kept as it is. It has a few transcription slips (a doubled word at kural 1, for example) that are worth a proofreader's eye.
+The text is the Wikisource transcription of the 1969 scan. Known transcription slips are corrected in tools/content/muva.py (SLIPS); others may remain and are worth a proofreader's eye.
+
+## For daily life
+
+1330 of 1,330 couplets have a note (tools/content/wisdom.json).

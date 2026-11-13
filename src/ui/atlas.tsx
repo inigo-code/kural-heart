@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
 import * as Linking from 'expo-linking';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ComponentRef } from 'react';
 import { PanResponder, Platform, Pressable, Text, View } from 'react-native';
-import type { ViewStyle } from 'react-native';
+import type { GestureResponderEvent, ViewStyle } from 'react-native';
 
 import { Icon, T } from './parts';
 import { F, alpha } from './theme';
@@ -69,6 +70,14 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
   const heightRef = height;
   // ox and oy hold where a drag began.
   const [view, setView] = useState<{ z: number; cx: number; cy: number; ox?: number; oy?: number } | null>(null);
+  // A two-finger pinch in progress: how far it has scaled, and where the fingers began and are now (in the map).
+  const [pinch, setPinch] = useState<{ s: number; fx: number; fy: number; mx: number; my: number } | null>(null);
+  const box = useRef<ComponentRef<typeof View>>(null);
+  // The latest of these, for the touch handlers (which outlive a render).
+  const live = useRef({ width: 0, view, pinch, d0: 0, left: 0, top: 0 });
+  useEffect(() => {
+    Object.assign(live.current, { width, view, pinch });
+  });
 
   // The first view: the focused page close up, or every page in frame.
   if (width && !view) {
@@ -79,17 +88,70 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
     } else setView(fit(points, width, height));
   }
 
-  const pan = useMemo(
-    () =>
-      PanResponder.create({
-        // Capture drags inside the map, so a page around it doesn't scroll instead.
-        onMoveShouldSetPanResponderCapture: (_e, g) => Math.abs(g.dx) + Math.abs(g.dy) > 4,
-        onPanResponderTerminationRequest: () => false,
-        onPanResponderGrant: () => setView((v) => (v ? { ...v, ox: v.cx, oy: v.cy } : v)),
-        onPanResponderMove: (_e, g) => setView((v) => (v && v.ox != null && v.oy != null ? { ...v, cx: v.ox - g.dx, cy: clampY(v.oy - g.dy, v.z, heightRef) } : v)),
-      }),
-    [heightRef],
-  );
+  const pan = useMemo(() => {
+    const touchesOf = (e: GestureResponderEvent) => e.nativeEvent.touches;
+    const spread = (t: ReturnType<typeof touchesOf>) => Math.hypot(t[0].pageX - t[1].pageX, t[0].pageY - t[1].pageY);
+    const mid = (t: ReturnType<typeof touchesOf>) => ({ x: (t[0].pageX + t[1].pageX) / 2 - live.current.left, y: (t[0].pageY + t[1].pageY) / 2 - live.current.top });
+    const settle = () => {
+      const { pinch: p, view: v, width: w } = live.current;
+      live.current.pinch = null;
+      setPinch(null);
+      if (!p || !v) return;
+      // Land on the nearest zoom the tiles come in, keeping the place under the fingers under them.
+      const z = Math.max(2, Math.min(MAX_Z, v.z + Math.round(Math.log2(p.s))));
+      const k = 2 ** (z - v.z);
+      setView({ z, cx: (v.cx - w / 2 + p.fx) * k - p.mx + w / 2, cy: clampY((v.cy - heightRef / 2 + p.fy) * k - p.my + heightRef / 2, z, heightRef) });
+    };
+    // The handlers read `live` only when touched, never while rendering.
+    // eslint-disable-next-line react-hooks/refs
+    return PanResponder.create({
+      // Capture drags and pinches inside the map, so a page around it doesn't scroll instead.
+      onStartShouldSetPanResponderCapture: (e) => touchesOf(e).length >= 2,
+      onMoveShouldSetPanResponderCapture: (e, g) => touchesOf(e).length >= 2 || Math.abs(g.dx) + Math.abs(g.dy) > 4,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: () => {
+        box.current?.measureInWindow((x, y) => ((live.current.left = x), (live.current.top = y)));
+        setView((v) => (v ? { ...v, ox: v.cx, oy: v.cy } : v));
+      },
+      onPanResponderMove: (e, g) => {
+        const t = touchesOf(e);
+        if (t.length >= 2) {
+          const m = mid(t);
+          const p = live.current.pinch;
+          if (!p) {
+            // The second finger landed: from here it's a pinch, not a drag.
+            live.current.d0 = spread(t) || 1;
+            setView((v) => (v ? { ...v, ox: undefined, oy: undefined } : v));
+            // Kept here at once as well: the next move can come before the render that would copy it.
+            live.current.pinch = { s: 1, fx: m.x, fy: m.y, mx: m.x, my: m.y };
+            setPinch(live.current.pinch);
+            return;
+          }
+          const v = live.current.view;
+          const lo = v ? 2 ** (2 - v.z) : 1;
+          const hi = v ? 2 ** (MAX_Z - v.z) : 1;
+          live.current.pinch = { ...p, s: Math.max(lo, Math.min(hi, spread(t) / live.current.d0)), mx: m.x, my: m.y };
+          setPinch(live.current.pinch);
+          return;
+        }
+        if (live.current.pinch) return; // one finger lifted mid-pinch: wait for the other
+        setView((v) => (v && v.ox != null && v.oy != null ? { ...v, cx: v.ox - g.dx, cy: clampY(v.oy - g.dy, v.z, heightRef) } : v));
+      },
+      onPanResponderRelease: settle,
+      onPanResponderTerminate: settle,
+    });
+  }, [heightRef]);
+
+  // While pinching, the drawn map scales about where the fingers began and follows them as they move.
+  const pinchTransform = pinch
+    ? [
+        { translateX: pinch.mx - width / 2 },
+        { translateY: pinch.my - height / 2 },
+        { scale: pinch.s },
+        { translateX: -(pinch.fx - width / 2) },
+        { translateY: -(pinch.fy - height / 2) },
+      ]
+    : undefined;
 
   const zoom = (d: number) =>
     setView((v) => {
@@ -116,9 +178,11 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
 
   return (
     <View
+      ref={box}
       style={{ height, borderRadius: 24, overflow: 'hidden', backgroundColor: c.isNight ? '#2A2622' : '#E9E3D6' }}
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       {...pan.panHandlers}>
+      <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, transform: pinchTransform }}>
       {/* On Midnight the map turns dark too: the same OpenStreetMap tiles, inverted and turned back round the colour
           wheel so water stays blue and parks green (Android 12 and later; older phones get them dimmed). */}
       <View pointerEvents="none" style={[{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }, c.isNight && DARK_FILTER ? { filter: DARK_FILTER } : null]}>
@@ -169,6 +233,7 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
             );
           })
         : null}
+      </View>
       <View style={{ position: 'absolute', right: 10, top: 10, gap: 8 }}>
         {(
           [

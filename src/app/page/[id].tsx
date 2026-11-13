@@ -5,9 +5,9 @@ import { Pressable, Share, Text, View } from 'react-native';
 import { deletePage } from '@/lib/actions';
 import { longDate } from '@/lib/dates';
 import { toggleStar, useJournal } from '@/lib/journal';
-import { chapterOf, kural } from '@/lib/pack';
+import { chapterOf, kural, questionOfPage } from '@/lib/pack';
 import { wordCount } from '@/lib/types';
-import { MOODS, Markdown, PhotoGallery, moodTint, plainMarkdown, questionText, timeOf, weatherLabel } from '@/ui/common';
+import { MOODS, Markdown, PhotoGallery, moodTint, plainMarkdown, timeOf, weatherLabel } from '@/ui/common';
 import { MayilBorder } from '@/ui/kolam';
 import { CoupletText, Leaf, LeafNote } from '@/ui/leaf';
 import { Button, Icon, Page, StarButton, T, raised } from '@/ui/parts';
@@ -40,7 +40,7 @@ export default function PageScreen() {
         contentStyle={{ paddingBottom: 24 }}
         footer={
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Button label={L.edit} icon="pen" style={{ flex: 1, minHeight: 50 }} onPress={() => router.replace({ pathname: '/write', params: { kural: String(e.kural), id: e.id } })} />
+            <Button label={L.edit} icon="pen" style={{ flex: 1, minHeight: 50 }} onPress={() => router.push({ pathname: '/write', params: { kural: String(e.kural), id: e.id } })} />
             <Button
               label={L.share}
               icon="share"
@@ -91,7 +91,7 @@ export default function PageScreen() {
             <T v="small" color={c.primary}>
               {L.lens[e.lens] ?? L.todayQ}
             </T>
-            <Text style={[type.title, { fontFamily: F.serifItalic, color: c.ink2, marginTop: 2 }]}>{questionText(k, e.lens, tamil)}</Text>
+            <Text style={[type.title, { fontFamily: F.serifItalic, color: c.ink2, marginTop: 2 }]}>{tamil ? questionOfPage(e).ta : questionOfPage(e).en}</Text>
           </View>
         </View>
 

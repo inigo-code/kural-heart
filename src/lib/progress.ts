@@ -29,13 +29,39 @@ function runFrom(written: Set<Day>, first: Day, end: Day, ended: boolean): numbe
   return days;
 }
 
+/**
+ * The longest thread that ended on a written day before [today], in one walk forward: the same as runFrom for every
+ * such day, without walking back from each. Walking back from a day, a run stops at the third miss met in one week,
+ * which is that week's third-last miss (counting only misses before the day, in the day's own week). Those stopping
+ * points only move forward as the end does, so the run ending on a day is the written days since the latest of them.
+ */
+function longestEnded(written: Set<Day>, first: Day, today: Day): number {
+  let best = 0;
+  let total = 0; // written days so far
+  let cut = 0; // written days up to the latest stopping point
+  let week = '';
+  let misses: number[] = []; // this week's misses so far, each as the written days before it
+  for (let d = first; d < today; d = addDays(d, 1)) {
+    const wk = mondayOf(d);
+    if (wk !== week) {
+      if (misses.length >= 3) cut = Math.max(cut, misses[misses.length - 3]);
+      week = wk;
+      misses = [];
+    }
+    if (written.has(d)) {
+      total++;
+      best = Math.max(best, total - Math.max(cut, misses.length >= 3 ? misses[misses.length - 3] : 0));
+    } else misses.push(total);
+  }
+  return best;
+}
+
 export function thread(written: Set<Day>, today: Day): Thread {
   const writtenToday = written.has(today);
   if (written.size === 0) return { days: 0, longest: 0, writtenToday, restDaysUsedThisWeek: 0, lastSeven: 0 };
   const first = [...written].sort()[0];
   const current = runFrom(written, first, today, false);
-  let longest = current;
-  for (const d of written) if (d < today) longest = Math.max(longest, runFrom(written, first, d, true));
+  const longest = Math.max(current, longestEnded(written, first, today));
   let missed = 0;
   for (let d = mondayOf(today); d < today; d = addDays(d, 1)) if (!written.has(d)) missed++;
   let lastSeven = 0;

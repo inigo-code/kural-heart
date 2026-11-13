@@ -8,7 +8,6 @@ import type { ComponentRef } from 'react';
 import { PixelRatio, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 
-import { today } from '@/lib/dates';
 import { useJournal } from '@/lib/journal';
 import { chapterOf, english, kural } from '@/lib/pack';
 import type { Kural } from '@/lib/pack';
@@ -59,15 +58,18 @@ const themeOf = (id: string) => THEMES.find((t) => t.id === id) ?? THEMES[0];
 export default function ShareScreen() {
   const { n: raw } = useLocalSearchParams<{ n: string }>();
   const k = kural(Math.min(1330, Math.max(1, Number(raw) || 1)));
-  const { L, c, tr, tamil } = useUI();
+  const { L, c, tr, tamil, day } = useUI();
   const s = useSettings();
   const { entries } = useJournal();
   const { width, height } = useWindowDimensions();
   const [story, setStory] = useState(false);
   const [addMine, setAddMine] = useState(false);
+  // Under the leaf: the couplet's meaning, or its "For daily life" note, remembered like the look.
+  const life = s.shareUnder === 'life';
+  const setLife = (v: boolean) => setSettings({ shareUnder: v ? 'life' : 'meaning' });
   const [busy, setBusy] = useState(false);
   const ref = useRef<ComponentRef<typeof View>>(null);
-  const mine = entries.find((e) => e.kural === k.n && e.date === today());
+  const mine = entries.find((e) => e.kural === k.n && e.date === day);
   const line = addMine && mine ? plainMarkdown(mine.text).split('\n')[0].slice(0, 160) : null;
   const theme = themeOf(s.shareTheme);
   // The card is laid out at 1080 pixels wide, then shown scaled down.
@@ -87,7 +89,7 @@ export default function ShareScreen() {
       <View style={{ height: H * fit, alignItems: 'center', justifyContent: 'center', marginTop: 4 }}>
         <View style={{ width: W, height: H, transform: [{ scale: fit }], borderRadius: 20 / fit, overflow: 'hidden' }}>
           <View ref={ref} collapsable={false} style={{ width: W, height: H }}>
-            <Card k={k} story={story} line={line} tamil={s.tamil} translation={s.translation} W={W} H={H} theme={theme} />
+            <Card k={k} story={story} line={line} life={life && !!k.w} tamil={s.tamil} translation={s.translation} W={W} H={H} theme={theme} />
           </View>
         </View>
       </View>
@@ -95,6 +97,15 @@ export default function ShareScreen() {
         <Choice label={L.sharePost} on={!story} onPress={() => setStory(false)} style={{ flex: 1 }} />
         <Choice label={L.shareStory} on={story} onPress={() => setStory(true)} style={{ flex: 1 }} />
       </View>
+      {k.w && !line ? (
+        <>
+          <SectionLabel style={{ marginTop: 16 }}>{tr('Under the couplet', 'குறளின் கீழ்')}</SectionLabel>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Choice label={tr('Its meaning', 'அதன் பொருள்')} on={!life} onPress={() => setLife(false)} style={{ flex: 1 }} />
+            <Choice label={tr('For daily life', 'அன்றாட வாழ்வில்')} on={life} onPress={() => setLife(true)} style={{ flex: 1 }} />
+          </View>
+        </>
+      ) : null}
       <SectionLabel style={{ marginTop: 16 }}>{tr('Look', 'தோற்றம்')}</SectionLabel>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 2, paddingBottom: 4 }}>
         {THEMES.map((t) => {
@@ -130,14 +141,16 @@ export default function ShareScreen() {
  * The share image. Story (9:16): the theme's sky, Valluvar reading, then the leaf. Post (4:5): the leaf first,
  * Valluvar below. Couplets are always flush left. Units are pixels of the 1080-wide image.
  */
-function Card({ k, story, line, tamil, translation, W, H, theme }: { k: Kural; story: boolean; line: string | null; tamil: boolean; translation: 'aiyar' | 'pope' | 'popeprose'; W: number; H: number; theme: CardTheme }) {
+function Card({ k, story, line, life, tamil, translation, W, H, theme }: { k: Kural; story: boolean; line: string | null; life: boolean; tamil: boolean; translation: 'aiyar' | 'pope' | 'popeprose'; W: number; H: number; theme: CardTheme }) {
   const u = W / 1080;
   const ch = chapterOf(k);
   const valluvar = useMemo(() => valluvarImage('reading', story ? 600 : 330), [story]);
   const rib = '#7A5A2E';
   const margin = 96 * u;
-  // Tamil-led share images carry Mu. Va.'s Tamil explanation; otherwise the chosen English.
-  const text = line ? `“${line}”` : tamil && k.ta ? k.ta : english(k, translation);
+  // Tamil-led share images carry Mu. Va.'s Tamil explanation; otherwise the chosen English. Or, if asked for, the
+  // couplet's "For daily life" note in the same language.
+  const wisdom = !line && life && k.w ? (tamil ? k.w.ta : k.w.en) : null;
+  const text = line ? `“${line}”` : wisdom ?? (tamil && k.ta ? k.ta : english(k, translation));
   const colors = (story ? theme.story : theme.post) as [string, string, ...string[]];
   const dark = theme.brand.toUpperCase().startsWith('#F');
   return (
@@ -199,19 +212,26 @@ function Card({ k, story, line, tamil, translation, W, H, theme }: { k: Kural; s
             {`அதிகாரம் ${ch.n} · ${ch.ta} · ${ch.en}`}
           </Text>
         </View>
+        {wisdom ? (
+          <Text allowFontScaling={false} style={{ fontFamily: F.sansBold, fontSize: 32 * u, color: theme.title, marginTop: 52 * u }}>
+            {tamil ? 'அன்றாட வாழ்வில்' : 'For daily life'}
+          </Text>
+        ) : null}
         <Text
           allowFontScaling={false}
           numberOfLines={story ? 8 : 5}
+          adjustsFontSizeToFit={!!wisdom}
+          minimumFontScale={0.8}
           style={{
-            fontFamily: isTamil(text) ? F.serifTamil : F.serifItalic,
+            fontFamily: isTamil(text) ? F.serifTamil : wisdom ? F.serif : F.serifItalic,
             fontSize: (story ? 46 : 42) * u,
             lineHeight: (story ? 46 : 42) * (isTamil(text) ? 1.6 : 1.35) * u,
             color: theme.ink,
-            marginTop: 60 * u,
+            marginTop: (wisdom ? 14 : 60) * u,
           }}>
           {text}
         </Text>
-        {!line ? (
+        {!line && !wisdom ? (
           <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 30 * u, color: theme.quiet, marginTop: 24 * u }}>
             {`— ${tamil && k.ta ? MUVA_BY.ta : translator(translation)}`}
           </Text>

@@ -2,17 +2,19 @@
 // invisible in the Drive app and closed to other apps. The one file there is the passphrase-sealed backup.
 //
 // Sync: download the Drive copy (if any), merge it into this phone, then upload the merged journal. Two phones that
-// sync take turns this way and end up with every page; a page edited on both is kept twice.
+// sync take turns this way and end up with every page; deletions travel as tombstones, an edit of a synced page
+// replaces it, and only a page edited on both phones since they last met is kept twice (see journal.ts, decide).
 //
 // Needs the owner's Google Cloud setup (docs/GOOGLE_DRIVE_SETUP.md): the Drive API, the consent screen, and an
 // Android OAuth client for com.inigocode.kuralheart with each signing key's SHA-1.
 
 import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin';
 
-import { exportBytes, importBytes } from './backup';
+import { currentFingerprint, exportSnapshot, importBytes, oneAtATime } from './backup';
 import { BackupError } from './crypto';
-import type { MergeResult } from './journal';
+import type { MergeMode, MergeResult } from './journal';
 import { setSettings, settings } from './settings';
+import { forgetUpload, markExported, setUploaded, syncState } from './syncState';
 
 const SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 const NAME = 'kural-heart.khb';
@@ -55,6 +57,7 @@ export async function disconnectDrive() {
     await GoogleSignin.revokeAccess();
     await GoogleSignin.signOut();
   } catch {}
+  forgetUpload();
   setSettings({ driveOn: false, driveEmail: '' });
 }
 
@@ -87,22 +90,32 @@ async function call(url: string, init: RequestInit & { headers: Record<string, s
   return r;
 }
 
-async function findFile(auth: Record<string, string>): Promise<string | null> {
+type DriveFile = { id: string; modifiedTime: string };
+
+/** The Kural Heart file in the app folder; the most recently changed one, should there ever be two. */
+async function findFile(auth: Record<string, string>): Promise<DriveFile | null> {
   const q = encodeURIComponent(`name = '${NAME}'`);
-  const list = (await (await call(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime)`, { headers: auth })).json()) as {
-    files: { id: string }[];
+  const order = encodeURIComponent('modifiedTime desc');
+  const list = (await (
+    await call(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&orderBy=${order}&fields=files(id,modifiedTime)`, { headers: auth })
+  ).json()) as {
+    files: { id: string; modifiedTime?: string }[];
   };
-  return list.files[0]?.id ?? null;
+  const f = list.files[0];
+  return f ? { id: f.id, modifiedTime: f.modifiedTime ?? '' } : null;
 }
 
 /**
  * Upload with Google's resumable protocol: one request opens a session, a second sends the bytes. Simple and
- * multipart uploads stop at 5 MB, which a journal with photos, voice notes or a video soon passes.
+ * multipart uploads stop at 5 MB, which a journal with photos, voice notes or a video soon passes. Returns the file's
+ * new modifiedTime ('' if Google didn't say).
  */
-async function upload(auth: Record<string, string>, id: string | null, bytes: Uint8Array) {
+async function upload(auth: Record<string, string>, id: string | null, bytes: Uint8Array): Promise<string> {
   const meta = id ? {} : { name: NAME, parents: ['appDataFolder'] };
   const start = await call(
-    id ? `https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=resumable` : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',
+    id
+      ? `https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=resumable&fields=id,modifiedTime`
+      : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,modifiedTime',
     {
       method: id ? 'PATCH' : 'POST',
       headers: { ...auth, 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': 'application/octet-stream', 'X-Upload-Content-Length': String(bytes.length) },
@@ -111,31 +124,55 @@ async function upload(auth: Record<string, string>, id: string | null, bytes: Ui
   );
   const session = start.headers.get('Location') ?? start.headers.get('location');
   if (!session) throw new DriveError(settings().tamil ? 'Google Drive பதிவேற்றத்தைத் தொடங்கவில்லை.' : 'Google Drive didn’t start the upload.');
-  await call(session, { method: 'PUT', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer });
+  const done = await call(session, { method: 'PUT', headers: { 'Content-Type': 'application/octet-stream' }, body: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer });
+  try {
+    const f = (await done.json()) as { modifiedTime?: string };
+    return f.modifiedTime ?? '';
+  } catch {
+    return '';
+  }
+}
+
+const NOTHING: MergeResult = { added: 0, keptBoth: 0, removed: 0, updated: 0 };
+
+/** Download the Drive copy and merge it in. A passphrase that doesn't open it is said as DriveError('passphrase'). */
+async function pull(auth: Record<string, string>, file: DriveFile, opts: { pass?: string; mode: MergeMode }): Promise<MergeResult> {
+  const remote = new Uint8Array(await (await call(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, { headers: auth })).arrayBuffer());
+  try {
+    const { result, held } = await importBytes(remote, { pass: opts.pass, mode: opts.mode, where: opts.mode === 'sync' ? 'drive' : 'any' });
+    // Drive holds these versions: what this phone now has the same as Drive's copy.
+    markExported('drive', held, false);
+    return result;
+  } catch (e) {
+    if (e instanceof BackupError && /passphrase/i.test(e.message)) throw new DriveError('passphrase');
+    throw e;
+  }
 }
 
 /**
  * Sync now. Returns what came in from Drive. The Drive copy is opened with this phone's passphrase, or with
  * [drivePass] when it was locked with another (a fresh install that chose a new one); either way the merged journal
  * goes back up locked with this phone's passphrase. Nothing is uploaded unless the Drive copy opened, so a wrong
- * passphrase can't replace it.
+ * passphrase can't replace it, and nothing is uploaded when Drive already holds this very journal.
  */
-export async function syncDrive(drivePass?: string): Promise<MergeResult> {
-  const auth = { Authorization: `Bearer ${await token()}` };
-  const id = await findFile(auth);
-  let result: MergeResult = { added: 0, keptBoth: 0 };
-  if (id) {
-    const remote = new Uint8Array(await (await call(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, { headers: auth })).arrayBuffer());
-    try {
-      result = await importBytes(remote, drivePass);
-    } catch (e) {
-      if (e instanceof BackupError && /passphrase/i.test(e.message)) throw new DriveError('passphrase');
-      throw e;
+export function syncDrive(drivePass?: string): Promise<MergeResult> {
+  return oneAtATime(async () => {
+    const auth = { Authorization: `Bearer ${await token()}` };
+    const file = await findFile(auth);
+    const result = file ? await pull(auth, file, { pass: drivePass, mode: 'sync' }) : NOTHING;
+    const brought = result.added + result.keptBoth + result.removed + result.updated;
+    // Drive's file is the one this phone last uploaded, nothing came in, and nothing changed here since: skip it.
+    if (file?.modifiedTime && !drivePass && brought === 0 && syncState().uploaded === `${currentFingerprint()} ${file.modifiedTime}`) {
+      setSettings({ lastDriveSync: Date.now() });
+      return result;
     }
-  }
-  await upload(auth, id, await exportBytes());
-  setSettings({ lastDriveSync: Date.now() });
-  return result;
+    const snap = await exportSnapshot();
+    const modified = await upload(auth, file?.id ?? null, snap.bytes);
+    markExported('drive', snap.stamps);
+    setUploaded(modified ? `${snap.fingerprint} ${modified}` : '');
+    setSettings({ lastDriveSync: Date.now() });
+    return result;
+  });
 }
 
 /** Whether there is a Kural Heart backup in this Google account's Drive (signed in already). */
@@ -146,27 +183,23 @@ export async function driveCopyExists(): Promise<boolean> {
 
 /**
  * Open the Drive copy with [pass] and merge it in, without uploading: a new phone proving the passphrase it was made
- * with. Throws DriveError('passphrase') if [pass] doesn't open it.
+ * with. A restore, so every page in the copy comes back. Throws DriveError('passphrase') if [pass] doesn't open it.
  */
-export async function openDriveCopy(pass: string): Promise<MergeResult> {
-  const auth = { Authorization: `Bearer ${await token()}` };
-  const id = await findFile(auth);
-  if (!id) return { added: 0, keptBoth: 0 };
-  const remote = new Uint8Array(await (await call(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, { headers: auth })).arrayBuffer());
-  try {
-    return await importBytes(remote, pass);
-  } catch (e) {
-    if (e instanceof BackupError && /passphrase/i.test(e.message)) throw new DriveError('passphrase');
-    throw e;
-  }
+export function openDriveCopy(pass: string): Promise<MergeResult> {
+  return oneAtATime(async () => {
+    const auth = { Authorization: `Bearer ${await token()}` };
+    const file = await findFile(auth);
+    return file ? pull(auth, file, { pass, mode: 'restore' }) : NOTHING;
+  });
 }
 
 /** Delete the copy in Drive (this phone's journal is untouched). Returns whether there was one. */
 export async function deleteDriveCopy(): Promise<boolean> {
   const auth = { Authorization: `Bearer ${await token()}` };
-  const id = await findFile(auth);
-  if (!id) return false;
-  await call(`https://www.googleapis.com/drive/v3/files/${id}`, { method: 'DELETE', headers: auth });
+  const file = await findFile(auth);
+  if (!file) return false;
+  await call(`https://www.googleapis.com/drive/v3/files/${file.id}`, { method: 'DELETE', headers: auth });
+  forgetUpload();
   setSettings({ lastDriveSync: 0 });
   return true;
 }
@@ -177,6 +210,7 @@ export async function switchDriveAccount(): Promise<string> {
   try {
     await GoogleSignin.signOut();
   } catch {}
+  forgetUpload();
   setSettings({ driveOn: false, driveEmail: '', lastDriveSync: 0 });
   return connectDrive();
 }

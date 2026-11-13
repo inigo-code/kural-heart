@@ -22,10 +22,13 @@ export default function AtlasScreen() {
   const [chosen, setChosen] = useState<string[]>(focus ? [focus] : []);
   const shown = entries.filter((e) => chosen.includes(e.id));
   return (
-    <Page title={tr('Atlas', 'வரைபடம்')} scrollProps={{ scrollEnabled: true }}>
+    <Page title={tr('Map', 'வரைபடம்')} scrollProps={{ scrollEnabled: true }}>
       <AtlasMap points={points} height={Math.round(height * 0.5)} focus={focus} selected={chosen} onSelect={setChosen} />
       <T v="labelM" color={c.ink3} style={{ marginTop: 10 }}>
-        {tr(`${points.length} pages with a place · drag to move, + and − to zoom`, `இடத்துடன் ${points.length} பக்கங்கள் · நகர்த்த இழுக்கவும்`)}
+        {tr(
+          `${points.length === 1 ? '1 page' : `${points.length} pages`} with a place · drag to move, pinch to zoom · tap a pin to see its pages`,
+          `இடத்துடன் ${points.length} ${points.length === 1 ? 'பக்கம்' : 'பக்கங்கள்'} · நகர்த்த இழுங்கள், பெரிதாக்க இரு விரல்களால் விரியுங்கள் · பக்கங்களைக் காண ஒரு குறியைத் தொடுங்கள்`,
+        )}
       </T>
       <View style={{ marginHorizontal: -16, marginTop: 8 }}>
         {shown.map((e) => (

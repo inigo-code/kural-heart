@@ -39,11 +39,14 @@ export async function placeName(lat: number, lon: number): Promise<string | null
   }
 }
 
-/** Current weather from Open-Meteo, mapped from WMO codes to the app's eight kinds. */
+/** Current weather from Open-Meteo, mapped from WMO codes to the app's eight kinds. Gives up after 10 seconds. */
 export async function weatherAt(lat: number, lon: number): Promise<Weather | null> {
+  const stop = new AbortController();
+  const timer = setTimeout(() => stop.abort(), 10_000);
   try {
     const r = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(2)}&longitude=${lon.toFixed(2)}&current=temperature_2m,weather_code,wind_speed_10m`,
+      { signal: stop.signal },
     );
     if (!r.ok) return null;
     const o = (await r.json()) as { current: { temperature_2m: number; weather_code: number; wind_speed_10m?: number } };
@@ -60,6 +63,8 @@ export async function weatherAt(lat: number, lon: number): Promise<Weather | nul
     return { kind, temp: o.current.temperature_2m };
   } catch {
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 }
 

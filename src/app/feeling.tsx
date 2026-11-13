@@ -7,7 +7,7 @@ import { forMood } from '@/lib/daily';
 import { COUNTRIES, ELSEWHERE_URL, homeCountry } from '@/lib/helplines';
 import { kural } from '@/lib/pack';
 import { useSettings } from '@/lib/settings';
-import { KuralLeaf, MOODS, MeaningUnder, MoodChip, SmoothHeight, Wrap, useCrossfade } from '@/ui/common';
+import { KuralLeaf, MOODS, MeaningUnder, MoodChip, SmoothHeight, WisdomNote, Wrap, useCrossfade } from '@/ui/common';
 import { Button, Chip, Icon, Page, raised, T, TextLink } from '@/ui/parts';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
@@ -55,6 +55,7 @@ export default function FeelingScreen() {
               <KuralLeaf k={k} />
               <View style={{ marginTop: 10 }}>
                 <MeaningUnder k={k} />
+                <WisdomNote k={k} style={{ marginTop: 12 }} />
               </View>
             </Animated.View>
           </SmoothHeight>
@@ -120,7 +121,7 @@ function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
       <Pressable onPress={() => dial(country.emergency)} accessibilityRole="button" hitSlop={4} style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <Icon name="shield" size={18} color={c.heart} />
         <T v="labelM" color={c.ink2} style={{ flex: 1 }}>
-          {tr('In danger right now? Call ', 'இப்போதே ஆபத்தா? அழையுங்கள் ')}
+          {tr('In danger right now? Call ', 'இப்போது ஆபத்தில் இருக்கிறீர்களா? அழையுங்கள் ')}
           <T v="label" color={c.heart}>
             {country.emergency}
           </T>

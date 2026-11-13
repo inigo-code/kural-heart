@@ -12,6 +12,9 @@ import { ArchValluvar, Wrap } from './common';
 import { Button, Choice, Icon, T, TextLink, timeLabel } from './parts';
 import { useUI } from './ui';
 
+/** Set when onboarding ends with "Coming from another phone?": the root layout then opens Backup. */
+export const afterOnboarding = { restore: false };
+
 export function Onboarding() {
   const { c, L, tamil } = useUI();
   const s = useSettings();
@@ -99,6 +102,15 @@ export function Onboarding() {
           ))}
         </View>
         <Button label={step === 3 ? L.begin : L.next} onPress={next} style={{ alignSelf: 'stretch' }} />
+        {step === 3 ? (
+          <TextLink
+            label={tamil ? 'வேறொரு அலைபேசியிலிருந்து வருகிறீர்களா? நாட்குறிப்பை மீட்டெடுங்கள்' : 'Coming from another phone? Bring your journal back'}
+            onPress={() => {
+              afterOnboarding.restore = true;
+              finish();
+            }}
+          />
+        ) : null}
       </View>
     </View>
   );

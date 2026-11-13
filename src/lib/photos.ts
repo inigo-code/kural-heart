@@ -64,6 +64,11 @@ export async function photoJpeg(id: string): Promise<Uint8Array | null> {
   }
 }
 
+/** Whether a photo, voice note or video with this id is kept here already. */
+export function hasStored(id: string): boolean {
+  return fileOf(id).exists;
+}
+
 export async function putJpeg(id: string, jpeg: Uint8Array) {
   const f = fileOf(id);
   if (!f.exists) f.write(await seal(jpeg));

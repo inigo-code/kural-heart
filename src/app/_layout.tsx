@@ -3,7 +3,7 @@ import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ import { useLocked } from '@/lib/lock';
 import { purgeMedia } from '@/lib/photos';
 import { planReminders } from '@/lib/notify';
 import { settings, useSettings } from '@/lib/settings';
-import { LockScreen, Onboarding } from '@/ui/gate';
+import { LockScreen, Onboarding, afterOnboarding } from '@/ui/gate';
 import { SplashOverlay } from '@/ui/splash';
 import { ToastHost } from '@/ui/toast';
 import { UIProvider, useUI } from '@/ui/ui';
@@ -34,7 +34,7 @@ export default function RootLayout() {
 }
 
 function Root() {
-  const { c } = useUI();
+  const { c, day } = useUI();
   const s = useSettings();
   const locked = useLocked();
   const [ready, setReady] = useState(false);
@@ -55,14 +55,19 @@ function Root() {
   // Keep the splash up until the journal is open, so the first screen is the real one.
   useEffect(() => {
     loadJournal()
-      .catch(() => {})
-      .finally(() => {
-        setReady(true);
+      .then(({ failed }) => {
+        // Media no page uses is tidied away only when every page opened: a page that couldn't be opened still
+        // owns its photos, and a journal that didn't open at all would otherwise look as if nothing used any.
+        if (failed > 0) return;
         const keep = new Set(allEntries().flatMap((e) => [...e.photos, ...e.audio, ...e.videos]));
         if (settings().avatar) keep.add(settings().avatar);
         try {
           purgeMedia(keep);
         } catch {}
+      })
+      .catch(() => {})
+      .finally(() => {
+        setReady(true);
         todayKural();
         refreshWidget();
         planReminders().catch(() => {});
@@ -71,7 +76,7 @@ function Root() {
       });
   }, []);
 
-  // A new day while the app sits open, or coming back to it: the widget and reminders catch up.
+  // Coming back to the app: the widget and reminders catch up.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (st) => {
       if (st !== 'active') return;
@@ -81,12 +86,31 @@ function Root() {
     return () => sub.remove();
   }, []);
 
+  // A new day while the app sits open: the day's couplet is chosen, and the widget and reminders move on with it.
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    todayKural(day);
+    refreshWidget();
+    planReminders().catch(() => {});
+  }, [day]);
+
   // The reminder's Write button, or a tap on the reminder, opens today's page.
   const response = Notifications.useLastNotificationResponse();
   useEffect(() => {
     if (!ready || !response) return;
     if (response.actionIdentifier === 'write') router.push('/write');
   }, [ready, response]);
+
+  // Onboarding's "Coming from another phone?" opens Backup once the app itself is showing.
+  useEffect(() => {
+    if (!s.onboarded || locked || !afterOnboarding.restore) return;
+    afterOnboarding.restore = false;
+    requestAnimationFrame(() => router.push({ pathname: '/backup', params: { restore: '1' } }));
+  }, [s.onboarded, locked]);
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>

@@ -47,7 +47,7 @@ export default function ProfileScreen() {
       <SectionLabel>{tr('So far', 'இதுவரை')}</SectionLabel>
       <Group>
         <Row title={tr('Pages', 'பக்கங்கள்')} sub={String(entries.length)} divider={false} />
-        <Row title={tr('Longest thread', 'நீண்ட தொடர்')} sub={String(thread.longest)} />
+        <Row title={tr('Longest thread', 'நீண்ட தொடர்')} sub={tr(thread.longest === 1 ? '1 day' : `${thread.longest} days`, thread.longest === 1 ? '1 நாள்' : `${thread.longest} நாட்கள்`)} />
         <Row title={tr('Chapters written on', 'எழுதிய அதிகாரங்கள்')} sub={`${chapters} / 133`} />
         <Row title={tr('Couplets read', 'படித்த குறள்கள்')} sub={`${s.read.length} / 1330`} />
         <Row title={tr('Seals', 'முத்திரைகள்')} sub={`${Object.keys(s.seals).length} / 9`} />
@@ -55,7 +55,7 @@ export default function ProfileScreen() {
       </Group>
       <Group style={{ marginTop: 12 }}>
         <Row title={tr('Insights', 'புள்ளிவிவரங்கள்')} sub={tr('Words, feelings, times and chapters', 'சொற்கள், உணர்வுகள், நேரங்கள், அதிகாரங்கள்')} icon="chart" divider={false} onPress={() => router.push('/journey/insights')} />
-        <Row title={tr('Atlas', 'வரைபடம்')} sub={tr('Your pages on a map', 'வரைபடத்தில் உங்கள் பக்கங்கள்')} icon="map" onPress={() => router.push('/atlas')} />
+        <Row title={tr('Map', 'வரைபடம்')} sub={tr('Your pages, where you wrote them', 'நீங்கள் எழுதிய இடங்களில் உங்கள் பக்கங்கள்')} icon="map" onPress={() => router.push('/atlas')} />
       </Group>
       <Button label={L.save} onPress={save} style={{ marginTop: 16 }} />
     </Page>

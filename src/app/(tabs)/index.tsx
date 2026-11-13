@@ -8,24 +8,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { currentThread } from '@/lib/actions';
 import { useTabTop } from '@/lib/tabTop';
 import { PERIODS, anotherToday, pick, todayKural } from '@/lib/daily';
-import { longDate, today } from '@/lib/dates';
+import { longDate } from '@/lib/dates';
 import { useJournal } from '@/lib/journal';
 import { english, kural } from '@/lib/pack';
-import { setSettings, useSettings } from '@/lib/settings';
+import { useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
-import { ActionRow, Avatar, KuralLeaf, LinkPills, MeaningUnder, Rise, SmoothHeight, questionText, useCrossfade } from '@/ui/common';
+import { ActionRow, Avatar, KuralLeaf, LensQuestion, LinkPills, MeaningUnder, Rise, SmoothHeight, WisdomNote, useCrossfade } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
 import { KolamBand, KolamRing, SikkuThreshold } from '@/ui/kolam';
 import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
-import { useUI } from '@/ui/ui';
+import { useToday, useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
 
 /** The sun or moon beside the time of day's name. */
 const PERIOD_ICON: Record<string, IconName> = { vaigarai: 'moon', kaalai: 'sunrise', nanpagal: 'sun', erpadu: 'sun', maalai: 'sunrise', yaamam: 'moon' };
 
 export default function TodayScreen() {
-  const { c, L, tamil, tr, period, type } = useUI();
+  const { c, L, tamil, tr, period } = useUI();
   const s = useSettings();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -33,24 +33,24 @@ export default function TodayScreen() {
   useTabTop('index', () => scroll.current?.scrollTo({ y: 0, animated: true }));
   const { entries } = useJournal();
   const speaker = useSpeaker();
-  const day = today();
+  const day = useToday();
   // Reading s.dayLog keeps this in step when today's couplet changes; a new day is recorded after drawing.
   const k = kural(s.dayLog[day] ?? pick(s.dayLog, s.seed, day, s.promptMode === 'random'));
   useEffect(() => {
     todayKural(day);
   }, [day]);
   const written = entries.some((e) => e.date === day);
-  const thread = currentThread();
+  // The page written today on this couplet, if there is one: the button keeps writing it, and says so.
+  const mine = entries.find((e) => e.date === day && e.kural === k.n);
+  const thread = currentThread(day);
   // Turned belongs to the couplet it was turned on: a new day's or another couplet starts face up.
   const [turnedFor, setTurnedFor] = useState<number | null>(null);
   const turned = turnedFor === k.n;
-  const lens = s.lastLens;
   const p = PERIODS[period];
   const playing = speaker.speaking === k.n;
   // A new couplet fades out and in on the leaf and under it together, and the space they take eases to its new size.
   const [shownN, leafFade] = useCrossfade(k.n);
   const shownK = kural(shownN);
-  const [question, questionFade] = useCrossfade(questionText(k, lens, tamil));
   // A new couplet on screen: whatever was being read stops, so Listen always reads what you see.
   useEffect(() => {
     stopReading();
@@ -107,6 +107,7 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
         <SmoothHeight style={{ paddingBottom: 12 }}>
           <Animated.View style={leafFade}>
             <MeaningUnder k={shownK} />
+            <WisdomNote k={shownK} style={{ marginTop: 14 }} />
           </Animated.View>
         </SmoothHeight>
       </Rise>
@@ -139,38 +140,12 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
         <T v="label" color={c.ink3}>
           {L.todayQ}
         </T>
-        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-          {L.lens.map((name, i) => {
-            const on = lens === i;
-            return (
-              <Pressable
-                key={name}
-                onPress={() => setSettings({ lastLens: i })}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: on }}
-                style={{ borderRadius: 16, backgroundColor: on ? c.primary : c.surface2, minHeight: 36, paddingHorizontal: 14, paddingVertical: 8 }}>
-                <T v="label" color={on ? c.onPrimary : c.ink2}>
-                  {name}
-                </T>
-              </Pressable>
-            );
-          })}
-        </View>
-        <SmoothHeight>
-          <Animated.View style={questionFade}>
-            <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.88 }}>
-              {question}
-            </T>
-          </Animated.View>
-        </SmoothHeight>
+        <LensQuestion k={k} />
         <Button
-          label={written ? L.keep : L.write}
+          label={mine ? L.keep : L.write}
           icon="pen"
           style={{ marginTop: 16 }}
-          onPress={() => {
-            const mine = entries.find((e) => e.date === day && e.kural === k.n);
-            router.push({ pathname: '/write', params: mine ? { kural: String(k.n), id: mine.id } : { kural: String(k.n) } });
-          }}
+          onPress={() => router.push({ pathname: '/write', params: mine ? { kural: String(k.n), id: mine.id } : { kural: String(k.n) } })}
         />
       </Rise>
       {thread.days > 0 ? (

@@ -29,6 +29,8 @@ SRC = ROOT / "tools/content/sources"
 OUT = ROOT / "assets/kural/pack.json"
 REPORT = ROOT / "tools/content/report.md"
 QUESTIONS = ROOT / "tools/content/questions.json"
+LENSES = ROOT / "tools/content/lenses.json"
+WISDOM = ROOT / "tools/content/wisdom.json"
 CHOICES = {k: v for k, v in json.loads((ROOT / "tools/content/choices.json").read_text(encoding="utf-8")).items()
            if not k.startswith("_")}
 
@@ -312,6 +314,30 @@ def main():
     missing = [c for c in pool if not all(questions["chapter"][str(c)].get(l) for l in ("en", "ta"))]
     if len(pool) != 90 or missing:
         sys.exit(f"Questions: {len(pool)} chapters (want 90), incomplete: {missing}")
+    # Every chapter's three questions: Mind from the pool chapter's question or lenses.json, Speech and Action from
+    # lenses.json. Each in English and Tamil.
+    lenses = {k: v for k, v in json.loads(LENSES.read_text(encoding="utf-8")).items() if not k.startswith("_")}
+    sets, gaps = {}, []
+    for c in range(1, 134):
+        own = lenses.get(str(c), {})
+        if str(c) in questions["chapter"] and own.get("mind"):
+            gaps.append(f"{c}: Mind is in both files")
+        three = {"mind": questions["chapter"].get(str(c)) or own.get("mind"), "speech": own.get("speech"), "action": own.get("action")}
+        for lens, q in three.items():
+            if not (q and q.get("en") and q.get("ta")):
+                gaps.append(f"{c}: {lens}")
+        sets[str(c)] = {lens: {"en": q["en"], "ta": q["ta"]} for lens, q in three.items() if q}
+    if gaps:
+        sys.exit("Questions, chapters missing a lens: " + ", ".join(gaps))
+    questions["sets"] = sets
+    # A short note on living each couplet, where one has been written (tools/content/wisdom.json).
+    wisdom = {k: v for k, v in json.loads(WISDOM.read_text(encoding="utf-8")).items() if not k.startswith("_")} if WISDOM.exists() else {}
+    for k in kurals:
+        w = wisdom.get(str(k["n"]))
+        if w:
+            if not (w.get("en") and w.get("ta")) or TAMIL.search(w["en"]) or not TAMIL.search(w["ta"]):
+                sys.exit(f"Wisdom for kural {k['n']} needs English and Tamil")
+            k["w"] = {"en": w["en"].strip(), "ta": w["ta"].strip()}
     pack = {
         "version": 1,
         "built": "2026-11-09",
@@ -339,8 +365,9 @@ def main():
     rep += ["", "## Tamil explanation (Mu. Va.)", "",
             f"{len(muva_text)} of 1,330 couplets have Mu. Varadarasanar's explanation. The rest show the English.", ""]
     rep += [f"- {p}" for p in muva_problems]
-    rep += ["", "The text is the Wikisource transcription of the 1969 scan, kept as it is. It has a few transcription "
-            "slips (a doubled word at kural 1, for example) that are worth a proofreader's eye."]
+    rep += ["", "The text is the Wikisource transcription of the 1969 scan. Known transcription slips are corrected in "
+            "tools/content/muva.py (SLIPS); others may remain and are worth a proofreader's eye."]
+    rep += ["", "## For daily life", "", f"{sum(1 for k in kurals if 'w' in k)} of 1,330 couplets have a note (tools/content/wisdom.json)."]
     REPORT.write_text("\n".join(rep) + "\n", encoding="utf-8")
     print(stats, "->", OUT.relative_to(ROOT), f"({OUT.stat().st_size // 1024} KB)")
 

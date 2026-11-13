@@ -9,14 +9,14 @@ Built like Prompt Heart and Watch Heart: Expo (SDK 58), React Native, Expo Route
 - `index.ts`: the entry. Registers the widget handler and the nightly task before Expo Router.
 - `src/app/`: the routes. `(tabs)/` holds Today (`index`), Kural, Journal, Journey and Settings; `(tabs)/journey/` is a small stack (Journey, then Insights) so the tab bar stays under Insights; pushed pages are `write`, `page/[id]`, `kural/[n]`, `chapter/[n]`, `share/[n]`, `award`, `feeling`, `backup`, `profile`, `about`, `sources`, `atlas` (OpenStreetMap), `video/[id]`. `_layout.tsx` opens the journal, gates onboarding and the lock, and plans reminders.
 - `src/lib/`: no UI.
-  - `pack.ts` (the couplet pack), `daily.ts` (daily pick, mood pick, the six times of day), `settings.ts` (settings and history in one kv-store value), `journal.ts` (SQLite, private part sealed with the device key), `crypto.ts` (device key in SecureStore, KHB1 backups), `backup.ts`, `drive.ts`, `places.ts` (place and weather), `photos.ts` (sealed photos, voice notes and videos; played from temporary files), `progress.ts` (the thread and the nine seals), `speak.ts` (Listen: the phone's Tamil voice, then English; 1.0.2's recorded Piper voice was dropped in 1.0.3 as less natural than Google's), `translit.ts` (the pronunciation line: simple, or scholarly ISO 15919), `notify.ts` (reminders), `background.ts` (nightly backup and sync), `lock.ts`, `actions.ts` (save, delete with undo, seals), `whatsNew.ts`, `helplines.ts` (checked support lines by country for a very heavy day; recheck before releases that touch it).
+  - `pack.ts` (the couplet pack), `daily.ts` (daily pick, mood pick, the six times of day), `settings.ts` (settings and history in one kv-store value), `journal.ts` (SQLite, private part sealed with the device key), `crypto.ts` (device key in SecureStore, KHB1 backups), `backup.ts` (also runs syncs, backups and restores one at a time), `drive.ts`, `syncState.ts` (what Drive and the folder last got, and tombstones of deleted pages, so a sync keeps deletions and tells an edit from a conflict; the merge rules are `decide` in `journal.ts`), `places.ts` (place and weather), `photos.ts` (sealed photos, voice notes and videos; played from temporary files), `progress.ts` (the thread and the nine seals), `speak.ts` (Listen: the phone's Tamil voice, then English; 1.0.2's recorded Piper voice was dropped in 1.0.3 as less natural than Google's), `translit.ts` (the pronunciation line: simple, or scholarly ISO 15919), `notify.ts` (reminders), `background.ts` (nightly backup and sync), `lock.ts`, `actions.ts` (save, delete with undo, seals), `whatsNew.ts`, `helplines.ts` (checked support lines by country for a very heavy day; recheck before releases that touch it).
 - `src/ui/`: `theme.ts` (Olai tokens `Ivory`, `Midnight`, accents, fonts, type scale; colours mirror `docs/canvas/project/olai.css`, change both together), `ui.tsx` (theme, language and text-size context), `parts.tsx` (icons, text, buttons, rows), `leaf.tsx` (`Leaf`, `CoupletText`), `common.tsx` (shared screen pieces, Markdown), `seal.tsx`, `gate.tsx` (onboarding, lock), `updates.tsx` (update prompt and What's new), `toast.tsx`, `splash.tsx` (Valluvar's winking start), `kolam.tsx` (the faint Tamil patterns: pulli kolam band, sikku threshold, mayil-kann silk border, Athangudi tile corner), `options.tsx` (choice sheets, voice picker), `media.tsx` (voice notes, video tiles), `atlas.tsx` (the tile map), `dayArt.tsx` (`ArchSky`: the six times of day in the arch behind Valluvar on Today; nothing behind the greeting), `kuralRow.tsx` (a couplet in a list).
 - `src/valluvar/`: `Valluvar.tsx` (drawn with Skia, moved on the UI thread), `motions.ts`, `model.ts`. `art.ts` is generated, never edit it.
 - `src/i18n/strings.ts`: English and Tamil interface text.
 - `src/widget/`: the Today widget (react-native-android-widget; never shows journal text).
 - `assets/kural/pack.json`: the couplet pack. Built by script, never edited by hand. Each couplet has Mu. Varadarasanar's Tamil explanation (`ta`), from Tamil Wikisource (nationalised, CC0), parsed by `tools/content/muva.py`.
 - `assets/fonts/`: static cuts of the three families, made by `tools/fonts/make_fonts.py` from `assets/fonts/source/`.
-- `tools/content/`: `build_pack.py`, the downloaded `sources/`, `questions.json` (draft questions, moods), `choices.json` (the 12 lines chosen by hand), `report.md` (what needs the owner's eye).
+- `tools/content/`: `build_pack.py`, the downloaded `sources/`, `questions.json` (the daily pool's chapters and their Mind question, moods), `lenses.json` (every chapter's Speech and Action questions, and Mind for chapters outside the pool), `wisdom.json` ("For daily life" notes by kural, English and Tamil; its `_note` is the style guide), `muva.py` (Mu. Va. parser; `SLIPS` mends known transcription slips), `choices.json` (the 12 lines chosen by hand), `report.md` (what needs the owner's eye).
 - `tools/valluvar/gen_valluvar.py`: regenerates `src/valluvar/art.ts` from the canvas. `scripts/make-icons.mjs`: the launcher, splash and notification icons.
 - `docs/canvas/project/`: the design canvas (https://claude.ai/artifact/3Xg9JoNNjmiztxxaed8Fnz), the design source of truth.
 - `android/`: generated by `npx expo prebuild`, ignored by git. Never edit it by hand; change `app.json` or a config plugin.
@@ -35,7 +35,7 @@ npm run typecheck && npm run lint
 npx expo prebuild -p android --clean --no-install
 ```
 
-Local APKs can't be built from this folder: its path is too long for Windows' 260-character limit in the C++ steps (Skia, Worklets, Reanimated's codegen), and a `subst` drive breaks autolinking. Build from a short copy, as for Prompt Heart: copy the project (without `node_modules`, `android`, `.git`) to `C:\kh`, run `npm ci` and the prebuild there, set `updates.requestHeaders` to `{"expo-channel-name": "preview"}` in that copy's `app.json`, append this to `android/settings.gradle`, then build. Copy the APK to `dist/` and delete `C:\kh` and `C:\c` afterwards.
+Local APKs can't be built from this folder: its path is too long for Windows' 260-character limit in the C++ steps (Skia, Worklets, Reanimated's codegen), and a `subst` drive breaks autolinking. Build from a short copy, as for Prompt Heart: copy the project (without the top-level `node_modules`, `android`, `.git`) to `C:\kh`, run `npm ci` and the prebuild there, set `updates.requestHeaders` to `{"expo-channel-name": "preview"}` in that copy's `app.json`, append this to `android/settings.gradle`, then build. Copy the APK to `dist/` and delete `C:\kh` and `C:\c` afterwards.
 
 ```groovy
 gradle.beforeProject { p ->
@@ -54,7 +54,13 @@ cd /c/kh/android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v
 
 For a Google Play bundle, the same short copy with `updates.requestHeaders` set to `{"expo-channel-name": "production"}` and the next versionCode, signed with the EAS key (the upload key; Play keeps the app signing key), then `./gradlew :app:bundleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a,x86_64`. GitHub APKs and Play bundles share one versionCode sequence. See `store/play-console.md`.
 
-`modules/kural-crypto` is a local native module: Android's PBKDF2 for backups (JavaScript's took about 50 seconds).
+`modules/kural-crypto` is a local native module: Android's PBKDF2 for backups (JavaScript's took about 50 seconds). Its `android/` folder must reach the short copy: excluding every folder named `android` (robocopy `/XD android`) drops it, the app quietly falls back to JavaScript, and every backup, restore and Drive sync seems to hang (1.0.6 and 1.0.7 shipped like this). After each build, check the APK or bundle has it:
+
+```bash
+unzip -p dist/kuralheart-X.apk 'classes*.dex' | grep -a -c -i kuralcrypto
+```
+
+For a Play bundle, read `'base/dex/*'` instead of `'classes*.dex'`. A count of 0 means the module is missing.
 
 ```bash
 python -I tools/content/build_pack.py

@@ -22,13 +22,12 @@ import { setSettings, useSettings, wipeSettings } from '@/lib/settings';
 import { pronounce, scholarly } from '@/lib/translit';
 import type { Accent, Settings } from '@/lib/settings';
 import { english, kural } from '@/lib/pack';
-import { today } from '@/lib/dates';
-import { Avatar, Dialog, Field, lastLabel } from '@/ui/common';
+import { Avatar, Dialog, Field, MOODS, lastLabel } from '@/ui/common';
 import { OptionSheet, VoiceSheet } from '@/ui/options';
 import { Button, Choice, Group, Icon, raised, Row, SectionLabel, SwitchRow, T, TextLink, timeLabel } from '@/ui/parts';
 import { ACCENT_SWATCH } from '@/ui/theme';
 import { toast } from '@/ui/toast';
-import { useUI } from '@/ui/ui';
+import { useToday, useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
 import { refreshWidget } from '@/widget/widgets';
 
@@ -45,13 +44,14 @@ export default function SettingsScreen() {
   const [lockMissing, setLockMissing] = useState(false);
   const [notifyOk, setNotifyOk] = useState(true);
   const [sheet, setSheet] = useState<null | 'theme' | 'english' | 'daily' | 'speed' | 'voiceTa' | 'voiceEn' | 'spelling'>(null);
-  const sampleK = kural(s.dayLog[today()] ?? 391);
+  const day = useToday();
+  const sampleK = kural(s.dayLog[day] ?? 391);
   const translatorName = (t: string) => (t === 'pope' ? 'G. U. Pope, 1886' : t === 'popeprose' ? tr('G. U. Pope, prose', 'போப், உரைநடை') : 'V. V. S. Aiyar, 1916');
   const voiceSub = (id: string) => (id && id !== 'kural-heart' ? tr('Your choice', 'நீங்கள் தேர்ந்தது') : tr('The best one on this phone', 'இந்த அலைபேசியின் சிறந்த குரல்'));
   const speedName = (r: number) => (r <= 0.75 ? tr('Slow', 'மெதுவாக') : r < 1 ? tr('Gentle', 'நிதானமாக') : tr('Normal', 'இயல்பாக'));
   const ways = [s.driveOn ? 'Google Drive' : null, s.hasPassphrase && s.backupFolder ? tr('a folder', 'ஒரு கோப்புறை') : null].filter(Boolean);
   const backupSummary = ways.length ? `${ways.join(' + ')} · ${lastLabel(Math.max(s.lastBackup, s.lastDriveSync), L, tamil)}` : L.notSet;
-  const thread = currentThread();
+  const thread = currentThread(day);
 
   useEffect(() => {
     const check = () => canNotify().then(setNotifyOk);
@@ -80,6 +80,16 @@ export default function SettingsScreen() {
         </View>
         <Icon name="chevron" color={c.ink3} size={20} />
       </Pressable>
+      {/* Next to the person: their pages' safety, the one setting that matters most on a new or lost phone. */}
+      <Group style={{ marginTop: 10 }}>
+        <Row
+          title={tr('Backup and Google Drive sync', 'காப்பும் Google Drive ஒத்திசைவும்')}
+          sub={backupSummary}
+          icon={ways.length ? 'sync' : 'shield'}
+          divider={false}
+          onPress={() => router.push('/backup')}
+        />
+      </Group>
 
       <SectionLabel>{L.sLook}</SectionLabel>
       <Group>
@@ -96,7 +106,8 @@ export default function SettingsScreen() {
         <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
           <View style={{ height: 1, backgroundColor: c.line, marginBottom: 12 }} />
           <T v="body">{tr('Text size', 'எழுத்து அளவு')}</T>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+          {/* Tamil's words are longer: two by two, so none has to shrink. */}
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
             {(
               [
                 [90, tr('Small', 'சிறியது')],
@@ -105,7 +116,7 @@ export default function SettingsScreen() {
                 [130, tr('Larger', 'மிகப் பெரியது')],
               ] as const
             ).map(([pct, label]) => (
-              <Choice key={pct} label={label} on={s.textScale === pct} onPress={() => set({ textScale: pct })} style={{ flex: 1, paddingHorizontal: 6 }} />
+              <Choice key={pct} label={label} on={s.textScale === pct} onPress={() => set({ textScale: pct })} style={{ flexGrow: 1, flexBasis: tamil ? '40%' : 0, paddingHorizontal: 6 }} />
             ))}
           </View>
           <T v="body" style={{ marginTop: 14 }}>
@@ -151,11 +162,6 @@ export default function SettingsScreen() {
             onPress={() => setSheet('spelling')}
           />
         ) : null}
-        <Row
-          title={tr('How today’s couplet is chosen', 'இன்றைய குறள் தேர்வு')}
-          sub={s.promptMode === 'random' ? tr('Any couplet, at random', 'ஏதேனும் ஒரு குறள்') : tr('A welcome week, then in turn', 'வரவேற்பு வாரம், பிறகு வரிசையாக')}
-          onPress={() => setSheet('daily')}
-        />
         <Row title={tr('Saved couplets', 'சேமித்த குறள்கள்')} sub={String(s.saved.length)} onPress={() => router.navigate({ pathname: '/kural', params: { from: 'settings', show: 'saved' } })} />
       </Group>
 
@@ -174,9 +180,14 @@ export default function SettingsScreen() {
 
       <SectionLabel>{L.sDaily}</SectionLabel>
       <Group>
+        <Row
+          title={tr('How today’s couplet is chosen', 'இன்றைய குறள் தேர்வு')}
+          sub={s.promptMode === 'random' ? tr('Any couplet, at random', 'ஏதேனும் ஒரு குறள், தற்செயலாக') : tr('A welcome week, then in turn', 'வரவேற்பு வாரம், பிறகு வரிசையாக')}
+          divider={false}
+          onPress={() => setSheet('daily')}
+        />
         <SwitchRow
           title={L.sRem}
-          divider={false}
           value={s.reminderOn}
           onChange={async (on) => {
             if (on && !(await canNotify()) && !(await askNotify())) {
@@ -248,14 +259,13 @@ export default function SettingsScreen() {
             }
           }}
         />
-        <Row title={tr('Backup and Google Drive', 'காப்பும் Google Drive-உம்')} sub={backupSummary} onPress={() => router.push('/backup')} />
         <Row
           title={L.sText}
           sub={L.sTextSub}
           onPress={async () => {
             try {
               const d = await awayFor(() => Directory.pickDirectoryAsync());
-              await exportTextTo(d.uri);
+              await exportTextTo(d.uri, (id) => MOODS.find((m) => m.id === id)?.en ?? null);
               toast(tr('Saved as Kural Heart pages.txt', 'Kural Heart pages.txt ஆகச் சேமிக்கப்பட்டது'));
             } catch {}
           }}
@@ -304,7 +314,7 @@ export default function SettingsScreen() {
       <OptionSheet
         visible={sheet === 'english'}
         title={tr('English under each couplet', 'குறளின் கீழ் ஆங்கிலம்')}
-        lede={tr(`Shown on Today and on share images. Here is couplet ${sampleK.n} in each.`, `இன்றும் பகிர்வுப் படங்களிலும் காட்டப்படும். குறள் ${sampleK.n} ஒவ்வொன்றிலும்:`)}
+        lede={tr(`Shown on Today and on share images. Here is couplet ${sampleK.n} in each.`, `இன்று திரையிலும் பகிர்வுப் படங்களிலும் காட்டப்படும். ஒவ்வொன்றிலும் குறள் ${sampleK.n}:`)}
         value={s.translation}
         onChange={(v) => set({ translation: v })}
         onClose={() => setSheet(null)}
@@ -331,7 +341,7 @@ export default function SettingsScreen() {
           },
           {
             value: 'random',
-            title: tr('Any couplet, at random', 'ஏதேனும் ஒரு குறள்'),
+            title: tr('Any couplet, at random', 'ஏதேனும் ஒரு குறள், தற்செயலாக'),
             sub: tr('A surprise each day; couplets may come round again sooner.', 'நாள்தோறும் ஒரு வியப்பு; குறள்கள் விரைவில் மீண்டும் வரலாம்.'),
           },
         ]}
@@ -351,7 +361,7 @@ export default function SettingsScreen() {
       <OptionSheet
         visible={sheet === 'spelling'}
         title={tr('Pronunciation style', 'உச்சரிப்பு முறை')}
-        lede={tr('How the line under each couplet spells it.', 'ஒவ்வொரு குறளின் கீழும் உள்ள வரி அதை எப்படி எழுதுகிறது.')}
+        lede={tr('How the line under each couplet spells it.', 'ஒவ்வொரு குறளின் கீழும் உள்ள உச்சரிப்பு வரியின் எழுத்து முறை.')}
         value={s.pronounceStyle}
         onChange={(v) => set({ pronounceStyle: v })}
         onClose={() => setSheet(null)}

@@ -28,9 +28,12 @@ export type Kural = {
   pp: string;
   /** How the Tamil was verified: agree, voted or review. */
   check: string;
+  /** A short note on living the couplet day to day, written for Kural Heart, where one has been written. */
+  w?: Question;
 };
 
 export type Question = { en: string; ta: string };
+export type Lens = 'mind' | 'speech' | 'action';
 
 type PackJson = {
   chapters: Chapter[];
@@ -38,6 +41,8 @@ type PackJson = {
   questions: {
     lens: Record<string, Question>;
     chapter: Record<string, Question>;
+    /** Every chapter's three questions, one for each lens. */
+    sets: Record<string, Record<Lens, Question>>;
     welcome: number[];
     moods: Record<string, number[]>;
     avoid: number[];
@@ -68,13 +73,24 @@ export const POOL_CHAPTERS: number[] = Object.keys(pack.questions.chapter).map(N
 /** Every couplet in the pool chapters, in order. */
 export const POOL: number[] = POOL_CHAPTERS.flatMap((c) => Array.from({ length: 10 }, (_, i) => (c - 1) * 10 + i + 1));
 
-/** The chapter's question, or the Mind lens for chapters outside the pool. */
-export function questionFor(k: Kural | number): Question {
+export const LENS_KEYS = ['mind', 'speech', 'action'] as const;
+
+/** The chapter's question for a lens (0 Mind, 1 Speech, 2 Action); each chapter has its own three. */
+export function questionFor(k: Kural | number, lens = 0): Question {
   const c = typeof k === 'number' ? kural(k).c : k.c;
-  return pack.questions.chapter[String(c)] ?? LENS.mind;
+  const key = LENS_KEYS[lens] ?? 'mind';
+  return pack.questions.sets[String(c)]?.[key] ?? LENS[key];
 }
 
-export const LENS_KEYS = ['mind', 'speech', 'action'] as const;
+/**
+ * The question a saved page answered. Pages keep theirs since 1.0.7; older ones asked the chapter's Mind question
+ * (or the shared one) or the shared Speech or Action question, so they still show what was asked.
+ */
+export function questionOfPage(e: { kural: number; lens: number; q?: Question }): Question {
+  if (e.q) return e.q;
+  const key = LENS_KEYS[e.lens] ?? 'mind';
+  return key === 'mind' ? (pack.questions.chapter[String(kural(e.kural).c)] ?? LENS.mind) : LENS[key];
+}
 
 /** The English the person chose to read under a couplet. */
 export function english(k: Kural, t: 'aiyar' | 'pope' | 'popeprose'): string {

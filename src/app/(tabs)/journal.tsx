@@ -6,27 +6,28 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { todayKural } from '@/lib/daily';
 import { useTabTop } from '@/lib/tabTop';
-import { addDays, dayOf, longDate, monthName, today } from '@/lib/dates';
+import { addDays, dayOf, longDate, monthName } from '@/lib/dates';
 import type { Day } from '@/lib/dates';
 import { allTags, searchEntries, useJournal } from '@/lib/journal';
 import { PARTS, partOf } from '@/lib/pack';
 import type { Part } from '@/lib/pack';
+import { setSettings, useSettings } from '@/lib/settings';
 import type { Entry } from '@/lib/types';
 import { ArchValluvar, EntryCard, MOODS, MoodChip, PhotoThumb, Rise, Sheet, ToTop, Wrap, moodTint, plainMarkdown, usePhoto } from '@/ui/common';
 import { KolamBand } from '@/ui/kolam';
 import { AtlasMap } from '@/ui/atlas';
 import { VideoTile } from '@/ui/media';
-import { Button, Chip, Icon, IconButton, SectionLabel, T, TextLink, raised } from '@/ui/parts';
+import { Button, Chip, Icon, IconButton, Note, SectionLabel, T, TextLink, raised } from '@/ui/parts';
 import { alpha } from '@/ui/theme';
-import { useUI } from '@/ui/ui';
+import { useToday, useUI } from '@/ui/ui';
 
 type Filter = { starred: boolean; photos: boolean; moods: string[]; tags: string[]; parts: Part[]; within: number; oldestFirst: boolean };
 const NONE: Filter = { starred: false, photos: false, moods: [], tags: [], parts: [], within: 0, oldestFirst: false };
 
 const count = (f: Filter) => [f.starred, f.photos, f.moods.length > 0, f.tags.length > 0, f.parts.length > 0, f.within > 0, f.oldestFirst].filter(Boolean).length;
 
-function applyFilter(f: Filter, list: Entry[]): Entry[] {
-  const since = f.within > 0 ? addDays(today(), -(f.within - 1)) : null;
+function applyFilter(f: Filter, list: Entry[], day: Day): Entry[] {
+  const since = f.within > 0 ? addDays(day, -(f.within - 1)) : null;
   const out = list.filter(
     (e) =>
       (!f.starred || e.starred) &&
@@ -48,7 +49,9 @@ export default function JournalScreen() {
   const { c, L, tr, type, tamil } = useUI();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { entries, loaded } = useJournal();
+  const { entries, loaded, failed, broken } = useJournal();
+  const s = useSettings();
+  const day = useToday();
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'list' | 'calendar' | 'media' | 'map'>('list');
   const calendar = view === 'calendar';
@@ -57,8 +60,12 @@ export default function JournalScreen() {
   const { height: screenH } = useWindowDimensions();
   const [filter, setFilter] = useState<Filter>(NONE);
   const [open, setOpen] = useState(false);
-  const shown = useMemo(() => applyFilter(filter, searchEntries(entries, query)), [filter, entries, query]);
-  const yearAgo = entries.find((e) => e.date === addDays(today(), -365) || e.date === `${Number(today().slice(0, 4)) - 1}${today().slice(4)}`);
+  const shown = useMemo(() => applyFilter(filter, searchEntries(entries, query, MOODS), day), [filter, entries, query, day]);
+  // On this day: the most recent earlier year with a page on today's date (newest first, so the first found).
+  const onThisDay = entries.find((e) => e.date.slice(5) === day.slice(5) && e.date < day);
+  const yearsAgo = onThisDay ? Number(day.slice(0, 4)) - Number(onThisDay.date.slice(0, 4)) : 0;
+  // Until a backup is set up, the journal lives only on this phone: once there's something to lose, say so once.
+  const nudge = loaded && entries.length >= 5 && !s.hasPassphrase && !s.backupNudgeDismissed;
   const n = count(filter);
 
   const header = (
@@ -81,6 +88,20 @@ export default function JournalScreen() {
           ) : null}
         </View>
       </View>
+      {/* A journal that couldn't be opened says so, rather than looking empty. Nothing is deleted meanwhile. */}
+      {broken || failed > 0 ? (
+        <Note icon="shield" iconColor={c.heart} style={{ marginHorizontal: 16, marginTop: 12 }}>
+          {broken
+            ? tr(
+                'Your journal couldn’t be opened on this phone just now. Nothing has been deleted. Close the app and open it again; if this stays, restore from your backup.',
+                'உங்கள் நாட்குறிப்பை இப்போது இந்த அலைபேசியில் திறக்க இயலவில்லை. எதுவும் நீக்கப்படவில்லை. செயலியை மூடி மீண்டும் திறங்கள்; இது தொடர்ந்தால் உங்கள் காப்பிலிருந்து மீட்டெடுங்கள்.',
+              )
+            : tr(
+                `${failed === 1 ? '1 page' : `${failed} pages`} couldn’t be opened on this phone. Nothing has been deleted: ${failed === 1 ? 'it stays, with its' : 'they stay, with their'} photos.`,
+                `${failed === 1 ? '1 பக்கத்தை' : `${failed} பக்கங்களை`} இந்த அலைபேசியில் திறக்க இயலவில்லை. எதுவும் நீக்கப்படவில்லை: ${failed === 1 ? 'அது அதன் படங்களுடன் அப்படியே உள்ளது' : 'அவை அவற்றின் படங்களுடன் அப்படியே உள்ளன'}.`,
+              )}
+        </Note>
+      ) : null}
       {entries.length === 0 && loaded ? (
         <View style={{ alignItems: 'center', padding: 24 }}>
           {/* Today shows him reading; here he waits with his stylus, for the first page. */}
@@ -114,7 +135,7 @@ export default function JournalScreen() {
               <T v="label" color={c.ink3} style={{ flex: 1 }}>
                 {tr(`${shown.length} of ${entries.length} pages`, `${entries.length}-இல் ${shown.length} பக்கங்கள்`)}
               </T>
-              <TextLink label={tr('Clear filters', 'வடிகட்டிகளை நீக்கு')} onPress={() => setFilter(NONE)} />
+              <TextLink label={tr('Clear filters', 'வடிகட்டிகளை அழி')} onPress={() => setFilter(NONE)} />
             </View>
           ) : null}
           <View style={{ flexDirection: 'row', gap: 6, marginHorizontal: 16, marginBottom: 10, padding: 4, borderRadius: 22, backgroundColor: c.surface2 }}>
@@ -173,15 +194,31 @@ export default function JournalScreen() {
               </View>
             </View>
           ) : null}
-          {view === 'list' && !query && yearAgo ? (
+          {view === 'list' && !query && nudge ? (
+            <View style={{ marginHorizontal: 16, marginBottom: 8 }}>
+              <Note icon="shield" iconColor={c.primary}>
+                {tr(
+                  'Your pages live only on this phone. A backup, locked with a passphrase only you know, keeps them safe if the phone is lost or replaced.',
+                  'உங்கள் பக்கங்கள் இந்த அலைபேசியில் மட்டுமே உள்ளன. உங்களுக்கு மட்டும் தெரிந்த கடவுச்சொற்றொடரால் பூட்டிய காப்பு, அலைபேசி தொலைந்தாலும் மாறினாலும் அவற்றைப் பாதுகாக்கும்.',
+                )}
+              </Note>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 4, marginTop: 4 }}>
+                <TextLink label={tr('Not now', 'இப்போது வேண்டாம்')} color={c.ink2} onPress={() => setSettings({ backupNudgeDismissed: true })} />
+                <TextLink label={tr('Set up a backup', 'காப்பை அமை')} onPress={() => router.push('/backup')} />
+              </View>
+            </View>
+          ) : null}
+          {view === 'list' && !query && onThisDay ? (
             <Pressable
-              onPress={() => router.push({ pathname: '/page/[id]', params: { id: yearAgo.id } })}
+              onPress={() => router.push({ pathname: '/page/[id]', params: { id: onThisDay.id } })}
               style={{ marginHorizontal: 16, marginBottom: 8, borderRadius: 24, backgroundColor: c.primarySoft, padding: 16 }}>
               <T v="label" color={c.onSoft}>
-                {L.otd}
+                {yearsAgo === 1
+                  ? tr('On this day, a year ago', 'இதே நாள், ஓராண்டுக்கு முன்')
+                  : tr(`On this day, ${yearsAgo} years ago`, `இதே நாள், ${yearsAgo} ஆண்டுகளுக்கு முன்`)}
               </T>
               <T v="body" numberOfLines={2}>
-                {plainMarkdown(yearAgo.text)}
+                {plainMarkdown(onThisDay.text)}
               </T>
             </Pressable>
           ) : null}
@@ -280,7 +317,8 @@ function CalendarMonth({ entries }: { entries: Entry[] }) {
   const router = useRouter();
   const now = new Date();
   const [ym, setYm] = useState<[number, number]>([now.getFullYear(), now.getMonth()]);
-  const [picked, setPicked] = useState<Day>(today());
+  const t = useToday();
+  const [picked, setPicked] = useState<Day>(t);
   const photoOf = useMemo(() => {
     const m = new Map<Day, string>();
     for (const e of entries) if (e.photos[0] && !m.has(e.date)) m.set(e.date, e.photos[0]);
@@ -298,10 +336,9 @@ function CalendarMonth({ entries }: { entries: Entry[] }) {
   const rows = Math.ceil((lead + days) / 7);
   const heads = tamil ? ['தி', 'செ', 'பு', 'வி', 'வெ', 'ச', 'ஞா'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const move = (d: number) => {
-    const t = new Date(y, mo + d, 1);
-    setYm([t.getFullYear(), t.getMonth()]);
+    const to = new Date(y, mo + d, 1);
+    setYm([to.getFullYear(), to.getMonth()]);
   };
-  const t = today();
   const monthKey = `${y}-${String(mo + 1).padStart(2, '0')}`;
   const inMonth = entries.filter((e) => e.date.startsWith(monthKey));
   const daysWritten = new Set(inMonth.map((e) => e.date)).size;
@@ -315,7 +352,7 @@ function CalendarMonth({ entries }: { entries: Entry[] }) {
             <T v="headline" style={{ textAlign: 'center' }}>{`${monthName(mo, tamil)} ${y}`}</T>
             <T v="small" color={daysWritten ? c.primary : c.ink3}>
               {daysWritten
-                ? tr(`${inMonth.length} ${inMonth.length === 1 ? 'page' : 'pages'} on ${daysWritten} ${daysWritten === 1 ? 'day' : 'days'}`, `${daysWritten} நாளில் ${inMonth.length} பக்கங்கள்`)
+                ? tr(`${inMonth.length} ${inMonth.length === 1 ? 'page' : 'pages'} on ${daysWritten} ${daysWritten === 1 ? 'day' : 'days'}`, `${daysWritten} நாளில் ${inMonth.length} ${inMonth.length === 1 ? 'பக்கம்' : 'பக்கங்கள்'}`)
                 : tr('No pages yet this month', 'இந்த மாதம் இன்னும் பக்கம் இல்லை')}
             </T>
           </View>
@@ -454,7 +491,7 @@ function FilterSheet({ visible, filter, entries, onClose }: { visible: boolean; 
         </>
       ) : null}
       <Button label={tr('Show pages', 'பக்கங்களைக் காட்டு')} style={{ marginTop: 18 }} onPress={() => onClose(f)} />
-      <TextLink label={tr('Clear all', 'அனைத்தையும் நீக்கு')} onPress={() => setF(NONE)} />
+      <TextLink label={tr('Clear all', 'எல்லாத் தேர்வுகளையும் அழி')} onPress={() => setF(NONE)} />
     </Sheet>
   );
 }

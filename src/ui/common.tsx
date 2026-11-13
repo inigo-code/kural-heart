@@ -9,10 +9,10 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { dayOf, longDate } from '@/lib/dates';
-import { LENS, chapterOf, english, questionFor } from '@/lib/pack';
+import { chapterOf, english, questionFor } from '@/lib/pack';
 import type { Kural, Part } from '@/lib/pack';
 import { photoUri } from '@/lib/photos';
-import { useSettings } from '@/lib/settings';
+import { setSettings, useSettings } from '@/lib/settings';
 import type { Entry, Weather } from '@/lib/types';
 import { Valluvar } from '@/valluvar/Valluvar';
 import type { ValluvarState } from '@/valluvar/Valluvar';
@@ -103,9 +103,9 @@ export function translator(which: string): string {
   return which === 'pope' ? 'G. U. Pope, 1886' : which === 'popeprose' ? 'G. U. Pope, 1886, prose' : 'V. V. S. Aiyar, 1916';
 }
 
-/** The question for a lens: Mind uses the chapter's own question, Speech and Action the shared lens prompts. */
+/** The question for a lens (Mind, Speech, Action): each chapter asks its own three. */
 export function questionText(k: Kural, lens: number, tamil: boolean): string {
-  const q = lens === 1 ? LENS.speech : lens === 2 ? LENS.action : questionFor(k);
+  const q = questionFor(k, lens);
   return tamil ? q.ta : q.en;
 }
 
@@ -224,16 +224,20 @@ export function SmoothHeight({ children, style, bleed = 0 }: { children: ReactNo
   const { still } = useUI();
   const h = useSharedValue(-1);
   const box = useAnimatedStyle(() => (h.value < 0 ? {} : { height: h.value }));
+  // Once measured, the content is laid out on its own rather than inside the box: a child of a clipped box is
+  // measured at most the box's height, so text that grew (a longer question, Tamil wrapping to one more line) was
+  // cut to the old height and never reported its new one.
+  const free = useAnimatedStyle(() => (h.value < 0 ? {} : { position: 'absolute', left: 0, right: 0, top: 0 }));
   return (
     <Animated.View style={[{ overflow: 'hidden', margin: -bleed }, box]}>
-      <View
-        style={[{ padding: bleed }, style]}
+      <Animated.View
+        style={[{ padding: bleed }, style, free]}
         onLayout={(e) => {
           const v = e.nativeEvent.layout.height;
           h.set(h.get() < 0 || still ? v : withTiming(v, { duration: 260, easing: Easing.out(Easing.cubic) }));
         }}>
         {children}
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -273,6 +277,63 @@ export function MeaningUnder({ k }: { k: Kural }) {
         {ta ? MUVA_BY.ta : translator(s.translation)}
       </T>
     </View>
+  );
+}
+
+/** For daily life: a short note on living the couplet today, where one has been written. Nothing otherwise. */
+export function WisdomNote({ k, style }: { k: Kural; style?: StyleProp<ViewStyle> }) {
+  const { c, tr, tamil } = useUI();
+  if (!k.w) return null;
+  return (
+    <View style={[{ borderRadius: 20, backgroundColor: c.surface2, padding: 16 }, style]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Icon name="bulb" size={20} color={c.primary} />
+        <T v="label" color={c.primary} style={{ flex: 1 }}>
+          {tr('For daily life', 'அன்றாட வாழ்வில்')}
+        </T>
+      </View>
+      <T v="bodyM" color={c.ink} style={{ marginTop: 6 }}>
+        {tamil ? k.w.ta : k.w.en}
+      </T>
+    </View>
+  );
+}
+
+/**
+ * The three ways into a couplet (Mind, Speech, Action) and the chapter's question for the one chosen. The choice is
+ * remembered, so the page you write opens on the same question.
+ */
+export function LensQuestion({ k }: { k: Kural }) {
+  const { c, L, tamil, type } = useUI();
+  const lens = useSettings().lastLens;
+  const [question, fade] = useCrossfade(questionText(k, lens, tamil));
+  return (
+    <>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+        {L.lens.map((name, i) => {
+          const on = lens === i;
+          return (
+            <Pressable
+              key={name}
+              onPress={() => setSettings({ lastLens: i })}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: on }}
+              style={{ borderRadius: 16, backgroundColor: on ? c.primary : c.surface2, minHeight: 36, paddingHorizontal: 14, paddingVertical: 8 }}>
+              <T v="label" color={on ? c.onPrimary : c.ink2}>
+                {name}
+              </T>
+            </Pressable>
+          );
+        })}
+      </View>
+      <SmoothHeight>
+        <Animated.View style={fade}>
+          <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.92 }}>
+            {question}
+          </T>
+        </Animated.View>
+      </SmoothHeight>
+    </>
   );
 }
 

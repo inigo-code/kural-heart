@@ -12,13 +12,14 @@ import { dayOf, longDate, parseDay, today } from '@/lib/dates';
 import type { Day } from '@/lib/dates';
 import { allTags, deleteEntry, entryById, saveEntry, useJournal } from '@/lib/journal';
 import { awayFor } from '@/lib/lock';
+import { planReminders } from '@/lib/notify';
 import { addMediaFile, addPhoto } from '@/lib/photos';
 import { placeAndWeather } from '@/lib/places';
 import { uuid } from '@/lib/random';
 import { useSettings } from '@/lib/settings';
 import type { Entry, Place, Weather } from '@/lib/types';
 import { wordCount } from '@/lib/types';
-import { Dialog, Field, HScroll, MOODS, MoodChip, PhotoThumb, WEATHER_NAMES, Wrap, questionText, timeOf, weatherLabel } from '@/ui/common';
+import { Dialog, Field, HScroll, MOODS, MoodChip, PhotoThumb, WEATHER_NAMES, Wrap, timeOf, weatherLabel } from '@/ui/common';
 import { KeyboardSafe } from '@/ui/keyboard';
 import { AudioNote, VideoNote, VoiceRecorder } from '@/ui/media';
 import { CoupletText, Pronounce } from '@/ui/leaf';
@@ -27,7 +28,7 @@ import { F } from '@/ui/theme';
 import { toast } from '@/ui/toast';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
-import { chapterOf, kural } from '@/lib/pack';
+import { chapterOf, kural, questionFor, questionOfPage } from '@/lib/pack';
 
 type Sel = { start: number; end: number };
 
@@ -89,11 +90,14 @@ export default function WriteScreen() {
   const savedOnce = useRef(!!existing);
   const done = useRef(false);
 
+  // An existing page keeps the question it was written to, until another lens is chosen.
+  const asked = existing && lens === existing.lens ? questionOfPage(existing) : questionFor(k, lens);
   const current = (): Entry => ({
     ...base,
     text: text.trim(),
     mood,
     lens,
+    q: asked,
     date,
     created,
     updated: Date.now(),
@@ -150,11 +154,13 @@ export default function WriteScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Leaving an emptied new page removes its draft.
+  // Leaving an emptied new page removes its draft (which leaves no tombstone unless a sync had already sent it out).
+  // Leaving at all plans the reminder again: a draft kept today means today's reminder isn't needed.
   useEffect(
     () => () => {
       const e = latest.current();
-      if (!done.current && !e.text && !e.photos.length && !e.audio.length && !e.videos.length && savedOnce.current && !existing) deleteEntry(base.id);
+      const emptied = !done.current && !e.text && !e.photos.length && !e.audio.length && !e.videos.length && savedOnce.current && !existing;
+      (emptied ? deleteEntry(base.id) : Promise.resolve(undefined)).then(() => planReminders()).catch(() => {});
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -294,8 +300,52 @@ export default function WriteScreen() {
               <Pronounce a={k.a} b={k.b} color={c.ink3} size={14} />
             </View>
           </View>
-          <View style={{ height: 12 }} />
-          <HScroll>
+          <View style={{ paddingHorizontal: 20 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
+              {L.lens.map((name, i) => (
+                <Pressable
+                  key={name}
+                  onPress={() => setLens(i)}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: lens === i }}
+                  style={{ borderRadius: 16, backgroundColor: lens === i ? c.primary : c.surface2, minHeight: 40, paddingHorizontal: 14, paddingVertical: 9 }}>
+                  <T v="label" color={lens === i ? c.onPrimary : c.ink2}>
+                    {name}
+                  </T>
+                </Pressable>
+              ))}
+            </View>
+            <T v="headline" style={{ marginTop: 10, fontSize: type.headline.fontSize * 0.88, lineHeight: type.headline.lineHeight * 0.9 }}>
+              {tamil ? asked.ta : asked.en}
+            </T>
+            <View style={{ marginTop: 14, borderRadius: 20, backgroundColor: c.surface, padding: 16, minHeight: 240 }}>
+              <TextInput
+                value={text}
+                onChangeText={setText}
+                onSelectionChange={(e) => setSel(e.nativeEvent.selection)}
+                selection={forceSel}
+                multiline
+                autoFocus={!existing}
+                placeholder={L.writeHere}
+                placeholderTextColor={c.ink3}
+                accessibilityLabel={L.writeHere}
+                selectionColor={c.primary}
+                cursorColor={c.primary}
+                textAlignVertical="top"
+                autoCapitalize="sentences"
+                maxFontSizeMultiplier={1.4}
+                style={{ fontFamily: F.sans, fontSize: writeSize, lineHeight: (tamil ? 33 : 30) * scale, color: c.ink, minHeight: 220, padding: 0 }}
+              />
+            </View>
+          </View>
+          {/* Everything that goes with the words, right under them: what to add, then when, where and how. */}
+          <HScroll style={{ marginTop: 12 }}>
+            <Chip label={tr('Photos', 'படங்கள்')} icon="gallery" onPress={pickPhotos} />
+            <Chip label={tr('Camera', 'கேமரா')} icon="photo" onPress={camera} />
+            <Chip label={videoBusy ? '…' : tr('Video', 'காணொளி')} icon="video" onPress={pickVideo} />
+            <Chip label={tr('Voice note', 'குரல் குறிப்பு')} icon="mic" onPress={() => setRecording(true)} />
+          </HScroll>
+          <HScroll style={{ marginTop: 8 }}>
             <Chip label={longDate(date, tamil)} icon="calendar" onPress={pickDate} />
             <Chip label={timeOf(current())} icon="clock" onPress={pickTime} />
             <Chip
@@ -323,44 +373,6 @@ export default function WriteScreen() {
               }}
             />
           </HScroll>
-          <View style={{ paddingHorizontal: 20 }}>
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
-              {L.lens.map((name, i) => (
-                <Pressable
-                  key={name}
-                  onPress={() => setLens(i)}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: lens === i }}
-                  style={{ borderRadius: 16, backgroundColor: lens === i ? c.primary : c.surface2, minHeight: 40, paddingHorizontal: 14, paddingVertical: 9 }}>
-                  <T v="label" color={lens === i ? c.onPrimary : c.ink2}>
-                    {name}
-                  </T>
-                </Pressable>
-              ))}
-            </View>
-            <T v="headline" style={{ marginTop: 10, fontSize: type.headline.fontSize * 0.88, lineHeight: type.headline.lineHeight * 0.9 }}>
-              {questionText(k, lens, tamil)}
-            </T>
-            <View style={{ marginTop: 14, borderRadius: 20, backgroundColor: c.surface, padding: 16, minHeight: 240 }}>
-              <TextInput
-                value={text}
-                onChangeText={setText}
-                onSelectionChange={(e) => setSel(e.nativeEvent.selection)}
-                selection={forceSel}
-                multiline
-                autoFocus={!existing}
-                placeholder={L.writeHere}
-                placeholderTextColor={c.ink3}
-                accessibilityLabel={L.writeHere}
-                selectionColor={c.primary}
-                cursorColor={c.primary}
-                textAlignVertical="top"
-                autoCapitalize="sentences"
-                maxFontSizeMultiplier={1.4}
-                style={{ fontFamily: F.sans, fontSize: writeSize, lineHeight: (tamil ? 33 : 30) * scale, color: c.ink, minHeight: 220, padding: 0 }}
-              />
-            </View>
-          </View>
           {photos.length ? (
             <HScroll style={{ marginTop: 12 }}>
               {photos.map((id) => (
@@ -386,12 +398,6 @@ export default function WriteScreen() {
               ))}
             </HScroll>
           ) : null}
-          <HScroll style={{ marginTop: 12 }}>
-            <Chip label={tr('Photos', 'படங்கள்')} icon="gallery" onPress={pickPhotos} />
-            <Chip label={tr('Camera', 'கேமரா')} icon="photo" onPress={camera} />
-            <Chip label={videoBusy ? '…' : tr('Video', 'காணொளி')} icon="video" onPress={pickVideo} />
-            <Chip label={tr('Voice note', 'குரல் குறிப்பு')} icon="mic" onPress={() => setRecording(true)} />
-          </HScroll>
           {/* Voice notes and videos play right here, so you can check them before keeping the page. */}
           {audio.length || videos.length ? (
             <View style={{ gap: 8, marginHorizontal: 20, marginTop: 10 }}>
