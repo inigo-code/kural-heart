@@ -74,6 +74,12 @@ The Tamil text is Project Madurai's, checked line by line against two other sour
 | Feature graphic | `feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `screenshots/01.png` to `06.png` | 1080 × 1920 |
 
+## Release notes for 1.0.7 (500 max)
+
+<en-IN>
+Every chapter now asks its own three questions, for Mind, Speech and Action. Each couplet has a short note on living it today, which can go on your share images too. Drive sync keeps your deletions and edits, restoring is much faster, and you can change your passphrase on the Backup page. The daily reminder pops up on screen and stays quiet on a day you've already written. Tamil text no longer gets cut off.
+</en-IN>
+
 ## Release notes for the first Play release, 1.0.6 (500 max)
 
 <en-IN>
