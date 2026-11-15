@@ -8,9 +8,9 @@ Default language: **English (India), en-IN**. Release notes go between `<en-IN>`
 
 Kural Heart
 
-## Short description (80 max)
+## Short description (80 max; one sentence takes no full stop, and it shouldn't repeat the feature graphic)
 
-A Thirukkural couplet each day in Tamil and English, and a private journal.
+A Thirukkural couplet each day in Tamil and English, and a private journal
 
 ## Full description (4000 max)
 
