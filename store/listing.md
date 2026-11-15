@@ -16,41 +16,41 @@ A Thirukkural couplet each day in Tamil and English, and a private journal
 
 Kural Heart is a quiet journal with Thiruvalluvar. Each day brings one couplet of the Thirukkural on its palm leaf, in Tamil and English, with a question to write about and a private page that stays on your phone.
 
-A COUPLET EACH DAY
+A couplet each day
 • All 1,330 couplets, each on a palm leaf, written flush left as on the olai
 • A pronunciation line under every couplet, simple or scholarly (ISO 15919), for readers new to Tamil
 • Turn the leaf for G. U. Pope's verse
 • Six times of day, from vaigarai to yaamam, each with its own greeting
 
-READ IT EVERY WAY
+Read it every way
 • V. V. S. Aiyar's English (1916) and G. U. Pope's verse and prose (1886)
 • With Tamil first, Mu. Varadarasanar's Tamil explanation under every couplet
 • Browse the three books by chapter, search by number or by a word in Tamil or English, and save the couplets you love
 • Listen: each couplet read aloud in your phone's Tamil voice, then the English if you like
 
-A QUESTION TO WRITE ABOUT
+A question to write about
 • A question for the mind, for speech and for action
 • Write a line or a page, with bold, lists and checklists
 • Add a feeling, photos, a voice note, a short video, the place and the weather
 • Find your pages by day, by feeling, in a calendar, with your photos, or on a map
 • How is your heart? Choose a feeling and Valluvar finds a couplet for it
 
-A THREAD, NOT A STREAK
+A thread, not a streak
 • Two rest days a week are kept for you, so a busy day never breaks your thread
 • Nine seals mark the way, from your first leaf to a year with Valluvar
 • 133 chapter beads fill as you write
 • Insights: your words over time, the days and hours you write, your feelings and the chapters you return to
 
-SHARE A COUPLET
+Share a couplet
 • Turn any couplet into a story or a post, in seven looks from Tamil life: dawn, midnight, clay, peacock, banana leaf, jasmine and turmeric
 • Your own words are added only if you switch that on
 
-MAKE IT YOURS
+Make it yours
 • Ivory or Midnight, or follow your phone's light or dark setting
 • Four accent colours and four text sizes, in English or Tamil
 • A Today widget and a gentle morning reminder
 
-PRIVATE BY DESIGN
+Private by design
 • No account, no ads, no analytics, no tracking
 • What you write, and your photos, voice notes and videos, are encrypted on your phone
 • Backups are one file locked with a passphrase only you know, saved to a folder you choose or to a hidden app folder in your own Google Drive
