@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Fragment, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 
 import { setToday } from '@/lib/daily';
@@ -73,26 +73,24 @@ export default function KuralScreen() {
           <TextLink label={tr('Open voice settings', 'குரல் அமைப்புகளைத் திற')} onPress={voiceSettings} />
         </View>
       ) : null}
+      {/* Living it comes first, right under the actions; then the renderings: Pope's verse and prose, then Aiyar. */}
+      <WisdomNote k={k} style={{ marginTop: 22, marginBottom: 4 }} />
       {(
         [
           ...(tamil && k.ta ? [[MUVA_BY.ta, k.ta, false] as const] : []),
-          ['V. V. S. Aiyar, 1916', k.en, false] as const,
           ['G. U. Pope, 1886', `${k.pa}\n${k.pb}`, true] as const,
           [tr("Pope's edition, prose", 'போப் பதிப்பு, உரைநடை'), k.pp, false] as const,
+          ['V. V. S. Aiyar, 1916', k.en, false] as const,
           // Readers who lead in English but know some Tamil find the Tamil explanation last.
           ...(!tamil && k.ta ? [[MUVA_BY.en, k.ta, false] as const] : []),
         ]
       ).map(([by, text, italic], i) => (
-        <Fragment key={by}>
-          <View style={{ marginTop: i === 0 ? 22 : 0, paddingVertical: 16, borderTopWidth: i === 0 || (i === 1 && k.w) ? 0 : 1, borderTopColor: c.line }}>
-            <T v="small" color={c.primary} style={{ letterSpacing: 0.2 }}>
-              {by}
-            </T>
-            <Text style={[type.body, { color: c.ink, marginTop: 6 }, italic ? { fontFamily: F.serifItalic } : null]}>{text}</Text>
-          </View>
-          {/* Living it comes right after the meaning in the reader's language, before the other renderings. */}
-          {i === 0 ? <WisdomNote k={k} style={{ marginBottom: 4 }} /> : null}
-        </Fragment>
+        <View key={by} style={{ marginTop: i === 0 && !k.w ? 22 : 0, paddingVertical: 16, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: c.line }}>
+          <T v="small" color={c.primary} style={{ letterSpacing: 0.2 }}>
+            {by}
+          </T>
+          <Text style={[type.body, { color: c.ink, marginTop: 6 }, italic ? { fontFamily: F.serifItalic } : null]}>{text}</Text>
+        </View>
       ))}
       <SectionLabel style={{ marginBottom: 0 }}>{tr('A question to write about', 'எழுதுவதற்கு ஒரு கேள்வி')}</SectionLabel>
       <LensQuestion k={k} />
