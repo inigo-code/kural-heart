@@ -775,18 +775,23 @@ export function ActionRow({ items, style }: { items: Action[]; style?: StyleProp
   );
 }
 
-/** Wider ways on from a couplet (choose another, say how you feel): soft pills with an icon, side by side. */
+/**
+ * Wider ways on from a couplet (choose another, say how you feel): soft pills with an icon, side by side
+ * while every label fits on one line. Once one would wrap ("How is your heart?" on a phone), they stack,
+ * each full width, so neither is a lopsided two-line pill.
+ */
 export function LinkPills({ items, style }: { items: Action[]; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
+  const [stacked, setStacked] = useState(false);
   return (
-    <View style={[{ flexDirection: 'row', gap: 10, paddingHorizontal: 20 }, style]}>
+    <View style={[{ flexDirection: stacked ? 'column' : 'row', gap: 10, paddingHorizontal: 20 }, style]}>
       {items.map((a) => (
         <Pressable
           key={a.icon + a.label}
           onPress={a.onPress}
           accessibilityRole="button"
           style={({ pressed }) => ({
-            flex: 1,
+            flex: stacked ? undefined : 1,
             minHeight: 52,
             flexDirection: 'row',
             alignItems: 'center',
@@ -799,7 +804,14 @@ export function LinkPills({ items, style }: { items: Action[]; style?: StyleProp
             backgroundColor: pressed ? c.primarySoft : c.surface,
           })}>
           <Icon name={a.icon} size={20} color={c.primary} stroke={2} />
-          <T v="label" color={c.ink} numberOfLines={2} style={{ flex: 1 }}>
+          <T
+            v="label"
+            color={c.ink}
+            numberOfLines={2}
+            style={{ flex: 1 }}
+            onTextLayout={(e) => {
+              if (!stacked && e.nativeEvent.lines.length > 1) setStacked(true);
+            }}>
             {a.label}
           </T>
         </Pressable>
