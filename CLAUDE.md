@@ -73,7 +73,7 @@ python -I tools/content/build_pack.py
 python -I tools/valluvar/gen_valluvar.py
 ```
 
-The local release build is signed with the debug key in `android/app/debug.keystore`, for installing on phones. EAS project: @inigojo/kural-heart (`eas.json`: development, preview APK, production). Ask before running `eas build` or `eas update`.
+A local build is signed with the prebuild's debug key, which is fine for testing but won't install over a published release. Released APKs (GitHub, F-Droid) are signed with the EAS key in `credentials/android/keystore.jks` (passwords in `credentials.json`, both ignored by git), the same key as the Play bundle's upload key: re-sign the built APK with build-tools' `apksigner sign --ks credentials/android/keystore.jks --ks-key-alias <keyAlias> --out dist/kuralheart-X.apk app-release.apk`, then check with `apksigner verify --print-certs` that the SHA-256 is `b276f669…3e8c7cd4`, as on 1.0.7. EAS project: @inigojo/kural-heart (`eas.json`: development, preview APK, production). Ask before running `eas build` or `eas update`.
 
 Emulator: AVD `KuralHeart_API36` (Pixel 7, Android 16). Start it with `-gpu host`; the software renderer (`swiftshader_indirect`) segfaults on this PC. Gboard on the emulator sometimes opens its stylus tutorial and swallows typed text; cancel it.
 
