@@ -514,22 +514,6 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
   return <View style={[{ backgroundColor: c.surface, borderRadius: R.lg, padding: 20 }, raised(c), style]}>{children}</View>;
 }
 
-export function Divider() {
-  const { c } = useUI();
-  return <View style={{ height: StyleSheet.hairlineWidth * 2, backgroundColor: c.line }} />;
-}
-
-export function Pill({ label, color, bg }: { label: string; color?: string; bg?: string }) {
-  const { c } = useUI();
-  return (
-    <View style={{ borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: bg ?? alpha(c.primary, 0.12) }}>
-      <T v="small" color={color ?? c.primary}>
-        {label}
-      </T>
-    </View>
-  );
-}
-
 export function timeLabel(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;

@@ -61,10 +61,6 @@ export async function storedPassphrase(): Promise<string> {
   return p;
 }
 
-export async function forgetPassphrase() {
-  await SecureStore.deleteItemAsync(PASS_KEY);
-}
-
 // --- passphrase backups (KHB1) ---
 
 const MAGIC = utf8('KHB1');

@@ -75,5 +75,3 @@ export async function placeAndWeather(): Promise<{ place: Place | null; weather:
   const [name, weather] = await Promise.all([placeName(pos.lat, pos.lon), weatherAt(pos.lat, pos.lon)]);
   return { place: name ? { name, lat: Math.round(pos.lat * 100) / 100, lon: Math.round(pos.lon * 100) / 100 } : null, weather };
 }
-
-export const WEATHER_KINDS: WeatherKind[] = ['sun', 'partly', 'cloud', 'rain', 'storm', 'fog', 'snow', 'wind'];

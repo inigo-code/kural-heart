@@ -861,18 +861,6 @@ export function HScroll({ children, style }: { children: ReactNode; style?: Styl
   return <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20 }, style]}>{children}</View>;
 }
 
-export function DetailLine({ icon, text }: { icon: Parameters<typeof Icon>[0]['name']; text: string }) {
-  const { c } = useUI();
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 3, gap: 10 }}>
-      <Icon name={icon} size={18} color={c.ink3} />
-      <T v="label" color={c.ink2} style={{ flex: 1 }}>
-        {text}
-      </T>
-    </View>
-  );
-}
-
 export function lastLabel(at: number, L: { backupNever: string; backupLast: (s: string) => string }, tamil: boolean): string {
   if (!at) return L.backupNever;
   const d = new Date(at);

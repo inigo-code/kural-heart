@@ -99,17 +99,3 @@ export function english(k: Kural, t: 'aiyar' | 'pope' | 'popeprose'): string {
   return k.en;
 }
 
-/** Search by number, Tamil words or English words. */
-export function searchKurals(q: string): Kural[] {
-  const s = q.trim().toLowerCase();
-  if (!s) return [];
-  if (/^\d+$/.test(s)) {
-    const n = Number(s);
-    return n >= 1 && n <= 1330 ? [kural(n)] : [];
-  }
-  const words = s.split(/\s+/);
-  return KURALS.filter((k) => {
-    const hay = `${k.a} ${k.b} ${k.en} ${k.pa} ${k.pb} ${k.pp} ${chapter(k.c).en} ${chapter(k.c).ta}`.toLowerCase();
-    return words.every((w) => hay.includes(w));
-  });
-}
