@@ -74,6 +74,12 @@ The Tamil text is Project Madurai's, checked line by line against two other sour
 | Feature graphic | `feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `screenshots/01.png` to `06.png` | 1080 × 1920 |
 
+## Release notes for 1.0.8 (500 max)
+
+<en-IN>
+A calmer, finer look. Titles are set in a finer cut of the serif, and a couplet's English meaning and its note for daily life read like a page of a book. Buttons and cards are quieter, so the palm leaf stands out, and feelings are marked with their own colour instead of emoji.
+</en-IN>
+
 ## Release notes for 1.0.7 (500 max)
 
 <en-IN>

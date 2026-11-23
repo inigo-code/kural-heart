@@ -20,8 +20,8 @@ what the app actually does. If the app changes (new data, a new library, ads), u
     then restore.
   - Google Drive sign-in needs the Play key's SHA-1 too (step 9 below).
 - **Version codes:** every upload to Play needs a higher versionCode than the last. GitHub APKs and Play bundles share
-  one sequence (1.0.3 APK 4, its bundle 5; 1.0.4 APK 6, its bundle 7; 1.0.5 APK 8, its bundle 9; 1.0.6 APK 10, its bundle 11). Before the next `eas build`, run
-  `npx eas-cli build:version:set -p android` and set it to 11, so EAS carries on from here.
+  one sequence (1.0.3 APK 4, its bundle 5; 1.0.4 APK 6, its bundle 7; 1.0.5 APK 8, its bundle 9; 1.0.6 APK 10, its bundle 11; 1.0.7 APK 12, its bundle 13; 1.0.8 APK 14, its bundle 15). Before the next `eas build`, run
+  `npx eas-cli build:version:set -p android` and set it to 15, so EAS carries on from here.
 - **Over-the-air updates:** Play builds listen on the `production` channel, GitHub APKs on `preview`. Publish every
   `eas update` to both, after checking the runtime fingerprint (local builds have their own; see the Prompt Heart
   notes). Every update needs a new What's new entry.
