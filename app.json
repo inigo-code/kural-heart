@@ -172,7 +172,8 @@
           "enableBackgroundPlayback": false
         }
       ],
-      "expo-video"
+      "expo-video",
+      "./plugins/withOptionalHardware"
     ],
     "experiments": {
       "typedRoutes": true,
