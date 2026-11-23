@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import type { ReactNode } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { currentThread } from '@/lib/actions';
 import { PERIODS, PERIOD_ORDER, asPeriod } from '@/lib/daily';
@@ -347,7 +347,7 @@ function BookRings({ done }: { done: Record<Part, number> }) {
 function Tile({ icon, value, label }: { icon: IconName; value: string; label: string }) {
   const { c, type } = useUI();
   return (
-    <View style={{ flexBasis: '46%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.surface, borderRadius: 22, paddingVertical: 14, paddingHorizontal: 14, gap: 12, ...raised(c) }}>
+    <View style={{ flexBasis: '46%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.surface, borderRadius: 20, paddingVertical: 16, paddingHorizontal: 16, gap: 12, ...raised(c) }}>
       <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: c.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
         <Icon name={icon} size={19} color={c.onSoft} />
       </View>
@@ -504,7 +504,7 @@ export default function InsightsScreen() {
 
   return (
     <Page title={tr('Insights', 'புள்ளிவிவரங்கள்')} inTab actions={<Valluvar state="presenting" size={64} />}>
-      <View style={{ flexDirection: 'row', gap: 4, marginTop: 4, padding: 4, borderRadius: 22, backgroundColor: c.surface2 }}>
+      <View style={{ flexDirection: 'row', gap: 4, marginTop: 4, padding: 4, borderRadius: 14, backgroundColor: c.surface2 }}>
         {(
           [
             ['30', tr('30 days', '30 நாட்கள்')],
@@ -522,8 +522,8 @@ export default function InsightsScreen() {
               }}
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
-              style={{ flex: 1, minHeight: 40, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? c.primary : 'transparent' }}>
-              <T v="label" color={on ? c.onPrimary : c.ink2} numberOfLines={1} style={{ paddingHorizontal: 4 }}>
+              style={{ flex: 1, minHeight: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? c.surface : 'transparent', borderWidth: on ? StyleSheet.hairlineWidth * 2 : 0, borderColor: c.line }}>
+              <T v="label" color={on ? c.ink : c.ink2} numberOfLines={1} style={{ paddingHorizontal: 4 }}>
                 {label}
               </T>
             </Pressable>
@@ -580,7 +580,7 @@ export default function InsightsScreen() {
                 <View key={m.id} style={{ gap: 6 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
                     <T v="label" style={{ flex: 1 }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
-                      {`${m.emoji}  ${tamil ? m.ta : m.en}`}
+                      {tamil ? m.ta : m.en}
                     </T>
                     <T v="labelM" color={c.ink3}>
                       {`${m.n} · ${pct}%`}

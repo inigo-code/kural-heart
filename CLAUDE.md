@@ -86,7 +86,8 @@ Emulator: AVD `KuralHeart_API36` (Pixel 7, Android 16). Start it with `-gpu host
 - Every update shows What's new: bump `WHATS_NEW.id` in `src/lib/whatsNew.ts` and write its lines (Heart Apps rule).
 - Kural text comes only from `pack.json`, built by `build_pack.py`. Never type Tamil couplets into code.
 - Couplets are always flush left.
-- Fonts are separate families per weight (`F` in `theme.ts`); never set `fontWeight` on them.
+- Fonts are separate families per weight and optical size (`F` in `theme.ts`, cut with every axis pinned by `tools/fonts/make_fonts.py`); never set `fontWeight` on them. Titles are Literata Display, English reading text the `read` role (Literata at text size), the interface Anek at 400 and 500. A font change needs a native build: the fingerprint changes, so `eas update` can't carry it.
+- Cards are a hairline with no shadow (`raised`), radii from `R`; the leaf is the one thing that lifts. No emoji in the interface; one kolam per screen.
 - Valluvar: white robes, no religious marks, no halo, hands without fingers.
 - Valluvar's motions live in two places: `.tv` rules in `olai.css` and `src/valluvar/motions.ts`. Keep them in step.
 - Commits as `Inigo <270059847+inigo-code@users.noreply.github.com>`, with no Claude co-author line. Commit only when asked.

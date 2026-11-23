@@ -71,7 +71,7 @@ export function AudioNote({ id, onRemove }: { id: string; onRemove?: () => void 
   };
   const progress = st.length ? Math.min(1, st.at / st.length) : 0;
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 14, borderRadius: 24, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 14, borderRadius: 20, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
       <Pressable
         onPress={toggle}
         accessibilityRole="button"
@@ -216,7 +216,7 @@ export function VideoNote({ id, onRemove }: { id: string; onRemove?: () => void 
   ) : null;
   if (!uri)
     return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 14, borderRadius: 24, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, paddingRight: 14, borderRadius: 20, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
         <Pressable
           onPress={open}
           accessibilityRole="button"
@@ -236,7 +236,7 @@ export function VideoNote({ id, onRemove }: { id: string; onRemove?: () => void 
       </View>
     );
   return (
-    <View style={{ borderRadius: 22, overflow: 'hidden', backgroundColor: '#000000', aspectRatio: Math.max(0.75, Math.min(16 / 9, ratio)) }}>
+    <View style={{ borderRadius: 14, overflow: 'hidden', backgroundColor: '#000000', aspectRatio: Math.max(0.75, Math.min(16 / 9, ratio)) }}>
       <VideoView player={player} style={{ flex: 1 }} contentFit="contain" nativeControls fullscreenOptions={{ enable: true }} />
       {remove ? <View style={{ position: 'absolute', top: 8, right: 8 }}>{remove}</View> : null}
     </View>

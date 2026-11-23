@@ -80,7 +80,7 @@ function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
   const [picking, setPicking] = useState(false);
   const dial = (n: string) => Linking.openURL(`tel:${n}`).catch(() => {});
   return (
-    <View style={{ marginTop: 16, borderRadius: 24, backgroundColor: c.surface, padding: 16, ...raised(c) }}>
+    <View style={{ marginTop: 16, borderRadius: 20, backgroundColor: c.surface, padding: 16, ...raised(c) }}>
       <T v="headline">{L.heavyTitle}</T>
       <T v="bodyM" color={c.ink2} style={{ marginTop: 6 }}>
         {L.heavyBody}
@@ -91,7 +91,7 @@ function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
           onPress={() => dial(line.dial)}
           accessibilityRole="button"
           accessibilityLabel={`${tr('Call', 'அழை')} ${line.name}, ${line.number}`}
-          style={({ pressed }) => ({ marginTop: 12, borderRadius: 18, backgroundColor: pressed ? c.surface3 : c.surface2, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 12 })}>
+          style={({ pressed }) => ({ marginTop: 12, borderRadius: 14, backgroundColor: pressed ? c.surface3 : c.surface2, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 12 })}>
           <View style={{ flex: 1 }}>
             <T v="label">{line.name}</T>
             <T v="labelM" color={c.ink3}>
@@ -99,7 +99,7 @@ function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
             </T>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 20, backgroundColor: c.primary, paddingHorizontal: 14, paddingVertical: 9 }}>
-            <Icon name="phone" size={17} color={c.onPrimary} stroke={2} />
+            <Icon name="phone" size={17} color={c.onPrimary} />
             <T v="label" color={c.onPrimary} style={{ fontVariant: ['tabular-nums'] }}>
               {line.number}
             </T>
@@ -109,7 +109,7 @@ function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
       <Pressable
         onPress={() => dial('')}
         accessibilityRole="button"
-        style={({ pressed }) => ({ marginTop: 10, borderRadius: 18, backgroundColor: pressed ? c.surface3 : c.surface2, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 12 })}>
+        style={({ pressed }) => ({ marginTop: 10, borderRadius: 14, backgroundColor: pressed ? c.surface3 : c.surface2, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 12 })}>
         <View style={{ flex: 1 }}>
           <T v="label">{L.heavyPerson}</T>
           <T v="labelM" color={c.ink3}>

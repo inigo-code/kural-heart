@@ -15,8 +15,9 @@ import { useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
 import { ActionRow, Avatar, KuralLeaf, LensQuestion, LinkPills, MeaningUnder, Rise, SmoothHeight, WisdomNote, useCrossfade } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
-import { KolamBand, KolamRing, SikkuThreshold } from '@/ui/kolam';
+import { SikkuThreshold } from '@/ui/kolam';
 import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
+import { R } from '@/ui/theme';
 import type { IconName } from '@/ui/parts';
 import { useToday, useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
@@ -57,35 +58,25 @@ export default function TodayScreen() {
   }, [k.n]);
   return (
     <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 12, minHeight: 56 }}>
-        {/* The date, underlined with a short row of pulli kolam, as a threshold is drawn each morning. */}
-        <View style={{ flex: 1, alignItems: 'flex-start' }}>
-          <T v="label" color={c.ink2}>
-            {longDate(day, tamil)}
-          </T>
-          <KolamBand height={10} strength={1.1} style={{ width: 132, marginTop: 6 }} />
-        </View>
-        <Pressable onPress={() => router.push('/profile')} accessibilityRole="button" accessibilityLabel={tr('Your profile', 'உங்கள் சுயவிவரம்')} hitSlop={6}>
-          <KolamRing size={52}>
-            <Avatar size={40} />
-          </KolamRing>
+      {/* The date and your profile. The screen's one kolam is the threshold under Valluvar's arch, below. */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 16, minHeight: 56 }}>
+        <T v="label" color={c.ink2} style={{ flex: 1 }}>
+          {longDate(day, tamil)}
+        </T>
+        <Pressable onPress={() => router.push('/profile')} accessibilityRole="button" accessibilityLabel={tr('Your profile', 'உங்கள் சுயவிவரம்')} hitSlop={8}>
+          <Avatar size={40} />
         </Pressable>
       </View>
       <Rise i={0} style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20, paddingRight: 8 }}>
         <View style={{ flex: 1, paddingBottom: 10 }}>
           <T v="display">{s.name ? `${tamil ? p.greetTa : p.greetEn},
 ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
-            <Icon name={PERIOD_ICON[period]} size={18} color={c.primary} stroke={2} />
-            {/* Tamil and English as separate pieces: one mixed line can be measured short on Android and lose its end. */}
-            <T v="label" color={c.primary} numberOfLines={1}>
+          {/* The time of day's Tamil name (சிறுபொழுது), quietly under the greeting that already says it in English. */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+            <Icon name={PERIOD_ICON[period]} size={18} color={c.ink3} />
+            <T v="label" color={c.ink2} numberOfLines={1}>
               {p.ta}
             </T>
-            {tamil ? null : (
-              <T v="label" color={c.primary} numberOfLines={1}>
-                {`· ${p.en.toLowerCase()}`}
-              </T>
-            )}
           </View>
         </View>
         <View style={{ width: 156, height: 156, alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -96,24 +87,24 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
           <SikkuThreshold height={14} style={{ position: 'absolute', left: 14, right: 14, bottom: -18 }} />
         </View>
       </Rise>
-      <Rise i={1} style={{ paddingHorizontal: 20, paddingTop: 30 }}>
+      <Rise i={1} style={{ paddingHorizontal: 20, paddingTop: 32 }}>
         <SmoothHeight bleed={10}>
           <Animated.View style={leafFade}>
             <KuralLeaf k={shownK} turned={turned} onPress={() => router.push({ pathname: '/kural/[n]', params: { n: String(shownK.n) } })} />
           </Animated.View>
         </SmoothHeight>
       </Rise>
-      <Rise i={2} style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+      <Rise i={2} style={{ paddingHorizontal: 20, paddingTop: 16 }}>
         <SmoothHeight style={{ paddingBottom: 12 }}>
           <Animated.View style={leafFade}>
             <MeaningUnder k={shownK} />
-            <WisdomNote k={shownK} style={{ marginTop: 14 }} />
+            <WisdomNote k={shownK} style={{ marginTop: 16 }} />
           </Animated.View>
         </SmoothHeight>
       </Rise>
       <Rise i={3}>
         <ActionRow
-          style={{ marginTop: 18 }}
+          style={{ marginTop: 16 }}
           items={[
             { icon: playing ? 'stop' : 'play', label: playing ? tr('Stop', 'நிறுத்து') : tr('Listen', 'கேள்'), on: playing, onPress: () => readAloud(k, english(k, s.translation)) },
             { icon: 'turn', label: L.turn, on: turned, onPress: () => setTurnedFor(turned ? null : k.n) },
@@ -129,14 +120,14 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
           ]}
         />
         <LinkPills
-          style={{ marginTop: 18 }}
+          style={{ marginTop: 20 }}
           items={[
             { icon: 'book', label: tr('Choose a couplet', 'குறள் தேர்வு'), onPress: () => router.navigate({ pathname: '/kural', params: { from: 'today' } }) },
             { icon: 'heart', label: L.feel, onPress: () => router.push('/feeling') },
           ]}
         />
       </Rise>
-      <Rise i={4} style={{ margin: 20, borderRadius: 28, backgroundColor: c.surface, padding: 18, ...raised(c) }}>
+      <Rise i={4} style={{ margin: 20, marginTop: 24, borderRadius: R.lg, backgroundColor: c.surface, padding: 20, ...raised(c) }}>
         <T v="label" color={c.ink3}>
           {L.todayQ}
         </T>
@@ -144,7 +135,7 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
         <Button
           label={mine ? L.keep : L.write}
           icon="pen"
-          style={{ marginTop: 16 }}
+          style={{ marginTop: 20 }}
           onPress={() => router.push({ pathname: '/write', params: mine ? { kural: String(k.n), id: mine.id } : { kural: String(k.n) } })}
         />
       </Rise>

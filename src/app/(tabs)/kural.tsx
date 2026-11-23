@@ -106,15 +106,15 @@ export default function LibraryScreen() {
             <BackButton onPress={goBack} label={from === 'settings' ? tr('Back to Settings', 'அமைப்புகளுக்குத் திரும்பு') : tr('Back to Today', 'இன்று திரைக்குத் திரும்பு')} />
           </View>
         ) : null}
+        <T v="display">{tr('Thirukkural', 'திருக்குறள்')}</T>
         <T v="label" color={c.ink3}>
           {tr('1,330 couplets · 133 chapters', '1,330 குறள்கள் · 133 அதிகாரங்கள்')}
         </T>
-        <T v="display">{tr('Thirukkural', 'திருக்குறள்')}</T>
       </View>
       <View
         style={{
           margin: 16,
-          borderRadius: 26,
+          borderRadius: 14,
           backgroundColor: c.surface2,
           minHeight: 54,
           paddingHorizontal: 16,

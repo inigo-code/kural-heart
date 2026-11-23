@@ -65,7 +65,7 @@ export default function PageScreen() {
         }>
         {/* The page's circumstances at a glance: how you felt, when, the weather and the place. */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {mood ? <InfoPill emoji={mood.emoji} text={tamil ? mood.ta : mood.en} tint={moodTint(mood, c)} /> : null}
+          {mood ? <InfoPill dot text={tamil ? mood.ta : mood.en} tint={moodTint(mood, c)} /> : null}
           <InfoPill icon="clock" text={timeOf(e)} />
           {e.weather ? <InfoPill icon={e.weather.kind === 'sun' || e.weather.kind === 'wind' ? 'sun' : 'cloud'} text={weatherLabel(e.weather, tamil)} /> : null}
           {e.place ? (
@@ -96,7 +96,7 @@ export default function PageScreen() {
         </View>
 
         {/* What you wrote, on its own sheet of paper. */}
-        <View style={{ marginTop: 16, borderRadius: 24, backgroundColor: c.surface, paddingHorizontal: 18, paddingVertical: 16, ...raised(c) }}>
+        <View style={{ marginTop: 16, borderRadius: 20, backgroundColor: c.surface, paddingHorizontal: 20, paddingVertical: 16, ...raised(c) }}>
           <Markdown text={e.text} style={[type.body, { color: c.ink, fontSize: 19 * scale * (tamil ? 1.08 : 1), lineHeight: (tamil ? 33 : 30) * scale }]} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
             <MayilBorder height={10} style={{ flex: 1 }} strength={0.7} />
@@ -133,8 +133,8 @@ export default function PageScreen() {
   );
 }
 
-/** A small rounded detail: an icon or emoji and a word or two; tinted for a feeling; tappable for the place. */
-function InfoPill({ icon, emoji, text, tint, onPress }: { icon?: IconName; emoji?: string; text: string; tint?: string; onPress?: () => void }) {
+/** A small rounded detail: an icon (or, for a feeling, its colour dot) and a word or two; tappable for the place. */
+function InfoPill({ icon, dot, text, tint, onPress }: { icon?: IconName; dot?: boolean; text: string; tint?: string; onPress?: () => void }) {
   const { c } = useUI();
   return (
     <Pressable
@@ -148,12 +148,10 @@ function InfoPill({ icon, emoji, text, tint, onPress }: { icon?: IconName; emoji
         minHeight: 34,
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 17,
-        backgroundColor: tint ? alpha(tint, 0.16) : pressed ? c.surface3 : c.surface2,
-        borderWidth: 1,
-        borderColor: tint ? alpha(tint, 0.4) : 'transparent',
+        borderRadius: 10,
+        backgroundColor: pressed ? c.surface3 : c.surface2,
       })}>
-      {emoji ? <Text style={{ fontSize: 15 }}>{emoji}</Text> : icon ? <Icon name={icon} size={16} color={tint ?? c.ink2} /> : null}
+      {dot && tint ? <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: tint }} /> : icon ? <Icon name={icon} size={16} color={c.ink2} /> : null}
       <T v="labelM" color={c.ink} numberOfLines={1}>
         {text}
       </T>

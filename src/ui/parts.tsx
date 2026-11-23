@@ -1,14 +1,13 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path as SvgPath } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { Easing, interpolateColor, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { ScrollViewProps, StyleProp, TextProps, TextStyle, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { alpha, mix } from './theme';
+import { R, alpha, mix } from './theme';
 import type { Colors, Variant } from './theme';
 import { useUI } from './ui';
 
@@ -103,8 +102,8 @@ export function T({ v = 'body', color, style, children, ...rest }: TextProps & {
 export const starInk = (c: Colors) => (c.isNight ? '#E9BE5E' : '#A8761A');
 
 /**
- * Star a page or save a couplet. Off, an outline star; on, a filled gold star in a soft gold disc, with a small pop as
- * it fills. [disc] gives it the round backing of the header buttons, so it pairs with Back.
+ * Star a page or save a couplet. Off, an outline star; on, a filled gold star in a soft gold disc, with a small lift as
+ * it fills (eased, not sprung: it settles rather than bounces). [disc] gives it the round backing of the header buttons, so it pairs with Back.
  */
 export function StarButton({ on, onPress, label, size = 24, disc }: { on: boolean; onPress: () => void; label: string; size?: number; disc?: boolean }) {
   const { c, still } = useUI();
@@ -115,7 +114,7 @@ export function StarButton({ on, onPress, label, size = 24, disc }: { on: boolea
   return (
     <Pressable
       onPress={() => {
-        if (!on && !still) pop.set(withSequence(withTiming(1.28, { duration: 110 }), withSpring(1, { damping: 9, stiffness: 260 })));
+        if (!on && !still) pop.set(withSequence(withTiming(1.16, { duration: 100, easing: Easing.out(Easing.cubic) }), withTiming(1, { duration: 200, easing: Easing.out(Easing.cubic) })));
         onPress();
       }}
       accessibilityLabel={label}
@@ -237,15 +236,18 @@ export function Page({
   );
 }
 
-/** The raised look of a card on the page: a fine edge and, on Ivory, a soft shadow, so it doesn't melt into the ground. */
+/**
+ * The edge of a card on the page: one fine line and no shadow, as paper lies on paper. A shadow and an edge together
+ * made every card float, so nothing on a screen sat still; the couplet's leaf is the one thing that lifts.
+ */
 export function raised(c: { isNight: boolean; line: string }): ViewStyle {
-  return { borderWidth: 1, borderColor: c.line, elevation: c.isNight ? 0 : 1.5, shadowColor: '#3C280A' };
+  return { borderWidth: StyleSheet.hairlineWidth * 2, borderColor: c.line };
 }
 
 /** A white rounded group of rows, as in Settings. */
 export function Group({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
-  return <View style={[{ backgroundColor: c.surface, borderRadius: 24, overflow: 'hidden' }, raised(c), style]}>{children}</View>;
+  return <View style={[{ backgroundColor: c.surface, borderRadius: R.lg, overflow: 'hidden' }, raised(c), style]}>{children}</View>;
 }
 
 export function Row({
@@ -268,12 +270,13 @@ export function Row({
   const { c } = useUI();
   return (
     <View>
-      {divider ? <View style={{ height: 1, backgroundColor: c.line }} /> : null}
+      {/* Inset to the text, so a group reads as one list rather than a stack of boxes. */}
+      {divider ? <View style={{ height: StyleSheet.hairlineWidth * 2, marginLeft: icon ? 52 : 16, backgroundColor: c.line }} /> : null}
       <Pressable
         onPress={onPress}
         disabled={!onPress}
         android_ripple={{ color: c.surface3 }}
-        style={{ minHeight: 60, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, gap: 14 }}>
+        style={{ minHeight: 60, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 14 }}>
         {icon ? <Icon name={icon} color={c.ink2} size={22} /> : null}
         <View style={{ flex: 1 }}>
           <T v="body" color={titleColor}>
@@ -285,7 +288,7 @@ export function Row({
             </T>
           ) : null}
         </View>
-        {trailing ?? (onPress ? <Icon name="chevron" color={c.ink3} size={20} /> : null)}
+        {trailing ?? (onPress ? <Icon name="chevron" color={c.ink3} size={18} /> : null)}
       </Pressable>
     </View>
   );
@@ -330,7 +333,7 @@ export function SwitchRow({ title, sub, value, onChange, divider = true }: { tit
 export function SectionLabel({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
   const { c } = useUI();
   return (
-    <T v="label" color={c.ink2} style={[{ marginLeft: 4, marginTop: 28, marginBottom: 10 }, style]}>
+    <T v="label" color={c.ink2} style={[{ marginLeft: 4, marginTop: 32, marginBottom: 8 }, style]}>
       {children}
     </T>
   );
@@ -340,8 +343,8 @@ export function SectionLabel({ children, style }: { children: ReactNode; style?:
 export function Note({ children, icon = 'shield', iconColor, style }: { children: ReactNode; icon?: IconName; iconColor?: string; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
   return (
-    <View style={[{ flexDirection: 'row', gap: 12, backgroundColor: c.surface2, borderRadius: 20, padding: 14 }, style]}>
-      <Icon name={icon} color={iconColor ?? c.aram} size={22} />
+    <View style={[{ flexDirection: 'row', gap: 12, backgroundColor: c.surface2, borderRadius: R.md, padding: 16 }, style]}>
+      <Icon name={icon} color={iconColor ?? c.aram} size={20} />
       <T v="bodyM" color={c.ink2} style={{ flex: 1 }}>
         {children}
       </T>
@@ -361,13 +364,15 @@ export function Chip({ label, icon, on = false, onPress, small }: { label: strin
         alignItems: 'center',
         gap: 8,
         minHeight: small ? 36 : 40,
-        borderRadius: 18,
+        borderRadius: R.sm,
         paddingHorizontal: 14,
         paddingVertical: 8,
-        backgroundColor: on ? c.primary : pressed ? c.surface3 : c.surface2,
+        // Chosen is a soft fill of the accent, as Material's filter chips are; the full accent is kept for the one
+        // thing to do on a screen.
+        backgroundColor: on ? c.primarySoft : pressed ? c.surface3 : c.surface2,
       })}>
-      {icon ? <Icon name={icon} size={18} color={on ? c.onPrimary : c.ink2} /> : null}
-      <T v="label" color={on ? c.onPrimary : c.ink} numberOfLines={1}>
+      {icon ? <Icon name={icon} size={18} color={on ? c.onSoft : c.ink2} /> : null}
+      <T v="label" color={on ? c.onSoft : c.ink} numberOfLines={1}>
         {label}
       </T>
     </Pressable>
@@ -384,7 +389,7 @@ export function Choice({ label, on, onPress, style }: { label: string; on: boole
       style={[
         {
           minHeight: 48,
-          borderRadius: 24,
+          borderRadius: R.md,
           borderWidth: 1,
           borderColor: on ? c.primary : c.line,
           backgroundColor: on ? c.primarySoft : c.surface,
@@ -423,7 +428,6 @@ export function Button({
 }) {
   const { c } = useUI();
   const base = danger ? c.heart : c.primary;
-  const filled = enabled && !tonal;
   const fg = !enabled ? c.ink3 : tonal ? c.onSoft : danger ? '#FFFFFF' : c.onPrimary;
   return (
     <Pressable
@@ -433,27 +437,21 @@ export function Button({
       accessibilityState={{ disabled: !enabled }}
       style={({ pressed }) => [
         {
-          minHeight: 54,
-          borderRadius: 27,
-          overflow: 'hidden',
-          backgroundColor: !enabled ? c.surface3 : tonal ? c.primarySoft : base,
-          borderWidth: tonal && enabled ? 1 : 0,
-          borderColor: alpha(c.primary, 0.3),
-          // A filled button sits up off the page a little, in its own colour, so it reads as the thing to do.
-          elevation: filled && !pressed ? 4 : 0,
-          shadowColor: base,
+          minHeight: 52,
+          borderRadius: 26,
+          // One flat fill: the colour alone says it is the thing to do. Pressed, it deepens a step.
+          backgroundColor: !enabled ? c.surface3 : tonal ? (pressed ? mix(c.primarySoft, c.primary, 0.12) : c.primarySoft) : pressed ? mix(base, '#000000', 0.12) : base,
           transform: [{ scale: pressed ? 0.98 : 1 }],
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 10,
-          paddingHorizontal: 22,
+          paddingHorizontal: 24,
           paddingVertical: 12,
         },
         style,
       ]}>
-      {filled ? <LinearGradient colors={[mix(base, '#FFFFFF', 0.16), base]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} /> : null}
-      {busy ? <ActivityIndicator color={fg} /> : icon ? <Icon name={icon} size={20} color={tonal && enabled ? c.primary : fg} stroke={2} /> : null}
+      {busy ? <ActivityIndicator color={fg} /> : icon ? <Icon name={icon} size={20} color={fg} /> : null}
       <T v="title" color={fg} style={{ textAlign: 'center', flexShrink: 1 }}>
         {label}
       </T>
@@ -462,8 +460,8 @@ export function Button({
 }
 
 /**
- * An invitation to go somewhere (Insights, your journey): an accent tile with its icon, a title, a line of what is
- * there, and an arrow. Reads as a door, where a plain button reads as a form's Submit.
+ * An invitation to go somewhere (Insights, your journey): its icon on a soft tile, a title, a line of what is there,
+ * and an arrow. Reads as a door, where a plain button reads as a form's Submit.
  */
 export function ActionCard({ icon, title, sub, onPress, style }: { icon: IconName; title: string; sub?: string; onPress: () => void; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
@@ -476,22 +474,16 @@ export function ActionCard({ icon, title, sub, onPress, style }: { icon: IconNam
         {
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 14,
-          padding: 14,
-          paddingRight: 16,
-          borderRadius: 24,
+          gap: 16,
+          padding: 16,
+          borderRadius: R.lg,
           backgroundColor: pressed ? c.surface2 : c.surface,
-          borderWidth: 1,
-          borderColor: c.line,
-          elevation: c.isNight ? 0 : 1.5,
-          shadowColor: '#3C280A',
-          transform: [{ scale: pressed ? 0.985 : 1 }],
+          ...raised(c),
         },
         style,
       ]}>
-      <View style={{ width: 50, height: 50, borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
-        <LinearGradient colors={[mix(c.primary, '#FFFFFF', 0.18), c.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} />
-        <Icon name={icon} size={24} color={c.onPrimary} stroke={2} />
+      <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: c.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name={icon} size={22} color={c.onSoft} />
       </View>
       <View style={{ flex: 1 }}>
         <T v="title">{title}</T>
@@ -501,9 +493,7 @@ export function ActionCard({ icon, title, sub, onPress, style }: { icon: IconNam
           </T>
         ) : null}
       </View>
-      <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: c.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name="chevron" size={18} color={c.onSoft} stroke={2.2} />
-      </View>
+      <Icon name="chevron" size={18} color={c.ink3} />
     </Pressable>
   );
 }
@@ -521,12 +511,12 @@ export function TextLink({ label, onPress, color }: { label: string; onPress: ()
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const { c } = useUI();
-  return <View style={[{ backgroundColor: c.surface, borderRadius: 28, padding: 18 }, raised(c), style]}>{children}</View>;
+  return <View style={[{ backgroundColor: c.surface, borderRadius: R.lg, padding: 20 }, raised(c), style]}>{children}</View>;
 }
 
 export function Divider() {
   const { c } = useUI();
-  return <View style={{ height: 1, backgroundColor: c.line }} />;
+  return <View style={{ height: StyleSheet.hairlineWidth * 2, backgroundColor: c.line }} />;
 }
 
 export function Pill({ label, color, bg }: { label: string; color?: string; bg?: string }) {

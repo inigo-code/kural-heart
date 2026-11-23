@@ -1,11 +1,13 @@
 // "What's new" after every update (Heart Apps rule): bump ID and write its lines with each release or eas update.
 
 export const WHATS_NEW = {
-  id: 20,
+  id: 21,
   en: [
-    'On a couplet’s page, For daily life now comes first, under Listen and Share. Pope’s verse and prose follow, then Aiyar.',
+    'A calmer, finer look: titles in a finer cut of the serif, a couplet’s English meaning set like a book, and quieter buttons and cards, so the leaf stands out.',
+    'Feelings are marked with their own colour instead of emoji.',
   ],
   ta: [
-    'ஒரு குறளின் பக்கத்தில் “அன்றாட வாழ்வில்” இப்போது முதலில், கேள், பகிர் பொத்தான்களின் கீழேயே. பிறகு போப்பின் செய்யுளும் உரைநடையும், அதன் பின் ஐயர்.',
+    'அமைதியான, நேர்த்தியான தோற்றம்: தலைப்புகளுக்கு நுண்ணிய எழுத்துரு, குறளின் ஆங்கிலப் பொருள் நூலில் போல, அடக்கமான பொத்தான்களும் அட்டைகளும்; ஓலை தனித்துத் தெரியும்.',
+    'உணர்வுகள் இப்போது emoji இல்லாமல் அவற்றின் சொந்த நிறத்தால் குறிக்கப்படுகின்றன.',
   ],
 };

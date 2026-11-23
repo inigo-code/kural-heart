@@ -45,7 +45,7 @@ export default function JourneyScreen() {
           {L.since(since)}
         </T>
       ) : null}
-      <Rise i={0} style={{ marginTop: 16, borderRadius: 28, backgroundColor: c.surface, padding: 18, flexDirection: 'row', alignItems: 'center', ...raised(c) }}>
+      <Rise i={0} style={{ marginTop: 16, borderRadius: 20, backgroundColor: c.surface, padding: 20, flexDirection: 'row', alignItems: 'center', ...raised(c) }}>
         <View style={{ flex: 1 }}>
           <T v="display" style={{ fontSize: type.display.fontSize * 1.4, lineHeight: type.display.lineHeight * 1.3 }}>
             {thread.days}
@@ -79,7 +79,7 @@ export default function JourneyScreen() {
       </Rise>
       <Rise i={2}>
       <SectionLabel>{`${L.chapters} · ${chaptersWritten.size} ${L.of133}`}</SectionLabel>
-      <View style={{ borderRadius: 24, backgroundColor: c.surface, padding: 16, ...raised(c) }}>
+      <View style={{ borderRadius: 20, backgroundColor: c.surface, padding: 16, ...raised(c) }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
           {/* Each dot opens its chapter. */}
           {CHAPTERS.map((ch) => {

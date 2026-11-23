@@ -70,12 +70,12 @@ export default function JournalScreen() {
 
   const header = (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', paddingLeft: 20, paddingRight: 8, paddingTop: insets.top + 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 8, paddingTop: insets.top + 12 }}>
         <View style={{ flex: 1 }}>
+          <T v="display">{L.journal}</T>
           <T v="label" color={c.ink3}>
             {L.pages(entries.length)}
           </T>
-          <T v="display">{L.journal}</T>
         </View>
         <View>
           <IconButton name="filter" label={tr('Filters', 'வடிகட்டிகள்')} onPress={() => setOpen(true)} color={n ? c.primary : c.ink} />
@@ -116,7 +116,7 @@ export default function JournalScreen() {
         </View>
       ) : (
         <>
-          <View style={{ margin: 16, borderRadius: 26, backgroundColor: c.surface2, minHeight: 52, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ margin: 16, borderRadius: 14, backgroundColor: c.surface2, minHeight: 52, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Icon name="search" color={c.ink3} size={20} />
             <TextInput
               value={query}
@@ -138,7 +138,7 @@ export default function JournalScreen() {
               <TextLink label={tr('Clear filters', 'வடிகட்டிகளை அழி')} onPress={() => setFilter(NONE)} />
             </View>
           ) : null}
-          <View style={{ flexDirection: 'row', gap: 6, marginHorizontal: 16, marginBottom: 10, padding: 4, borderRadius: 22, backgroundColor: c.surface2 }}>
+          <View style={{ flexDirection: 'row', gap: 6, marginHorizontal: 16, marginBottom: 10, padding: 4, borderRadius: 14, backgroundColor: c.surface2 }}>
             {(
               [
                 ['list', 'list', L.list],
@@ -163,12 +163,14 @@ export default function JournalScreen() {
                     minHeight: tamil ? 52 : 40,
                     paddingHorizontal: 4,
                     paddingVertical: tamil ? 6 : 0,
-                    borderRadius: 18,
-                    backgroundColor: on ? c.primary : 'transparent',
+                    borderRadius: 10,
+                    backgroundColor: on ? c.surface : 'transparent',
+                    borderWidth: on ? StyleSheet.hairlineWidth * 2 : 0,
+                    borderColor: c.line,
                   }}>
-                  <Icon name={icon} size={16} color={on ? c.onPrimary : c.ink2} />
+                  <Icon name={icon} size={16} color={on ? c.ink : c.ink2} />
                   {/* Tamil words are longer: the label sits under the icon and shrinks to fit rather than run out. */}
-                  <T v="small" color={on ? c.onPrimary : c.ink2} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ maxWidth: '100%' }}>
+                  <T v="small" color={on ? c.ink : c.ink2} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ maxWidth: '100%' }}>
                     {label}
                   </T>
                 </Pressable>
@@ -211,7 +213,7 @@ export default function JournalScreen() {
           {view === 'list' && !query && onThisDay ? (
             <Pressable
               onPress={() => router.push({ pathname: '/page/[id]', params: { id: onThisDay.id } })}
-              style={{ marginHorizontal: 16, marginBottom: 8, borderRadius: 24, backgroundColor: c.primarySoft, padding: 16 }}>
+              style={{ marginHorizontal: 16, marginBottom: 8, borderRadius: 20, backgroundColor: c.primarySoft, padding: 16 }}>
               <T v="label" color={c.onSoft}>
                 {yearsAgo === 1
                   ? tr('On this day, a year ago', 'இதே நாள், ஓராண்டுக்கு முன்')
@@ -307,7 +309,7 @@ function MonthButton({ back, onPress }: { back?: boolean; onPress: () => void })
       accessibilityRole="button"
       accessibilityLabel={back ? tr('Previous month', 'முந்தைய மாதம்') : tr('Next month', 'அடுத்த மாதம்')}
       style={({ pressed }) => ({ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.primarySoft : c.surface2 })}>
-      <Icon name={back ? 'back' : 'chevron'} size={20} color={c.ink} stroke={2} />
+      <Icon name={back ? 'back' : 'chevron'} size={20} color={c.ink} />
     </Pressable>
   );
 }
@@ -345,7 +347,7 @@ function CalendarMonth({ entries }: { entries: Entry[] }) {
   const pickedPages = byDay.get(picked) ?? [];
   return (
     <View style={{ paddingHorizontal: 16 }}>
-      <View style={{ borderRadius: 28, backgroundColor: c.surface, padding: 14, paddingTop: 12, ...raised(c) }}>
+      <View style={{ borderRadius: 20, backgroundColor: c.surface, padding: 14, paddingTop: 12, ...raised(c) }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <MonthButton back onPress={() => move(-1)} />
           <View style={{ flex: 1, alignItems: 'center' }}>

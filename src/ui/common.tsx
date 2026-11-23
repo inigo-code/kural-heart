@@ -17,32 +17,39 @@ import type { Entry, Weather } from '@/lib/types';
 import { Valluvar } from '@/valluvar/Valluvar';
 import type { ValluvarState } from '@/valluvar/Valluvar';
 
-import { MayilBorder, SikkuThreshold } from './kolam';
+import { SikkuThreshold } from './kolam';
 import { CoupletText, Leaf, LeafNote, Pronounce } from './leaf';
 import { Icon, T, TextLink, raised, starInk, timeLabel } from './parts';
 import type { IconName } from './parts';
-import { F, alpha } from './theme';
+import { F, R, alpha } from './theme';
 import type { Colors } from './theme';
 import { useUI } from './ui';
 
 export const MOODS = [
-  // Each feeling has its own emoji and colour (a day and a night step), so it reads at a glance.
-  { id: 'calm', en: 'Calm', ta: 'அமைதி', emoji: '😌', day: '#2E8B6E', night: '#5CC4A0' },
-  { id: 'grateful', en: 'Grateful', ta: 'நன்றி', emoji: '🙏', day: '#B07D12', night: '#E2B33C' },
-  { id: 'driven', en: 'Driven', ta: 'முயற்சி', emoji: '💪', day: '#C2502C', night: '#F08A5D' },
-  { id: 'unsure', en: 'Seeking clarity', ta: 'தெளிவு', emoji: '🤔', day: '#3B6FC2', night: '#7CA3F0' },
-  { id: 'anxious', en: 'Anxious', ta: 'கவலை', emoji: '😟', day: '#8A5BC2', night: '#B48AE8' },
-  { id: 'angry', en: 'Angry', ta: 'சினம்', emoji: '😤', day: '#C23A3A', night: '#F07070' },
-  { id: 'lonely', en: 'Lonely', ta: 'தனிமை', emoji: '😔', day: '#5A6F8A', night: '#9DB0C8' },
-  { id: 'missing', en: 'Missing someone', ta: 'ஏக்கம்', emoji: '💭', day: '#C2457A', night: '#F08AB4' },
-  { id: 'heavy', en: 'Very heavy', ta: 'மிகக் கனம்', emoji: '🌧️', day: '#4B5480', night: '#8E97C8' },
+  // Each feeling has its own colour (a day and a night step), shown as a small dot, so it reads at a glance.
+  // (They had emoji, which looked like a chat app's reactions beside the couplet and drew differently on every phone.)
+  { id: 'calm', en: 'Calm', ta: 'அமைதி', day: '#2E8B6E', night: '#5CC4A0' },
+  { id: 'grateful', en: 'Grateful', ta: 'நன்றி', day: '#B07D12', night: '#E2B33C' },
+  { id: 'driven', en: 'Driven', ta: 'முயற்சி', day: '#C2502C', night: '#F08A5D' },
+  { id: 'unsure', en: 'Seeking clarity', ta: 'தெளிவு', day: '#3B6FC2', night: '#7CA3F0' },
+  { id: 'anxious', en: 'Anxious', ta: 'கவலை', day: '#8A5BC2', night: '#B48AE8' },
+  { id: 'angry', en: 'Angry', ta: 'சினம்', day: '#C23A3A', night: '#F07070' },
+  { id: 'lonely', en: 'Lonely', ta: 'தனிமை', day: '#5A6F8A', night: '#9DB0C8' },
+  { id: 'missing', en: 'Missing someone', ta: 'ஏக்கம்', day: '#C2457A', night: '#F08AB4' },
+  { id: 'heavy', en: 'Very heavy', ta: 'மிகக் கனம்', day: '#4B5480', night: '#8E97C8' },
 ] as const;
 
 export type Mood = (typeof MOODS)[number];
 
 export const moodTint = (m: Mood, c: Colors) => (c.isNight ? m.night : m.day);
 
-/** A feeling to pick: its emoji, its name, and its own colour (filled when chosen). */
+/** A feeling's colour as a small dot, beside its name. */
+export function MoodDot({ m, size = 10 }: { m: Mood; size?: number }) {
+  const { c } = useUI();
+  return <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: moodTint(m, c) }} />;
+}
+
+/** A feeling to pick: its colour dot and its name; chosen, the chip takes a soft wash of that colour and its edge. */
 export function MoodChip({ m, on, onPress }: { m: Mood; on: boolean; onPress: () => void }) {
   const { c, tamil } = useUI();
   const tint = moodTint(m, c);
@@ -57,18 +64,16 @@ export function MoodChip({ m, on, onPress }: { m: Mood; on: boolean; onPress: ()
         alignItems: 'center',
         gap: 8,
         minHeight: 40,
-        borderRadius: 18,
-        paddingLeft: 10,
+        borderRadius: R.sm,
+        paddingLeft: 12,
         paddingRight: 14,
-        paddingVertical: 7,
+        paddingVertical: 8,
         borderWidth: 1.5,
-        borderColor: on ? tint : alpha(tint, 0.35),
-        backgroundColor: on ? tint : alpha(tint, pressed ? 0.24 : 0.12),
+        borderColor: on ? tint : 'transparent',
+        backgroundColor: on ? alpha(tint, c.isNight ? 0.22 : 0.14) : pressed ? c.surface3 : c.surface2,
       })}>
-      <Text allowFontScaling={false} style={{ fontSize: 18, lineHeight: 24 }}>
-        {m.emoji}
-      </Text>
-      <T v="label" color={on ? (c.isNight ? '#1E1A16' : '#FFFFFF') : c.ink} numberOfLines={1}>
+      <MoodDot m={m} />
+      <T v="label" color={c.ink} numberOfLines={1}>
         {tamil ? m.ta : m.en}
       </T>
     </Pressable>
@@ -77,7 +82,7 @@ export function MoodChip({ m, on, onPress }: { m: Mood; on: boolean; onPress: ()
 
 export const moodLabel = (id: string | null, tamil: boolean) => {
   const m = MOODS.find((x) => x.id === id);
-  return m ? `${m.emoji} ${tamil ? m.ta : m.en}` : null;
+  return m ? (tamil ? m.ta : m.en) : null;
 };
 
 export const WEATHER_NAMES: [Weather['kind'], string, string][] = [
@@ -270,7 +275,7 @@ export function MeaningUnder({ k }: { k: Kural }) {
   const ta = tamil && !!k.ta;
   return (
     <View>
-      <T v="body" color={c.ink2}>
+      <T v="read" color={c.ink2}>
         {ta ? k.ta : english(k, s.translation)}
       </T>
       <T v="labelM" color={c.ink3} style={{ marginTop: 4 }}>
@@ -280,19 +285,19 @@ export function MeaningUnder({ k }: { k: Kural }) {
   );
 }
 
-/** For daily life: a short note on living the couplet today, where one has been written. Nothing otherwise. */
+/**
+ * For daily life: a short note on living the couplet today, where one has been written. Nothing otherwise. Set as a
+ * note in the margin of the page: a quiet label and the words, on a soft ground, with no icon to compete with the leaf.
+ */
 export function WisdomNote({ k, style }: { k: Kural; style?: StyleProp<ViewStyle> }) {
   const { c, tr, tamil } = useUI();
   if (!k.w) return null;
   return (
-    <View style={[{ borderRadius: 20, backgroundColor: c.surface2, padding: 16 }, style]}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Icon name="bulb" size={20} color={c.primary} />
-        <T v="label" color={c.primary} style={{ flex: 1 }}>
-          {tr('For daily life', 'அன்றாட வாழ்வில்')}
-        </T>
-      </View>
-      <T v="bodyM" color={c.ink} style={{ marginTop: 6 }}>
+    <View style={[{ borderRadius: R.md, backgroundColor: c.surface2, paddingHorizontal: 16, paddingVertical: 16 }, style]}>
+      <T v="labelM" color={c.ink3}>
+        {tr('For daily life', 'அன்றாட வாழ்வில்')}
+      </T>
+      <T v="read" color={c.ink} style={{ marginTop: 4 }}>
         {tamil ? k.w.ta : k.w.en}
       </T>
     </View>
@@ -304,12 +309,12 @@ export function WisdomNote({ k, style }: { k: Kural; style?: StyleProp<ViewStyle
  * remembered, so the page you write opens on the same question.
  */
 export function LensQuestion({ k }: { k: Kural }) {
-  const { c, L, tamil, type } = useUI();
+  const { c, L, tamil } = useUI();
   const lens = useSettings().lastLens;
   const [question, fade] = useCrossfade(questionText(k, lens, tamil));
   return (
     <>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
         {L.lens.map((name, i) => {
           const on = lens === i;
           return (
@@ -318,8 +323,8 @@ export function LensQuestion({ k }: { k: Kural }) {
               onPress={() => setSettings({ lastLens: i })}
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
-              style={{ borderRadius: 16, backgroundColor: on ? c.primary : c.surface2, minHeight: 36, paddingHorizontal: 14, paddingVertical: 8 }}>
-              <T v="label" color={on ? c.onPrimary : c.ink2}>
+              style={{ borderRadius: R.sm, backgroundColor: on ? c.primarySoft : c.surface2, minHeight: 36, paddingHorizontal: 14, paddingVertical: 8 }}>
+              <T v="label" color={on ? c.onSoft : c.ink2}>
                 {name}
               </T>
             </Pressable>
@@ -328,7 +333,7 @@ export function LensQuestion({ k }: { k: Kural }) {
       </View>
       <SmoothHeight>
         <Animated.View style={fade}>
-          <T v="headline" style={{ marginTop: 14, fontSize: type.headline.fontSize * 0.85, lineHeight: type.headline.lineHeight * 0.92 }}>
+          <T v="question" style={{ marginTop: 16 }}>
             {question}
           </T>
         </Animated.View>
@@ -380,7 +385,7 @@ export function PhotoThumb({ id, size, round }: { id: string; size: number; roun
   const { c } = useUI();
   const uri = usePhoto(id);
   return (
-    <View style={{ width: size, height: size, borderRadius: round ? size / 2 : 16, overflow: 'hidden', backgroundColor: c.surface2 }}>
+    <View style={{ width: size, height: size, borderRadius: round ? size / 2 : 12, overflow: 'hidden', backgroundColor: c.surface2 }}>
       {uri ? <Image source={{ uri }} style={{ width: size, height: size }} contentFit="cover" /> : null}
     </View>
   );
@@ -391,10 +396,10 @@ function PhotoTile({ id, height, width, onPress }: { id: string; height: number;
   const { c, tr } = useUI();
   const uri = usePhoto(id);
   return (
-    <Pressable onPress={onPress} accessibilityRole="imagebutton" accessibilityLabel={tr('Open photo', 'படத்தைத் திற')} style={{ width: width ?? '100%', height, borderRadius: 18, overflow: 'hidden', backgroundColor: c.surface2 }}>
+    <Pressable onPress={onPress} accessibilityRole="imagebutton" accessibilityLabel={tr('Open photo', 'படத்தைத் திற')} style={{ width: width ?? '100%', height, borderRadius: R.md, overflow: 'hidden', backgroundColor: c.surface2 }}>
       {uri ? <Image source={{ uri }} style={{ flex: 1 }} contentFit="cover" transition={150} /> : null}
       <View style={{ position: 'absolute', right: 8, bottom: 8, width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(20,16,12,0.5)', alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name="expand" size={16} color="#F6F2EA" stroke={2} />
+        <Icon name="expand" size={16} color="#F6F2EA" />
       </View>
     </Pressable>
   );
@@ -516,9 +521,9 @@ export function EntryCard({ e }: { e: Entry }) {
     <Pressable
       onPress={() => router.push({ pathname: '/page/[id]', params: { id: e.id } })}
       accessibilityRole="button"
-      style={({ pressed }) => ({ marginHorizontal: 16, marginVertical: 6, borderRadius: 24, backgroundColor: pressed ? c.surface2 : c.surface, padding: 16, ...raised(c) })}>
+      style={({ pressed }) => ({ marginHorizontal: 16, marginVertical: 6, borderRadius: R.lg, backgroundColor: pressed ? c.surface2 : c.surface, padding: 16, ...raised(c) })}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text style={[type.headline, { fontSize: type.headline.fontSize * 0.7, lineHeight: type.headline.lineHeight * 0.7, color: c.ink2, flex: 1 }]} numberOfLines={1}>
+        <Text style={[type.question, { fontSize: type.question.fontSize * 0.82, lineHeight: type.question.lineHeight * 0.84, color: c.ink2, flex: 1 }]} numberOfLines={1}>
           {longDate(e.date, tamil)}
         </Text>
         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: partColor(ch.part, c), marginRight: 6 }} />
@@ -646,7 +651,7 @@ export function Field({ value, onChangeText, placeholder, secret, style, ...rest
       selectionColor={c.primary}
       cursorColor={c.primary}
       maxFontSizeMultiplier={1.6}
-      style={[type.body, { color: c.ink, backgroundColor: c.surface, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, minHeight: 56 }, style]}
+      style={[type.body, { color: c.ink, backgroundColor: c.surface, borderRadius: R.md, paddingHorizontal: 16, paddingVertical: 14, minHeight: 56 }, style]}
       {...rest}
     />
   );
@@ -717,9 +722,8 @@ export function Sheet({ visible, onClose, children }: { visible: boolean; onClos
             paddingBottom: insets.bottom,
             transform: [{ translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [0, 600] }) }],
           }}>
-          <View style={{ alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: c.surface3, marginTop: 10 }} />
-          <MayilBorder height={12} style={{ alignSelf: 'center', width: 132, marginTop: 10 }} />
-          <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 24 }}>{children}</ScrollView>
+          <View style={{ alignSelf: 'center', width: 32, height: 4, borderRadius: 2, backgroundColor: c.surface3, marginTop: 12 }} />
+          <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 16, paddingBottom: 24 }}>{children}</ScrollView>
         </RNAnimated.View>
       </View>
     </Modal>
@@ -762,7 +766,7 @@ export function ActionRow({ items, style }: { items: Action[]; style?: StyleProp
                   borderColor: c.line,
                   transform: [{ scale: pressed ? 0.94 : 1 }],
                 }}>
-                <Icon name={a.icon} size={24} color={a.on ? c.onPrimary : pressed ? c.onSoft : c.ink} stroke={2} />
+                <Icon name={a.icon} size={24} color={a.on ? c.onPrimary : pressed ? c.onSoft : c.ink} />
               </View>
               <T v="labelM" color={a.on ? c.primary : c.ink2} numberOfLines={2} style={{ textAlign: 'center', paddingHorizontal: 2 }}>
                 {a.label}
@@ -776,7 +780,7 @@ export function ActionRow({ items, style }: { items: Action[]; style?: StyleProp
 }
 
 /**
- * Wider ways on from a couplet (choose another, say how you feel): soft pills with an icon, side by side
+ * Wider ways on from a couplet (choose another, say how you feel): quiet outlined rows with an icon, side by side
  * while every label fits on one line. Once one would wrap ("How is your heart?" on a phone), they stack,
  * each full width, so neither is a lopsided two-line pill.
  */
@@ -795,15 +799,14 @@ export function LinkPills({ items, style }: { items: Action[]; style?: StyleProp
             minHeight: 52,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 10,
+            gap: 12,
             paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderRadius: 26,
-            borderWidth: 1,
-            borderColor: c.line,
-            backgroundColor: pressed ? c.primarySoft : c.surface,
+            paddingVertical: 12,
+            borderRadius: R.md,
+            ...raised(c),
+            backgroundColor: pressed ? c.surface2 : c.surface,
           })}>
-          <Icon name={a.icon} size={20} color={c.primary} stroke={2} />
+          <Icon name={a.icon} size={20} color={c.ink2} />
           <T
             v="label"
             color={c.ink}
@@ -843,7 +846,7 @@ export function ToTop({ visible, onPress }: { visible: boolean; onPress: () => v
           transform: [{ scale: pressed ? 0.95 : 1 }],
         })}>
         <View style={{ transform: [{ rotate: '90deg' }] }}>
-          <Icon name="back" size={20} color={c.onPrimary} stroke={2.2} />
+          <Icon name="back" size={20} color={c.onPrimary} />
         </View>
         <T v="label" color={c.onPrimary}>
           {tr('Top', 'மேலே')}

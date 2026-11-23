@@ -33,7 +33,7 @@ export default function AboutScreen() {
       </T>
       <SectionLabel>{L.heartApps}</SectionLabel>
       {/* The Heart Apps card: the mark and its line, the other apps, and the way home (as on the website). */}
-      <View style={{ backgroundColor: c.surface, borderRadius: 24, padding: 14, gap: 12 }}>
+      <View style={{ backgroundColor: c.surface, borderRadius: 20, padding: 16, gap: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Image source={LOGO} style={{ width: 48, height: 48, borderRadius: 12 }} />
           <View style={{ flex: 1 }}>
@@ -59,7 +59,7 @@ export default function AboutScreen() {
             <Icon name="share" size={16} color={c.ink3} />
           </Pressable>
         ))}
-        <Pressable onPress={() => Linking.openURL('https://inigo-code.github.io/')} accessibilityRole="link" style={{ alignSelf: 'flex-start', borderRadius: 18, backgroundColor: c.primarySoft, paddingHorizontal: 16, paddingVertical: 8 }}>
+        <Pressable onPress={() => Linking.openURL('https://inigo-code.github.io/')} accessibilityRole="link" style={{ alignSelf: 'flex-start', borderRadius: 10, backgroundColor: c.primarySoft, paddingHorizontal: 16, paddingVertical: 8 }}>
           <T v="label" color={c.onSoft}>
             {tr('All Heart Apps', 'எல்லா Heart Apps')}
           </T>

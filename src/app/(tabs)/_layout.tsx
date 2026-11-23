@@ -2,10 +2,9 @@ import { useRouter } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 
 import { tabTop } from '@/lib/tabTop';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { KolamBand } from '@/ui/kolam';
 import { Icon, T } from '@/ui/parts';
 import type { IconName } from '@/ui/parts';
 import { F, alpha } from '@/ui/theme';
@@ -39,8 +38,10 @@ function NavBar({ state, navigateToTab }: BarProps) {
       style={{
         backgroundColor: c.bg,
         paddingBottom: insets.bottom,
+        // A plain hairline between the page and the bar: the bar is furniture, not a place for ornament.
+        borderTopWidth: StyleSheet.hairlineWidth * 2,
+        borderTopColor: c.line,
       }}>
-      <KolamBand height={14} strength={0.9} />
       <View style={{ flexDirection: 'row', height: 76 }}>
         {state.routes.map((r) => {
           const tab = TABS.find((t) => t.name === r.name);
@@ -69,7 +70,7 @@ function NavBar({ state, navigateToTab }: BarProps) {
                   backgroundColor: on ? c.primarySoft : alpha(c.primarySoft, 0),
                   overflow: 'hidden',
                 }}>
-                <Icon name={tab.icon} color={on ? c.onSoft : c.ink2} stroke={on ? 2.2 : 1.8} />
+                <Icon name={tab.icon} color={on ? c.onSoft : c.ink2} stroke={on ? 2 : 1.8} />
               </View>
               {!big || on ? (
                 <T
@@ -85,7 +86,7 @@ function NavBar({ state, navigateToTab }: BarProps) {
                     textAlign: 'center',
                     marginTop: 4,
                     paddingHorizontal: 2,
-                    fontFamily: on ? F.sansBold : F.sansMedium,
+                    fontFamily: on ? F.sansSemi : F.sansMedium,
                     fontSize: (tamil ? 11 : 12) * Math.min(scale, 1.15),
                     lineHeight: 16 * Math.min(scale, 1.15),
                   }}>

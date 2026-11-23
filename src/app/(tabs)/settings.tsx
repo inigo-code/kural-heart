@@ -70,7 +70,7 @@ export default function SettingsScreen() {
       </T>
       <Pressable
         onPress={() => router.push('/profile')}
-        style={{ marginTop: 12, borderRadius: 24, backgroundColor: c.surface, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, ...raised(c) }}>
+        style={{ marginTop: 12, borderRadius: 20, backgroundColor: c.surface, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, ...raised(c) }}>
         <Avatar size={56} />
         <View style={{ flex: 1 }}>
           <T v="title">{s.name || tr('Add your name', 'உங்கள் பெயரைச் சேர்க்கவும்')}</T>
@@ -222,7 +222,7 @@ export default function SettingsScreen() {
         ) : null}
       </Group>
       {s.reminderOn && !notifyOk ? (
-        <View style={{ marginTop: 12, borderRadius: 24, backgroundColor: c.surface, padding: 16, alignItems: 'center', ...raised(c) }}>
+        <View style={{ marginTop: 12, borderRadius: 20, backgroundColor: c.surface, padding: 16, alignItems: 'center', ...raised(c) }}>
           <Valluvar state="listening" size={160} />
           <T v="headline" style={{ textAlign: 'center' }}>
             {L.remOffTitle}

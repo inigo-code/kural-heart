@@ -290,7 +290,7 @@ export default function WriteScreen() {
           <View style={{ paddingHorizontal: 20 }}>
             <Pressable
               onPress={() => router.push({ pathname: '/kural/[n]', params: { n: String(k.n) } })}
-              style={{ alignSelf: 'flex-start', borderRadius: 17, backgroundColor: c.primarySoft, paddingHorizontal: 12, paddingVertical: 6 }}>
+              style={{ alignSelf: 'flex-start', borderRadius: 10, backgroundColor: c.primarySoft, paddingHorizontal: 12, paddingVertical: 6 }}>
               <T v="label" color={c.onSoft}>
                 {tamil ? `குறள் ${k.n} · அதிகாரம் ${ch.n} · ${ch.ta}` : `Kural ${k.n} · Chapter ${ch.n} · ${ch.en}`}
               </T>

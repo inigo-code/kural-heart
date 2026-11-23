@@ -107,7 +107,10 @@ export const ACCENT_SWATCH: Record<string, string> = { clay: '#B4492A', indigo: 
 
 /**
  * Three bundled families (all SIL OFL, licences in assets/licenses), cut into static fonts by tools/fonts/make_fonts.py
- * because React Native can't set variable-font axes. Each weight is its own family name.
+ * because React Native can't set variable-font axes. Each weight (and optical size) is its own family name.
+ *
+ * Anek Tamil is the interface in both scripts and the couplet face; Literata is the Latin serif, in three optical
+ * sizes (display for titles, 24 for questions, text for reading); Noto Serif Tamil is the Tamil serif for titles.
  */
 export const F = {
   sans: 'AnekTamil-Regular',
@@ -116,6 +119,7 @@ export const F = {
   sansBold: 'AnekTamil-Bold',
   couplet: 'AnekTamil-Couplet',
   coupletBold: 'AnekTamil-CoupletBold',
+  display: 'Literata-Display',
   serif: 'Literata-Regular',
   serifMedium: 'Literata-Medium',
   serifSemi: 'Literata-SemiBold',
@@ -126,13 +130,23 @@ export const F = {
   serifTamilBold: 'NotoSerifTamil-ExtraBold',
 };
 
-export type Variant = 'display' | 'headline' | 'title' | 'body' | 'bodyM' | 'label' | 'labelM' | 'small';
+/**
+ * Corner radii, by size of thing: a chip or small control, a field or inner note, a card or group, a sheet or dialog.
+ * Buttons and round icon buttons stay fully round, as Material draws them.
+ */
+export const R = { sm: 10, md: 14, lg: 20, xl: 28 } as const;
+
+export type Variant = 'display' | 'headline' | 'question' | 'title' | 'read' | 'body' | 'bodyM' | 'label' | 'labelM' | 'small';
 
 type Style = { fontFamily: string; fontSize: number; lineHeight: number; letterSpacing?: number };
 
 /**
  * Type roles. Sizes are a step above Material's defaults because a journal is read slowly, and Tamil gets a further
  * lift: Anek Tamil's letters sit smaller than Latin ones at the same size. The text-size setting scales all of it.
+ *
+ * Hierarchy comes from size, face and colour, not weight: the interface is Anek at 400 and 500 only (600 is kept for
+ * the odd strong word), titles are the serif, and English reading text (a couplet's meaning, a note on daily life) is
+ * Literata at its text size, so it reads as a page rather than as a control.
  */
 export function typeScale(tamil: boolean, scale: number): Record<Variant, Style> {
   const k = (tamil ? 1.08 : 1) * scale;
@@ -142,18 +156,22 @@ export function typeScale(tamil: boolean, scale: number): Record<Variant, Style>
     lineHeight: Math.round(lh * scale),
     letterSpacing,
   });
-  const heading = tamil ? F.serifTamilMedium : F.serifMedium;
   return {
     // Noto Serif Tamil's vowel signs reach far above and below the line, so Tamil headings get 1.6 leading.
     // Literata's descenders (g, y) need more than 1.25 leading on Android, or the last line's tails are cut.
-    display: s(tamil ? 30 : 34, tamil ? 48 : 46, heading, tamil ? 0 : -0.3),
-    headline: s(tamil ? 23 : 25, tamil ? 37 : 34, heading),
-    title: { fontFamily: F.sansSemi, fontSize: 18 * k, lineHeight: Math.round(18 * k * 1.4) },
-    body: { fontFamily: F.sans, fontSize: 17.5 * k, lineHeight: Math.round((tamil ? 32 : 28) * scale) },
-    bodyM: { fontFamily: F.sans, fontSize: 16 * k, lineHeight: Math.round((tamil ? 29 : 25) * scale) },
-    label: { fontFamily: F.sansSemi, fontSize: 15 * k, lineHeight: Math.round(15 * k * 1.35) },
-    labelM: { fontFamily: F.sansMedium, fontSize: 14 * k, lineHeight: Math.round(14 * k * 1.35) },
-    small: { fontFamily: F.sansMedium, fontSize: 12.5 * k, lineHeight: Math.round(12.5 * k * 1.35) },
+    display: tamil ? s(30, 48, F.serifTamilMedium) : s(34, 44, F.display, -0.4),
+    headline: tamil ? s(23, 37, F.serifTamilMedium) : s(25, 33, F.display, -0.1),
+    // The day's question: the serif a size down, at its own optical size, so it is the warmest line on the card.
+    question: tamil ? s(19.5, 31, F.serifTamilMedium) : s(21.5, 30, F.serifMedium),
+    title: { fontFamily: F.sansMedium, fontSize: 18 * k, lineHeight: Math.round(18 * k * 1.4) },
+    read: tamil
+      ? { fontFamily: F.sans, fontSize: 17.5 * k, lineHeight: Math.round(32 * scale) }
+      : s(17, 28, F.serif),
+    body: { fontFamily: F.sans, fontSize: 17 * k, lineHeight: Math.round((tamil ? 31 : 26) * scale) },
+    bodyM: { fontFamily: F.sans, fontSize: 15.5 * k, lineHeight: Math.round((tamil ? 28 : 23) * scale) },
+    label: { fontFamily: F.sansMedium, fontSize: 15 * k, lineHeight: Math.round(15 * k * 1.35) },
+    labelM: { fontFamily: F.sans, fontSize: 14 * k, lineHeight: Math.round(14 * k * 1.4) },
+    small: { fontFamily: F.sansMedium, fontSize: 12.5 * k, lineHeight: Math.round(12.5 * k * 1.35), letterSpacing: tamil ? 0 : 0.1 },
   };
 }
 

@@ -179,7 +179,7 @@ export function AtlasMap({ points, height, focus, selected, onSelect }: { points
   return (
     <View
       ref={box}
-      style={{ height, borderRadius: 24, overflow: 'hidden', backgroundColor: c.isNight ? '#2A2622' : '#E9E3D6' }}
+      style={{ height, borderRadius: 20, overflow: 'hidden', backgroundColor: c.isNight ? '#2A2622' : '#E9E3D6' }}
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       {...pan.panHandlers}>
       <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, transform: pinchTransform }}>
