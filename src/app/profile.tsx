@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import { currentThread } from '@/lib/actions';
@@ -23,10 +23,13 @@ export default function ProfileScreen() {
   const [title, setTitle] = useState(s.journalTitle);
   const thread = currentThread();
   const chapters = new Set(entries.map((e) => kural(e.kural).c)).size;
-  const save = () => {
-    setSettings({ name: name.trim(), journalTitle: title.trim() });
-    router.back();
-  };
+  // Kept however the page is left: the Save button, the header's back arrow, or the phone's own back button or gesture.
+  const typed = useRef({ name, title });
+  useEffect(() => {
+    typed.current = { name, title };
+  }, [name, title]);
+  useEffect(() => () => setSettings({ name: typed.current.name.trim(), journalTitle: typed.current.title.trim() }), []);
+  const save = () => router.back();
   const pick = async () => {
     const r = await awayFor(() => ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 1 }));
     if (r.canceled) return;

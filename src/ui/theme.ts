@@ -158,20 +158,23 @@ export function typeScale(tamil: boolean, scale: number): Record<Variant, Style>
   });
   return {
     // Noto Serif Tamil's vowel signs reach far above and below the line, so Tamil headings get 1.6 leading.
-    // Literata's descenders (g, y) need more than 1.25 leading on Android, or the last line's tails are cut.
-    display: tamil ? s(30, 48, F.serifTamilMedium) : s(34, 44, F.display, -0.4),
-    headline: tamil ? s(23, 37, F.serifTamilMedium) : s(25, 33, F.display, -0.1),
+    // Literata's box is 1.49 em tall and its g and y reach 0.23 em down; Android trims the line box to the line height
+    // evenly at top and bottom, so below about 1.4 leading the last line's tails are cut (the g of a name on Today).
+    display: tamil ? s(30, 48, F.serifTamilMedium) : s(34, 48, F.display, -0.4),
+    headline: tamil ? s(23, 37, F.serifTamilMedium) : s(25, 35, F.display, -0.1),
     // The day's question: the serif a size down, at its own optical size, so it is the warmest line on the card.
-    question: tamil ? s(19.5, 31, F.serifTamilMedium) : s(21.5, 30, F.serifMedium),
-    title: { fontFamily: F.sansMedium, fontSize: 18 * k, lineHeight: Math.round(18 * k * 1.4) },
+    question: tamil ? s(20, 32, F.serifTamilMedium) : s(22, 31, F.serifMedium),
+    // Anek's Latin runs about a quarter narrower than Literata's and a little shorter, so the interface roles sit a
+    // size above the serif ones to look the same size beside them, and nothing that is read goes below 14.
+    title: { fontFamily: F.sansMedium, fontSize: 19 * k, lineHeight: Math.round(19 * k * 1.4) },
     read: tamil
-      ? { fontFamily: F.sans, fontSize: 17.5 * k, lineHeight: Math.round(32 * scale) }
-      : s(17, 28, F.serif),
-    body: { fontFamily: F.sans, fontSize: 17 * k, lineHeight: Math.round((tamil ? 31 : 26) * scale) },
-    bodyM: { fontFamily: F.sans, fontSize: 15.5 * k, lineHeight: Math.round((tamil ? 28 : 23) * scale) },
-    label: { fontFamily: F.sansMedium, fontSize: 15 * k, lineHeight: Math.round(15 * k * 1.35) },
-    labelM: { fontFamily: F.sans, fontSize: 14 * k, lineHeight: Math.round(14 * k * 1.4) },
-    small: { fontFamily: F.sansMedium, fontSize: 12.5 * k, lineHeight: Math.round(12.5 * k * 1.35), letterSpacing: tamil ? 0 : 0.1 },
+      ? { fontFamily: F.sans, fontSize: 18.5 * k, lineHeight: Math.round(33 * scale) }
+      : s(17.5, 29, F.serif),
+    body: { fontFamily: F.sans, fontSize: 18 * k, lineHeight: Math.round((tamil ? 32 : 27) * scale) },
+    bodyM: { fontFamily: F.sans, fontSize: 16.5 * k, lineHeight: Math.round((tamil ? 29 : 24) * scale) },
+    label: { fontFamily: F.sansMedium, fontSize: 16 * k, lineHeight: Math.round(16 * k * 1.35) },
+    labelM: { fontFamily: F.sans, fontSize: 15 * k, lineHeight: Math.round(15 * k * 1.4) },
+    small: { fontFamily: F.sansMedium, fontSize: 13.5 * k, lineHeight: Math.round(13.5 * k * 1.35), letterSpacing: tamil ? 0 : 0.1 },
   };
 }
 

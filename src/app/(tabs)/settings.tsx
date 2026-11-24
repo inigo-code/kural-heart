@@ -116,7 +116,7 @@ export default function SettingsScreen() {
                 [130, tr('Larger', 'மிகப் பெரியது')],
               ] as const
             ).map(([pct, label]) => (
-              <Choice key={pct} label={label} on={s.textScale === pct} onPress={() => set({ textScale: pct })} style={{ flexGrow: 1, flexBasis: tamil ? '40%' : 0, paddingHorizontal: 6 }} />
+              <Choice key={pct} label={label} on={s.textScale === pct} onPress={() => set({ textScale: pct })} style={{ flexGrow: 1, flexBasis: tamil ? 'auto' : 0, width: tamil ? '47%' : undefined, paddingHorizontal: 6 }} />
             ))}
           </View>
           <T v="body" style={{ marginTop: 14 }}>

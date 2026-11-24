@@ -297,7 +297,7 @@ export default function WriteScreen() {
             </Pressable>
             <View style={{ marginTop: 10 }}>
               <CoupletText a={k.a} b={k.b} max={23} min={17} color={c.ink2} />
-              <Pronounce a={k.a} b={k.b} color={c.ink3} size={14} />
+              <Pronounce a={k.a} b={k.b} color={c.ink3} size={15} />
             </View>
           </View>
           <View style={{ paddingHorizontal: 20 }}>

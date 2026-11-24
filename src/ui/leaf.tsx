@@ -136,7 +136,7 @@ ${b}`;
 }
 
 /** The couplet spelled out for readers who don't read Tamil (Settings, Pronunciation; on by default). */
-export function Pronounce({ a, b, color, size = 14.5 }: { a: string; b: string; color?: string; size?: number }) {
+export function Pronounce({ a, b, color, size = 15.5 }: { a: string; b: string; color?: string; size?: number }) {
   const { c, scale } = useUI();
   const s = useSettings();
   if (!s.pronounce) return null;
@@ -158,7 +158,7 @@ export function Pronounce({ a, b, color, size = 14.5 }: { a: string; b: string; 
 export function LeafNote({ children }: { children: ReactNode }) {
   const { c, scale } = useUI();
   return (
-    <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 13.5 * scale, lineHeight: 19 * scale, color: c.leafNote, marginTop: 6 }}>
+    <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 14.5 * scale, lineHeight: 20 * scale, color: c.leafNote, marginTop: 6 }}>
       {children}
     </Text>
   );

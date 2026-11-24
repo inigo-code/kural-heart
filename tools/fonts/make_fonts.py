@@ -15,11 +15,11 @@ OUT = ROOT / "assets/fonts"
 # the axis's default, which put every heading at Literata's 12 pt text size, heavy and blunt.
 CUTS = {
     "anek_tamil.ttf": {
-        # The interface: a touch narrower than Anek's normal width, so labels sit compact and even.
-        "AnekTamil-Regular": {"wght": 400, "wdth": 92},
-        "AnekTamil-Medium": {"wght": 500, "wdth": 92},
-        "AnekTamil-SemiBold": {"wght": 600, "wdth": 92},
-        "AnekTamil-Bold": {"wght": 700, "wdth": 92},
+        # The interface, at Anek's normal width: its Latin is already a quarter narrower than Literata's, and narrower still read as small type.
+        "AnekTamil-Regular": {"wght": 400, "wdth": 100},
+        "AnekTamil-Medium": {"wght": 500, "wdth": 100},
+        "AnekTamil-SemiBold": {"wght": 600, "wdth": 100},
+        "AnekTamil-Bold": {"wght": 700, "wdth": 100},
         # The couplet face: condensed, so a line of seven words fits a phone.
         "AnekTamil-Couplet": {"wght": 560, "wdth": 75},
         "AnekTamil-CoupletBold": {"wght": 700, "wdth": 75},
