@@ -115,8 +115,10 @@ function Root() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <StatusBar style={c.isNight ? 'light' : 'dark'} />
-      {/* The system's buttons sit on the app's own ground, with no grey scrim (enforceContrast is off in app.json). */}
-      <NavigationBar style={c.isNight ? 'dark' : 'light'} />
+      {/* The system's buttons sit on the app's own ground, with no grey scrim (enforceContrast is off in app.json).
+          The style names the buttons' colour, as for StatusBar: 'dark' buttons on Ivory. The library's type docs say
+          the opposite, but its native setStyle reads 'dark' as dark content. */}
+      <NavigationBar style={c.isNight ? 'light' : 'dark'} />
       {!ready ? null : !s.onboarded ? (
         <Onboarding />
       ) : locked ? (
