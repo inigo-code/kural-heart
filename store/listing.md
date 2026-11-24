@@ -74,6 +74,15 @@ The Tamil text is Project Madurai's, checked line by line against two other sour
 | Feature graphic | `feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `screenshots/01.png` to `06.png` | 1080 × 1920 |
 
+## Release notes for the first production release (500 max)
+
+For the first release on the Production track, whichever version it is. People installing from Play have no
+earlier version, so these say what the app is rather than what changed.
+
+<en-IN>
+Kural Heart is here: a quiet journal with Thiruvalluvar. Each day brings one Thirukkural couplet on its palm leaf, in Tamil and English, with a pronunciation line, Pope's and Aiyar's translations and Mu. Varadarasanar's Tamil explanation. Answer the day's question in a private page, with a feeling, photos or a voice note. Free, with no account and no ads: your journal is encrypted on your phone, and backups are locked with your passphrase.
+</en-IN>
+
 ## Release notes for 1.0.9 (500 max)
 
 <en-IN>
