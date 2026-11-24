@@ -71,11 +71,13 @@ export default function TodayScreen() {
         <View style={{ flex: 1, paddingBottom: 10 }}>
           <T v="display">{s.name ? `${tamil ? p.greetTa : p.greetEn},
 ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
-          {/* The time of day's Tamil name (சிறுபொழுது), quietly under the greeting that already says it in English. */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
+          {/* The time of day (சிறுபொழுது) in the lead language; English leads with its own name and keeps the Tamil one
+              beside it, quieter. The gap clears the display face's descenders (the g in a name). */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
             <Icon name={PERIOD_ICON[period]} size={18} color={c.ink3} />
-            <T v="label" color={c.ink2} numberOfLines={1}>
-              {p.ta}
+            <T v="label" color={c.ink2} numberOfLines={1} style={{ flexShrink: 1 }}>
+              {tamil ? p.ta : p.en}
+              {tamil ? null : <T v="label" color={c.ink3}>{`  ·  ${p.ta}`}</T>}
             </T>
           </View>
         </View>
