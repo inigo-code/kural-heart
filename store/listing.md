@@ -74,6 +74,12 @@ The Tamil text is Project Madurai's, checked line by line against two other sour
 | Feature graphic | `feature-graphic.png` | 1024 × 500 |
 | Phone screenshots | `screenshots/01.png` to `06.png` | 1080 × 1920 |
 
+## Release notes for 1.0.9 (500 max)
+
+<en-IN>
+Easier to read. Text is a size larger, and labels and notes no longer look small beside the reading text. The greeting on Today has room for every letter of your name, your name is kept however you leave the profile page, and the phone's navigation buttons stay visible in the light theme.
+</en-IN>
+
 ## Release notes for 1.0.8 (500 max)
 
 <en-IN>
