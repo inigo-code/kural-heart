@@ -63,8 +63,8 @@ The Tamil text is Project Madurai's, checked line by line against two other sour
 - App category: **Books & Reference** (Lifestyle is the other fit, if you'd rather sit with journals)
 - Tags (up to 5, whichever Play offers): Reference, Journal, Diary, Literature, Self-improvement
 - Email: inigo@tosstheworld.org
-- Website: https://inigo-code.github.io/kural-heart-site/
-- Privacy policy: https://inigo-code.github.io/kural-heart-site/privacy.html
+- Website: https://heartapps.github.io/kural-heart/
+- Privacy policy: https://heartapps.github.io/kural-heart/privacy.html
 
 ## Graphics (in `graphics/`, made by `tools/make_store_graphics.py`)
 

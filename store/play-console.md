@@ -2,7 +2,7 @@
 
 How to get Kural Heart from a bundle to a public release, and the answers for every Play Console form, based on
 what the app actually does. If the app changes (new data, a new library, ads), update these answers and the
-[privacy policy](https://inigo-code.github.io/kural-heart-site/privacy.html) together.
+[privacy policy](https://heartapps.github.io/kural-heart/privacy.html) together.
 
 ## Before you start
 
@@ -109,7 +109,7 @@ doesn't need Google's verification).
 
 ### Privacy policy
 
-https://inigo-code.github.io/kural-heart-site/privacy.html
+https://heartapps.github.io/kural-heart/privacy.html
 
 ### App access
 

@@ -13,7 +13,7 @@ import { useUI } from './ui';
 // an identifying User-Agent and the attribution below. Pages carry their place rounded to about a kilometre.
 
 const TILE = 192;
-const UA = 'KuralHeart/1.0 (+https://inigo-code.github.io/kural-heart-site/)';
+const UA = 'KuralHeart/1.0 (+https://heartapps.github.io/kural-heart/)';
 const MAX_Z = 17;
 
 export type MapPoint = { id: string; lat: number; lon: number };

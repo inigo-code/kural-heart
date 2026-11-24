@@ -10,8 +10,8 @@ import { useUI } from '@/ui/ui';
 const ICON = require('../../assets/icon.png');
 const LOGO = require('../../assets/heart-apps.png');
 const APPS = [
-  { name: 'Prompt Heart', en: 'For the AI prompts that work', ta: 'பயன்தரும் AI கட்டளைகளுக்கு', url: 'https://inigo-code.github.io/prompt-heart-site/', icon: require('../../assets/prompt-heart.png') },
-  { name: 'Watch Heart', en: 'A diary for films and shows', ta: 'திரைப்படங்களுக்கும் தொடர்களுக்கும் ஒரு நாட்குறிப்பு', url: 'https://inigo-code.github.io/watch-heart-site/', icon: require('../../assets/watch-heart.png') },
+  { name: 'Prompt Heart', en: 'For the AI prompts that work', ta: 'பயன்தரும் AI கட்டளைகளுக்கு', url: 'https://heartapps.github.io/prompt-heart/', icon: require('../../assets/prompt-heart.png') },
+  { name: 'Watch Heart', en: 'A diary for films and shows', ta: 'திரைப்படங்களுக்கும் தொடர்களுக்கும் ஒரு நாட்குறிப்பு', url: 'https://heartapps.github.io/watch-heart/', icon: require('../../assets/watch-heart.png') },
 ];
 
 export default function AboutScreen() {
@@ -59,7 +59,7 @@ export default function AboutScreen() {
             <Icon name="share" size={16} color={c.ink3} />
           </Pressable>
         ))}
-        <Pressable onPress={() => Linking.openURL('https://inigo-code.github.io/')} accessibilityRole="link" style={{ alignSelf: 'flex-start', borderRadius: 10, backgroundColor: c.primarySoft, paddingHorizontal: 16, paddingVertical: 8 }}>
+        <Pressable onPress={() => Linking.openURL('https://heartapps.github.io/')} accessibilityRole="link" style={{ alignSelf: 'flex-start', borderRadius: 10, backgroundColor: c.primarySoft, paddingHorizontal: 16, paddingVertical: 8 }}>
           <T v="label" color={c.onSoft}>
             {tr('All Heart Apps', 'எல்லா Heart Apps')}
           </T>
