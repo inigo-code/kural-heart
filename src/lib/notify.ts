@@ -87,7 +87,8 @@ async function plan() {
       body = `${k.a}\n${k.b}`;
     } else {
       title = s.tamil ? 'இன்றைய குறள்' : "Today's couplet";
-      body = s.tamil ? 'இன்றைய குறள் காத்திருக்கிறது.' : "Today's couplet is waiting.";
+      // The title already names the couplet, so the body says what is inside rather than repeating it.
+      body = s.tamil ? 'ஒரு புதிய குறளும் ஒரு கேள்வியும் உங்களுக்காக.' : 'A new couplet and one question, ready when you are.';
     }
     await Notifications.scheduleNotificationAsync({
       content: { title, body, categoryIdentifier: CATEGORY, data: { kind: 'reminder' }, color: '#B4492A' },
