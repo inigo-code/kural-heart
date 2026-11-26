@@ -1,9 +1,9 @@
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ComponentRef, ReactNode, RefObject } from 'react';
 import { ActivityIndicator, Animated as RNAnimated, Easing as RNEasing, FlatList, KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
-import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
+import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleProp, TextInputProps, TextStyle, ViewStyle } from 'react-native';
 import Animated, { Easing, FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -225,6 +225,37 @@ export function useCrossfade<V>(value: V): [V, ReturnType<typeof useAnimatedStyl
  * Holds its height and eases to the new one when its content grows or shrinks (a longer meaning, a taller leaf), so
  * what sits below glides instead of jumping. [bleed] leaves room for a shadow that would otherwise be clipped.
  */
+/**
+ * Props for a tab's ScrollView that keep it inside its content when the content gets shorter. Android leaves a scroll
+ * view where it was when its page shrinks (Today scrolled down in Tamil, then English chosen in Settings), so an
+ * empty band showed at the foot until the next touch. A tab that is not on screen can't be scrolled, so it is checked
+ * again when the tab is opened.
+ */
+export function useScrollClamp(ref: RefObject<ComponentRef<typeof ScrollView> | null>) {
+  const m = useRef({ y: 0, view: 0, content: 0 });
+  const clamp = useCallback(() => {
+    const { y, view, content } = m.current;
+    if (!view || !content) return;
+    const max = Math.max(0, content - view);
+    if (y > max + 1) ref.current?.scrollTo({ y: max, animated: false });
+  }, [ref]);
+  useFocusEffect(clamp);
+  return {
+    scrollEventThrottle: 32,
+    onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      m.current.y = e.nativeEvent.contentOffset.y;
+    },
+    onLayout: (e: LayoutChangeEvent) => {
+      m.current.view = e.nativeEvent.layout.height;
+      clamp();
+    },
+    onContentSizeChange: (_w: number, h: number) => {
+      m.current.content = h;
+      clamp();
+    },
+  };
+}
+
 export function SmoothHeight({ children, style, bleed = 0 }: { children: ReactNode; style?: StyleProp<ViewStyle>; bleed?: number }) {
   const { still } = useUI();
   const h = useSharedValue(-1);

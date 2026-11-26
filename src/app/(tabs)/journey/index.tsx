@@ -13,7 +13,7 @@ import type { Part } from '@/lib/pack';
 import { SEALS, sealProgress } from '@/lib/progress';
 import type { Seal } from '@/lib/progress';
 import { useSettings } from '@/lib/settings';
-import { Dialog, Rise, partColor } from '@/ui/common';
+import { Dialog, Rise, partColor, useScrollClamp } from '@/ui/common';
 import { ActionCard, raised, SectionLabel, T } from '@/ui/parts';
 import { useRouter } from 'expo-router';
 import { SealMedal } from '@/ui/seal';
@@ -28,6 +28,7 @@ export default function JourneyScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   useTabTop('journey', () => scroll.current?.scrollTo({ y: 0, animated: true }));
+  const clampProps = useScrollClamp(scroll);
   const { entries } = useJournal();
   const t = useToday();
   const thread = currentThread(t);
@@ -36,7 +37,7 @@ export default function JourneyScreen() {
   const chaptersWritten = useMemo(() => new Set(entries.map((e) => kural(e.kural).c)), [entries]);
   const since = s.startedOn ? `${parseDay(s.startedOn).getDate()} ${monthName(parseDay(s.startedOn).getMonth(), tamil)}` : null;
   return (
-    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} {...clampProps} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
       <T v="display" style={{ marginLeft: 4 }}>
         {L.journey}
       </T>

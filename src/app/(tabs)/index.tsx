@@ -13,7 +13,7 @@ import { useJournal } from '@/lib/journal';
 import { english, kural } from '@/lib/pack';
 import { useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
-import { ActionRow, Avatar, KuralLeaf, LensQuestion, LinkPills, MeaningUnder, Rise, SmoothHeight, WisdomNote, useCrossfade } from '@/ui/common';
+import { ActionRow, Avatar, KuralLeaf, LensQuestion, LinkPills, MeaningUnder, Rise, SmoothHeight, WisdomNote, useCrossfade, useScrollClamp } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
 import { SikkuThreshold } from '@/ui/kolam';
 import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
@@ -32,6 +32,7 @@ export default function TodayScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   useTabTop('index', () => scroll.current?.scrollTo({ y: 0, animated: true }));
+  const clampProps = useScrollClamp(scroll);
   const { entries } = useJournal();
   const speaker = useSpeaker();
   const day = useToday();
@@ -57,7 +58,7 @@ export default function TodayScreen() {
     stopReading();
   }, [k.n]);
   return (
-    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} {...clampProps} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
       {/* The date and your profile. The screen's one kolam is the threshold under Valluvar's arch, below. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 16, minHeight: 56 }}>
         <T v="label" color={c.ink2} style={{ flex: 1 }}>
