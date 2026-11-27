@@ -50,7 +50,43 @@ export async function canLock(): Promise<boolean> {
   return level !== LocalAuthentication.SecurityLevel.NONE;
 }
 
+// Prompts asked for and not yet answered. Android can lose a prompt asked for while the app is going to or coming from
+// the background: it never shows it and never answers, yet refuses every later one at once ('app_cancel') until it is
+// cleared, so Unlock seemed to do nothing. A prompt that is showing covers the screen, so a new request while one is
+// open means the open one was lost: clear it first.
+let open = 0;
+
+async function ask(title: string) {
+  if (open > 0) await LocalAuthentication.cancelAuthenticate().catch(() => {});
+  open++;
+  try {
+    const opts = { promptMessage: title, disableDeviceFallback: false };
+    let r = await LocalAuthentication.authenticateAsync(opts);
+    if (!r.success && r.error === 'app_cancel' && AppState.currentState === 'active') {
+      await LocalAuthentication.cancelAuthenticate().catch(() => {});
+      r = await LocalAuthentication.authenticateAsync(opts);
+    }
+    return r;
+  } finally {
+    open--;
+  }
+}
+
 export async function authenticate(title: string): Promise<boolean> {
-  const r = await awayFor(() => LocalAuthentication.authenticateAsync({ promptMessage: title, disableDeviceFallback: false }));
+  const r = await awayFor(() => ask(title));
   return r.success;
+}
+
+/** Runs [work] once the app is on screen: a prompt asked for while it is still in the background gets lost. */
+export function whenActive(work: () => void): () => void {
+  if (AppState.currentState === 'active') {
+    work();
+    return () => {};
+  }
+  const sub = AppState.addEventListener('change', (s) => {
+    if (s !== 'active') return;
+    sub.remove();
+    work();
+  });
+  return () => sub.remove();
 }
