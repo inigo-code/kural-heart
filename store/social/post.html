@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Kural Heart launch post. Render at ?s=sq (1080 x 1080), ?s=ls (1200 x 675) or ?s=st (1080 x 1920).
+     Colours are Olai's Ivory tokens (src/ui/theme.ts); fonts are the app's own cuts in assets/fonts. -->
+<style>
+@font-face { font-family: 'Lit Display'; src: url('../../assets/fonts/Literata-Display.ttf'); }
+@font-face { font-family: 'Lit SemiBold'; src: url('../../assets/fonts/Literata-SemiBold.ttf'); }
+@font-face { font-family: 'Lit Medium'; src: url('../../assets/fonts/Literata-Medium.ttf'); }
+@font-face { font-family: 'Anek'; src: url('../../assets/fonts/AnekTamil-Regular.ttf'); }
+@font-face { font-family: 'Anek Medium'; src: url('../../assets/fonts/AnekTamil-Medium.ttf'); }
+:root { --bg: #F6F2EA; --ink: #1E1A16; --ink2: #564D44; --clay: #B4492A; --gold: #C9A45C; --leaf: #EFE2C2; }
+* { margin: 0; box-sizing: border-box; }
+html, body { overflow: hidden; background: var(--bg); }
+body { position: relative; color: var(--ink); font-family: 'Anek', sans-serif; }
+.wash { position: absolute; border-radius: 50%; background: var(--leaf); filter: blur(70px); }
+.band { position: absolute; height: 20px; color: var(--gold); opacity: 0.75; }
+.band svg { display: block; width: 100%; height: 100%; }
+.copy { position: absolute; }
+.pill { font-family: 'Anek Medium'; color: var(--clay); }
+.brand { display: flex; align-items: center; }
+.brand img { border-radius: 23%; box-shadow: 0 18px 40px -18px rgb(80 40 20 / 0.45); }
+.name { font-family: 'Lit SemiBold'; line-height: 0.98; letter-spacing: -0.01em; }
+.name b { font-weight: normal; color: var(--clay); }
+.tag { font-family: 'Lit Medium'; line-height: 1.16; letter-spacing: -0.01em; text-wrap: balance; }
+.ta { font-family: 'Anek'; color: var(--ink2); }
+.facts { font-family: 'Anek'; color: var(--ink2); line-height: 1.45; }
+/* phones: the raw 1080 x 2400 app screens in a dark bezel */
+.phone { position: absolute; background: #181513; border-radius: 12.5% / 5.8%; padding: 2.6%; box-shadow: 0 50px 90px -40px rgb(60 30 15 / 0.55), 0 0 0 1px rgb(0 0 0 / 0.04); }
+.phone img { display: block; width: 100%; border-radius: 10.5% / 4.8%; }
+.hint { display: none; }
+
+/* square 1080 */
+.sq { width: 1080px; height: 1080px; }
+.sq .wash { left: 520px; top: -160px; width: 760px; height: 900px; }
+.sq .band { left: 72px; top: 92px; width: 450px; }
+.sq .copy { left: 72px; top: 162px; width: 480px; }
+.sq .pill { font-size: 30px; }
+.sq .brand { gap: 24px; margin-top: 40px; }
+.sq .brand img { width: 112px; height: 112px; }
+.sq .name { font-size: 64px; }
+.sq .tag { margin-top: 52px; font-size: 50px; }
+.sq .ta { margin-top: 20px; font-size: 34px; }
+.sq .facts { margin-top: 40px; font-size: 28px; }
+.sq .front { left: 650px; top: 120px; width: 380px; }
+.sq .back { left: 560px; top: 250px; width: 330px; transform: rotate(-7deg); }
+
+/* landscape 1200 x 675 */
+.ls { width: 1200px; height: 675px; }
+.ls .wash { left: 700px; top: -200px; width: 700px; height: 900px; }
+.ls .band { left: 64px; top: 56px; width: 552px; }
+.ls .copy { left: 64px; top: 108px; width: 620px; }
+.ls .pill { font-size: 24px; }
+.ls .brand { gap: 22px; margin-top: 26px; }
+.ls .brand img { width: 104px; height: 104px; }
+.ls .name { font-size: 58px; }
+.ls .tag { margin-top: 34px; font-size: 42px; }
+.ls .ta { margin-top: 12px; font-size: 28px; }
+.ls .facts { margin-top: 24px; font-size: 23px; }
+.ls .front { left: 905px; top: 48px; width: 262px; }
+.ls .back { left: 745px; top: 120px; width: 230px; transform: rotate(-7deg); }
+
+/* story 1080 x 1920: 250 px kept clear at the top and bottom for Instagram's bars; the link sticker goes under the hint */
+.st { width: 1080px; height: 1920px; }
+.st .wash { left: 90px; top: 760px; width: 900px; height: 900px; }
+.st .band { left: 179px; top: 262px; width: 722px; }
+.st .copy { left: 80px; right: 80px; top: 322px; display: grid; justify-items: center; text-align: center; }
+.st .pill { font-size: 34px; }
+.st .brand { gap: 26px; margin-top: 40px; }
+.st .brand img { width: 128px; height: 128px; }
+.st .name { font-size: 74px; text-align: left; }
+.st .tag { margin-top: 44px; font-size: 56px; }
+.st .ta { margin-top: 16px; font-size: 38px; }
+.st .facts { display: none; }
+.st .front { left: 470px; top: 860px; width: 330px; }
+.st .back { left: 260px; top: 940px; width: 300px; transform: rotate(-7deg); }
+.st .hint { display: block; position: absolute; left: 0; right: 0; top: 1600px; text-align: center; font-size: 30px; color: var(--ink2); }
+</style></head>
+<body>
+<div class="wash"></div>
+<div class="band"><svg aria-hidden="true"><defs><pattern id="k" width="34" height="20" patternUnits="userSpaceOnUse">
+  <circle cx="4" cy="10" r="4" fill="currentColor"/><path d="M21 1.5 L29.5 10 L21 18.5 L12.5 10 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+</pattern></defs><rect width="100%" height="100%" fill="url(#k)"/></svg></div>
+<div class="phone back"><img src="shots/today-night.jpg" alt=""></div>
+<div class="phone front"><img src="shots/today.jpg" alt=""></div>
+<div class="copy">
+  <div class="pill">Now on Google Play</div>
+  <div class="brand"><img src="../../assets/icon.png" alt=""><div class="name">Kural<br><b>Heart</b></div></div>
+  <p class="tag">One couplet a day, and a page of your own.</p>
+  <p class="ta">குறளுடன் நாட்குறிப்பு</p>
+  <p class="facts">All 1,330 couplets in Tamil and English.<br>Free. No account, no ads.</p>
+</div>
+<p class="hint">Free on Google Play · No account · No ads</p>
+<script>document.body.className = new URLSearchParams(location.search).get('s') || 'sq';</script>
+</body></html>
