@@ -26,10 +26,10 @@ GOLD = (201, 164, 92)
 
 SHOTS = [
     ("today.png", "One couplet a day", "On its palm leaf, in Tamil and English", False),
-    ("kural.png", "Read it every way", "Aiyar, Pope, and Mu. Va. in Tamil", False),
+    ("kural.png", "Read it every way", "For daily life, Pope, Aiyar and Mu. Va.", False),
     ("journal.png", "A private journal", "Feelings, photos, voice notes, places", False),
     ("journey.png", "A thread, not a streak", "Rest days, seals and 133 chapters", False),
-    ("today-night.png", "Day and night", "Ivory or Midnight, by the hour", True),
+    ("today-night.png", "Day and night", "Ivory or Midnight, with your phone", True),
     ("share.png", "Share a couplet", "Seven looks from Tamil life", True),
 ]
 
