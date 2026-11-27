@@ -87,6 +87,8 @@ export default function WriteScreen() {
   const [fetching, setFetching] = useState(false);
   const [placeInput, setPlaceInput] = useState('');
   const [tagInput, setTagInput] = useState('');
+  // A photo, voice note or video waiting for "Remove it?": the page saves at once and the file goes for good.
+  const [removing, setRemoving] = useState<null | { kind: 'photo' | 'audio' | 'video'; id: string }>(null);
   const savedOnce = useRef(!!existing);
   const done = useRef(false);
 
@@ -379,7 +381,7 @@ export default function WriteScreen() {
                 <View key={id}>
                   <PhotoThumb id={id} size={96} />
                   <Pressable
-                    onPress={() => setPhotos((p) => p.filter((x) => x !== id))}
+                    onPress={() => setRemoving({ kind: 'photo', id })}
                     accessibilityLabel={tr('Remove photo', 'படத்தை நீக்கு')}
                     style={{
                       position: 'absolute',
@@ -402,10 +404,10 @@ export default function WriteScreen() {
           {audio.length || videos.length ? (
             <View style={{ gap: 8, marginHorizontal: 20, marginTop: 10 }}>
               {audio.map((id) => (
-                <AudioNote key={id} id={id} onRemove={() => setAudio((a) => a.filter((x) => x !== id))} />
+                <AudioNote key={id} id={id} onRemove={() => setRemoving({ kind: 'audio', id })} />
               ))}
               {videos.map((id) => (
-                <VideoNote key={id} id={id} onRemove={() => setVideos((v) => v.filter((x) => x !== id))} />
+                <VideoNote key={id} id={id} onRemove={() => setRemoving({ kind: 'video', id })} />
               ))}
             </View>
           ) : null}
@@ -455,6 +457,42 @@ export default function WriteScreen() {
       </KeyboardSafe>
 
       <VoiceRecorder visible={recording} onClose={() => setRecording(false)} onSaved={(id) => setAudio((a) => [...a, id])} />
+
+      <Dialog
+        visible={!!removing}
+        title={
+          removing?.kind === 'audio'
+            ? tr('Remove this voice note?', 'இந்தக் குரல் குறிப்பை நீக்கவா?')
+            : removing?.kind === 'video'
+              ? tr('Remove this video?', 'இந்தக் காணொளியை நீக்கவா?')
+              : tr('Remove this photo?', 'இந்தப் படத்தை நீக்கவா?')
+        }
+        onClose={() => setRemoving(null)}
+        actions={[
+          { label: L.cancel, onPress: () => setRemoving(null) },
+          {
+            label: tr('Remove', 'நீக்கு'),
+            color: c.heart,
+            onPress: () => {
+              if (removing) {
+                const { kind, id } = removing;
+                const drop = (list: string[]) => list.filter((x) => x !== id);
+                if (kind === 'photo') setPhotos(drop);
+                else if (kind === 'audio') setAudio(drop);
+                else setVideos(drop);
+              }
+              setRemoving(null);
+            },
+          },
+        ]}>
+        <T v="bodyM" color={c.ink2}>
+          {removing?.kind === 'audio'
+            ? tr('It leaves this page, and the recording is deleted. This can’t be undone.', 'இது இந்தப் பக்கத்திலிருந்து நீங்கும்; பதிவும் அழிக்கப்படும். இதைத் திரும்பப் பெற முடியாது.')
+            : removing?.kind === 'video'
+              ? tr('It leaves this page and can’t be brought back here. The video stays in your gallery.', 'இது இந்தப் பக்கத்திலிருந்து நீங்கும்; இங்கே திரும்பப் பெற முடியாது. காணொளி உங்கள் கேலரியில் அப்படியே இருக்கும்.')
+              : tr('It leaves this page and can’t be brought back here. A photo picked from your gallery stays there.', 'இது இந்தப் பக்கத்திலிருந்து நீங்கும்; இங்கே திரும்பப் பெற முடியாது. கேலரியிலிருந்து எடுத்த படம் அங்கேயே இருக்கும்.')}
+        </T>
+      </Dialog>
 
       <Dialog
         visible={dialog === 'kb'}
