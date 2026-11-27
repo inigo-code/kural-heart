@@ -77,16 +77,15 @@ export async function authenticate(title: string): Promise<boolean> {
   return r.success;
 }
 
-/** Runs [work] once the app is on screen: a prompt asked for while it is still in the background gets lost. */
-export function whenActive(work: () => void): () => void {
-  if (AppState.currentState === 'active') {
-    work();
-    return () => {};
-  }
+/**
+ * Runs [work] whenever the app is on screen: now if it already is, and on every return. A prompt asked for while the
+ * app is still in the background gets lost, and one cut short by leaving needs asking again when you come back. A
+ * return from the prompt itself (the PIN screen is another app) doesn't count, or cancelling would ask again at once.
+ */
+export function onEachReturn(work: () => void): () => void {
+  if (AppState.currentState === 'active') work();
   const sub = AppState.addEventListener('change', (s) => {
-    if (s !== 'active') return;
-    sub.remove();
-    work();
+    if (s === 'active' && away === 0) work();
   });
   return () => sub.remove();
 }

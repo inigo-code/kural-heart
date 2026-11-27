@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { today } from '@/lib/dates';
-import { authenticate, canLock, unlockNow, whenActive } from '@/lib/lock';
+import { authenticate, canLock, onEachReturn, unlockNow } from '@/lib/lock';
 import { askNotify, planReminders } from '@/lib/notify';
 import { setSettings, useSettings } from '@/lib/settings';
 import { WHATS_NEW } from '@/lib/whatsNew';
@@ -123,8 +123,9 @@ export function LockScreen() {
     if (!(await canLock())) unlockNow(); // the phone's own lock was removed; nothing to check against
     else if (await authenticate('Kural Heart')) unlockNow();
   };
-  // The lock screen appears as the app leaves, so the first prompt waits until the app is back on screen.
-  useEffect(() => whenActive(unlock), []);
+  // The lock screen appears as the app leaves, so the prompt waits until the app is back on screen, and asks again on
+  // each return while locked.
+  useEffect(() => onEachReturn(unlock), []);
   return (
     <View style={{ flex: 1, paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24, paddingHorizontal: 24, alignItems: 'center' }}>
       <View style={{ flex: 1 }} />
