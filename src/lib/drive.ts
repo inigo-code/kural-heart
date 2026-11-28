@@ -74,14 +74,14 @@ function explain(status: number, body: string): string {
   const ta = settings().tamil;
   if (status === 403 && /has not been used|is disabled|accessNotConfigured|SERVICE_DISABLED/i.test(body))
     return ta
-      ? 'இந்தச் செயலியின் Google Cloud திட்டத்தில் Google Drive API இன்னும் இயக்கப்படவில்லை. அதை இயக்கி, சில நிமிடங்கள் கழித்து மீண்டும் ஒத்திசைக்கவும்.'
-      : 'Google Drive isn’t switched on for this app’s Google Cloud project yet. Enable the Drive API there, wait a few minutes, then sync again.';
+      ? 'Google Drive இப்போது இந்தச் செயலிக்குக் கிடைக்கவில்லை. பிறகு மீண்டும் முயலுங்கள்.'
+      : 'Google Drive isn’t available to this app just now. Try again later.';
   if (status === 401 || /invalid_grant|unauthorized/i.test(body))
     return ta ? 'Google உள்நுழைவு காலாவதியானது. Drive ஒத்திசைவை அணைத்து மீண்டும் இயக்கவும்.' : 'The Google sign-in has expired. Turn Drive sync off and on again.';
   if (status === 403 && /storageQuota|quotaExceeded/i.test(body))
     return ta ? 'உங்கள் Google சேமிப்பகம் நிரம்பியுள்ளது.' : 'Your Google storage is full.';
   if (status >= 500) return ta ? 'Google Drive இப்போது பதிலளிக்கவில்லை. சற்று கழித்து முயலுங்கள்.' : 'Google Drive isn’t answering just now. Try again in a little while.';
-  return ta ? `Google Drive கோரிக்கையை மறுத்தது (${status}).` : `Google Drive refused the request (${status}).`;
+  return ta ? 'Google Drive கோரிக்கையை மறுத்தது. பிறகு மீண்டும் முயலுங்கள்.' : 'Google Drive refused the request. Try again later.';
 }
 
 async function call(url: string, init: RequestInit & { headers: Record<string, string> }): Promise<Response> {

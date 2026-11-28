@@ -15,6 +15,7 @@ import { setSettings, settings, useSettings } from '@/lib/settings';
 import { forgetUpload } from '@/lib/syncState';
 import { Dialog, Field, lastLabel } from '@/ui/common';
 import { ActionCard, Button, Group, Icon, Note, Page, Row, SectionLabel, SwitchRow, T, TextLink } from '@/ui/parts';
+import { noteError } from '@/lib/problemLog';
 import { toast } from '@/ui/toast';
 import { useUI } from '@/ui/ui';
 import { Valluvar } from '@/valluvar/Valluvar';
@@ -75,14 +76,18 @@ export default function BackupScreen() {
     if (said) toast(said);
   };
 
+  // What a failure says on screen: the app's own words, never an exception's (the Heart Apps rule).
   const errorText = (e: unknown): string => {
+    noteError(e, 'backup'); // kept for "Report a problem", cleaned of personal details
     const m = e instanceof Error ? e.message : String(e);
     if (e instanceof DriveError && m === 'cancelled') return tr('Google Drive wasn’t connected.', 'Google Drive இணைக்கப்படவில்லை.');
-    if (/Network request failed/i.test(m)) return tr('No connection. Try again when you’re online.', 'இணைப்பு இல்லை. இணையத்தில் இருக்கும்போது மீண்டும் முயலுங்கள்.');
+    if (/network request failed|fetch failed|failed to fetch|unable to resolve host|unknownhost|timed? ?out/i.test(m)) return tr('No connection. Try again when you’re online.', 'இணைப்பு இல்லை. இணையத்தில் இருக்கும்போது மீண்டும் முயலுங்கள்.');
     if ((e instanceof BackupError && m === 'memory') || /Failed to allocate|OutOfMemory/i.test(m))
       return tr('Too large to fit in this phone’s memory. Nothing was changed.', 'இந்த அலைபேசியின் நினைவகத்தில் அடங்காத அளவு பெரியது. எதுவும் மாற்றப்படவில்லை.');
-    if (/isn’t set up/.test(m)) return tr('Google sign-in isn’t set up for this copy of the app yet (see docs/GOOGLE_DRIVE_SETUP.md).', 'இந்தப் பதிப்புக்கு Google உள்நுழைவு இன்னும் அமைக்கப்படவில்லை.');
-    return m || tr('Something went wrong.', 'ஏதோ தவறு நடந்தது.');
+    if (/isn’t set up/.test(m)) return tr('Google sign-in isn’t set up for this copy of the app yet.', 'இந்தப் பதிப்புக்கு Google உள்நுழைவு இன்னும் அமைக்கப்படவில்லை.');
+    // Our own errors are written for people; anything else is a library's or the phone's.
+    const ours = e instanceof DriveError || e instanceof BackupError || m === 'Choose a folder first.' || m === 'Set a passphrase first.';
+    return ours && m ? m : tr('Something went wrong. Try again.', 'ஏதோ தவறு நடந்தது. மீண்டும் முயலுங்கள்.');
   };
 
   /** What a merge changed, in a line, or null when it changed nothing. */
