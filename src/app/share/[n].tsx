@@ -137,6 +137,74 @@ export default function ShareScreen() {
   );
 }
 
+// The space kept at the bottom of the card, in pixels of the 1080-wide image. Post: Valluvar's 302 pixels, 40 above
+// the edge, and a gap. Story: the name under the icon (96 above the edge, up to two lines of tagline) and a gap.
+const VALLUVAR_POST = 302;
+const POST_FOOT = 40 + VALLUVAR_POST + 28;
+const STORY_FOOT = 96 + 140 + 40;
+// The words under the leaf shrink to this much of their size before the last lines give way to an ellipsis.
+const MIN_SCALE = 0.7;
+
+/**
+ * The words under the leaf: the "For daily life" label, the text and who it is by. They fill the space left between
+ * the leaf and the bottom of the card, made smaller until they fit, whatever the language, look or shape.
+ */
+function Below({ label, text, by, italic, story, theme, u }: { label: string | null; text: string; by: string | null; italic: boolean; story: boolean; theme: CardTheme; u: number }) {
+  const [scale, setScale] = useState(1);
+  const [maxLines, setMaxLines] = useState<number>();
+  const room = useRef(0);
+  const need = useRef(0);
+  const lines = useRef(0);
+  const tamilText = isTamil(text);
+  const size = (story ? 46 : 42) * u * scale;
+  const lineHeight = size * (tamilText ? 1.6 : 1.35);
+  const fit = () => {
+    if (!room.current || !need.current || need.current <= room.current + 1 || maxLines) return;
+    if (scale > MIN_SCALE) setScale(Math.max(MIN_SCALE, scale * Math.min(0.97, Math.sqrt(room.current / need.current))));
+    else if (lines.current) setMaxLines(Math.max(1, lines.current - Math.ceil((need.current - room.current) / lineHeight)));
+  };
+  return (
+    <View
+      style={{ flex: 1, overflow: 'hidden' }}
+      onLayout={(e) => {
+        room.current = e.nativeEvent.layout.height;
+        fit();
+      }}>
+      <View
+        onLayout={(e) => {
+          need.current = e.nativeEvent.layout.height;
+          fit();
+        }}>
+        {label ? (
+          <Text allowFontScaling={false} style={{ fontFamily: F.sansBold, fontSize: 32 * u, color: theme.title, marginTop: 52 * u }}>
+            {label}
+          </Text>
+        ) : null}
+        <Text
+          allowFontScaling={false}
+          numberOfLines={maxLines}
+          onTextLayout={(e) => {
+            lines.current = e.nativeEvent.lines.length;
+          }}
+          style={{
+            fontFamily: tamilText ? F.serifTamil : italic ? F.serifItalic : F.serif,
+            fontSize: size,
+            lineHeight,
+            color: theme.ink,
+            marginTop: (label ? 14 : 60) * u,
+          }}>
+          {text}
+        </Text>
+        {by ? (
+          <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 30 * u, color: theme.quiet, marginTop: 24 * u }}>
+            {by}
+          </Text>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
 /**
  * The share image. Story (9:16): the theme's sky, Valluvar reading, then the leaf. Post (4:5): the leaf first,
  * Valluvar below. Couplets are always flush left. Units are pixels of the 1080-wide image.
@@ -168,7 +236,8 @@ function Card({ k, story, line, life, tamil, translation, W, H, theme }: { k: Ku
           <MayilBorder height={34 * u} color={theme.borderInk} strength={1.4} style={{ position: 'absolute', left: 40 * u, right: 40 * u, bottom: 28 * u }} />
         </>
       ) : null}
-      <View style={{ paddingHorizontal: margin, paddingTop: (story ? 110 : 100) * u }}>
+      {/* The bottom is kept for the name and, on the post, Valluvar, so the words under the leaf never run under them. */}
+      <View style={{ flex: 1, paddingHorizontal: margin, paddingTop: (story ? 110 : 100) * u, paddingBottom: (story ? STORY_FOOT : POST_FOOT) * u }}>
         <Text allowFontScaling={false} style={{ fontFamily: F.serifTamil, fontSize: 38 * u, color: theme.title }}>
           {`திருக்குறள் · ${tamil ? 'குறள்' : 'Kural'} ${k.n}`}
         </Text>
@@ -212,32 +281,18 @@ function Card({ k, story, line, life, tamil, translation, W, H, theme }: { k: Ku
             {`அதிகாரம் ${ch.n} · ${ch.ta} · ${ch.en}`}
           </Text>
         </View>
-        {wisdom ? (
-          <Text allowFontScaling={false} style={{ fontFamily: F.sansBold, fontSize: 32 * u, color: theme.title, marginTop: 52 * u }}>
-            {tamil ? 'அன்றாட வாழ்வில்' : 'For daily life'}
-          </Text>
-        ) : null}
-        <Text
-          allowFontScaling={false}
-          numberOfLines={story ? 8 : 5}
-          adjustsFontSizeToFit={!!wisdom}
-          minimumFontScale={0.8}
-          style={{
-            fontFamily: isTamil(text) ? F.serifTamil : wisdom ? F.serif : F.serifItalic,
-            fontSize: (story ? 46 : 42) * u,
-            lineHeight: (story ? 46 : 42) * (isTamil(text) ? 1.6 : 1.35) * u,
-            color: theme.ink,
-            marginTop: (wisdom ? 14 : 60) * u,
-          }}>
-          {text}
-        </Text>
-        {!line && !wisdom ? (
-          <Text allowFontScaling={false} style={{ fontFamily: F.sans, fontSize: 30 * u, color: theme.quiet, marginTop: 24 * u }}>
-            {`— ${tamil && k.ta ? MUVA_BY.ta : translator(translation)}`}
-          </Text>
-        ) : null}
+        <Below
+          key={`${text}|${story}|${W}`}
+          label={wisdom ? (tamil ? 'அன்றாட வாழ்வில்' : 'For daily life') : null}
+          text={text}
+          by={!line && !wisdom ? `— ${tamil && k.ta ? MUVA_BY.ta : translator(translation)}` : null}
+          italic={!wisdom}
+          story={story}
+          theme={theme}
+          u={u}
+        />
       </View>
-      {!story && valluvar ? <Image source={{ uri: valluvar }} style={{ position: 'absolute', right: margin - 30 * u, bottom: 40 * u, width: 330 * u, height: 302 * u }} /> : null}
+      {!story && valluvar ? <Image source={{ uri: valluvar }} style={{ position: 'absolute', right: margin - 30 * u, bottom: 40 * u, width: 330 * u, height: VALLUVAR_POST * u }} /> : null}
       <View style={{ position: 'absolute', left: margin, bottom: 96 * u, flexDirection: 'row', alignItems: 'center' }}>
         <Image source={ICON} style={{ width: 84 * u, height: 84 * u, borderRadius: 20 * u }} />
         {/* Clear of Valluvar on the post, whose figure takes the corner to the right. */}
