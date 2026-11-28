@@ -4,14 +4,14 @@
 .o{--bg:#F6F2EA;--surface:#FFFDF9;--surface2:#EFE8DC;--surface3:#E7DECF;--ink:#1E1A16;--ink2:#564D44;--ink3:#6B6156;--line:#E0D4C1;
   --primary:#B4492A;--onprimary:#FFF8F2;--primary-soft:#F1D2C1;--onsoft:#6E2610;
   --aram:#2F6B53;--porul:#3A4E86;--inbam:#A8475C;--aram-soft:#E1EDE6;--porul-soft:#E2E6F2;--inbam-soft:#F4E1E5;
-  --heart:#D63B58;--gold:#C9A45C;--leaf1:#F3E7C6;--leaf2:#E7D4A2;--leafink:#2B1E10;--leafnote:#6A4B22;
+  --heart:#D63B58;--heartink:#B32E48;--gold:#C9A45C;--leaf1:#F3E7C6;--leaf2:#E7D4A2;--leafink:#2B1E10;--leafnote:#563B17;
   --sans:"Anek Tamil","Noto Sans Tamil",system-ui,sans-serif;--serif:"Literata","Noto Serif Tamil",Georgia,serif;
   --std:cubic-bezier(.2,0,0,1);--dec:cubic-bezier(.05,.7,.1,1);--ease:cubic-bezier(.45,0,.55,1);--spring:cubic-bezier(.34,1.4,.64,1);
   position:relative;width:390px;height:844px;overflow:hidden;box-sizing:border-box;background:var(--bg);color:var(--ink);
   font-family:var(--sans);font-size:16px;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 .o.night{--bg:#14110F;--surface:#1E1A17;--surface2:#28231F;--surface3:#332D28;--ink:#F3ECE2;--ink2:#CBC1B4;--ink3:#A0958A;--line:#352E28;
   --primary:#E58A62;--onprimary:#2A140B;--primary-soft:#3A2419;--onsoft:#F4C2A8;
-  --aram:#7FC3A5;--porul:#9DB0E6;--inbam:#E79AAD;--aram-soft:#1F2C26;--porul-soft:#1F2433;--inbam-soft:#33222A}
+  --aram:#7FC3A5;--porul:#9DB0E6;--inbam:#E79AAD;--aram-soft:#1F2C26;--porul-soft:#1F2433;--inbam-soft:#33222A;--heartink:#EC6E86}
 .o.ta{--serif:"Noto Serif Tamil","Literata",Georgia,serif}
 .o *,.o *::before,.o *::after{box-sizing:border-box}
 :where(.o) :where(p,h1,h2,h3,ul,ol){margin:0;padding:0}

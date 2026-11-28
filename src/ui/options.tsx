@@ -137,7 +137,7 @@ export function VoiceSheet({ lang, visible, onClose, sample }: { lang: 'ta' | 'e
       <View style={{ gap: 10, marginTop: 16 }}>
         {!list ? <ActivityIndicator color={c.primary} style={{ marginTop: 8 }} /> : null}
         {list && list.length === 0 ? (
-          <T v="bodyM" color={c.heart}>
+          <T v="bodyM" color={c.heartInk}>
             {lang === 'ta'
               ? tr('No Tamil voice is installed yet. Add one in Android settings.', 'தமிழ்க் குரல் இன்னும் நிறுவப்படவில்லை. Android அமைப்புகளில் சேர்க்கவும்.')
               : tr('No English voice is installed yet.', 'ஆங்கிலக் குரல் இன்னும் நிறுவப்படவில்லை.')}

@@ -317,7 +317,8 @@ export function Toggle({ value, onChange, label }: { value: boolean; onChange: (
   }));
   return (
     <Pressable onPress={() => onChange(!value)} accessibilityRole="switch" accessibilityState={{ checked: value }} accessibilityLabel={label} hitSlop={8}>
-      <Animated.View style={[{ width: 52, height: 28, borderRadius: 14, borderWidth: value ? 0 : 1.5, borderColor: alpha(c.ink3, 0.45) }, track]}>
+      {/* Off, the outline is what shows the switch is there: at 60% of the muted ink it keeps 3 to 1 on both grounds. */}
+      <Animated.View style={[{ width: 52, height: 28, borderRadius: 14, borderWidth: value ? 0 : 1.5, borderColor: alpha(c.ink3, 0.6) }, track]}>
         <Animated.View style={[{ position: 'absolute', top: value ? 0 : -1.5, left: value ? 0 : -1.5, backgroundColor: value ? '#FFFFFF' : c.isNight ? c.ink2 : '#FFFFFF', alignItems: 'center', justifyContent: 'center', elevation: 2, shadowColor: '#000' }, thumb]}>
           {value ? <Icon name="tick" size={14} color={c.primary} stroke={2.6} /> : null}
         </Animated.View>

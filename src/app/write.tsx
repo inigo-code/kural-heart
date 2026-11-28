@@ -19,7 +19,7 @@ import { uuid } from '@/lib/random';
 import { useSettings } from '@/lib/settings';
 import type { Entry, Place, Weather } from '@/lib/types';
 import { wordCount } from '@/lib/types';
-import { Dialog, Field, HScroll, MOODS, MoodChip, PhotoThumb, WEATHER_NAMES, Wrap, timeOf, weatherLabel } from '@/ui/common';
+import { Dialog, Field, HScroll, LensChips, MOODS, MoodChip, PhotoThumb, WEATHER_NAMES, Wrap, timeOf, weatherLabel } from '@/ui/common';
 import { KeyboardSafe } from '@/ui/keyboard';
 import { AudioNote, VideoNote, VoiceRecorder } from '@/ui/media';
 import { CoupletText, Pronounce } from '@/ui/leaf';
@@ -303,20 +303,7 @@ export default function WriteScreen() {
             </View>
           </View>
           <View style={{ paddingHorizontal: 20 }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
-              {L.lens.map((name, i) => (
-                <Pressable
-                  key={name}
-                  onPress={() => setLens(i)}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: lens === i }}
-                  style={{ borderRadius: 16, backgroundColor: lens === i ? c.primary : c.surface2, minHeight: 40, paddingHorizontal: 14, paddingVertical: 9 }}>
-                  <T v="label" color={lens === i ? c.onPrimary : c.ink2}>
-                    {name}
-                  </T>
-                </Pressable>
-              ))}
-            </View>
+            <LensChips value={lens} onChange={setLens} style={{ marginTop: 16 }} />
             <T v="headline" style={{ marginTop: 10, fontSize: type.headline.fontSize * 0.88, lineHeight: type.headline.lineHeight * 0.9 }}>
               {tamil ? asked.ta : asked.en}
             </T>
@@ -382,6 +369,8 @@ export default function WriteScreen() {
                   <PhotoThumb id={id} size={96} />
                   <Pressable
                     onPress={() => setRemoving({ kind: 'photo', id })}
+                    hitSlop={10}
+                    accessibilityRole="button"
                     accessibilityLabel={tr('Remove photo', 'படத்தை நீக்கு')}
                     style={{
                       position: 'absolute',
@@ -472,7 +461,7 @@ export default function WriteScreen() {
           { label: L.cancel, onPress: () => setRemoving(null) },
           {
             label: tr('Remove', 'நீக்கு'),
-            color: c.heart,
+            color: c.heartInk,
             onPress: () => {
               if (removing) {
                 const { kind, id } = removing;

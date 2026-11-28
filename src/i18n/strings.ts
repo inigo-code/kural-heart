@@ -145,6 +145,8 @@ const EN = {
   notifAsk: "Allow one reminder a day",
   lens: ["Mind", "Speech", "Action"],
   threadDays: (it: number) => (it === 1 ? `1 day on your thread` : `${it} days on your thread`),
+  // The words under the big number on Journey, which already shows the count.
+  threadUnit: (it: number): string => (it === 1 ? `day on your thread` : `days on your thread`),
   longest: (it: number) => (it === 1 ? `Longest thread: 1 day` : `Longest thread: ${it} days`),
   wordsN: (it: number) => (it === 1 ? `1 word` : `${it} words`),
   week: (it: number) => `In the last 7 days you wrote on ${it} days`,
@@ -297,6 +299,7 @@ const TA = {
   notifAsk: "நாளுக்கு ஒரு நினைவூட்டலை அனுமதி",
   lens: ["மனம்", "சொல்", "செயல்"],
   threadDays: (it: number) => (it === 1 ? `தொடர்ந்து 1 நாள் எழுதியுள்ளீர்கள்` : `தொடர்ந்து ${it} நாட்கள் எழுதியுள்ளீர்கள்`),
+  threadUnit: (it: number): string => (it === 1 ? `நாள் தொடர்ந்து எழுதியுள்ளீர்கள்` : `நாட்கள் தொடர்ந்து எழுதியுள்ளீர்கள்`),
   longest: (it: number) => (it === 1 ? `நீண்ட தொடர்: 1 நாள்` : `நீண்ட தொடர்: ${it} நாட்கள்`),
   wordsN: (it: number) => (it === 1 ? `1 சொல்` : `${it} சொற்கள்`),
   week: (it: number) => `கடந்த 7 நாட்களில் ${it} நாள் எழுதினீர்கள்`,

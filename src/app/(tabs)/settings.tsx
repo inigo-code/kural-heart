@@ -271,7 +271,7 @@ export default function SettingsScreen() {
             } catch {}
           }}
         />
-        <Row title={L.sWipe} titleColor={c.heart} onPress={() => (setTyped(''), setWipe(true))} />
+        <Row title={L.sWipe} titleColor={c.heartInk} onPress={() => (setTyped(''), setWipe(true))} />
       </Group>
 
       <SectionLabel>{tr('Online', 'இணையம்')}</SectionLabel>
@@ -398,7 +398,7 @@ ${scholarly(sampleK.b)}`,
           { label: L.cancel, onPress: () => setWipe(false) },
           {
             label: L.wipeConfirm,
-            color: c.heart,
+            color: c.heartInk,
             disabled: typed.trim() !== L.wipeWord,
             onPress: async () => {
               setWipe(false);

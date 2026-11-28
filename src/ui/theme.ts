@@ -21,6 +21,8 @@ export type Colors = {
   porulSoft: string;
   inbamSoft: string;
   heart: string;
+  /** Heart red for words (a warning, a delete): the heart itself is too light for text, 4.1 to 1. */
+  heartInk: string;
   gold: string;
   leaf1: string;
   leaf2: string;
@@ -30,7 +32,7 @@ export type Colors = {
   isNight: boolean;
 };
 
-const LEAF = { heart: '#D63B58', gold: '#C9A45C', leaf1: '#F3E7C6', leaf2: '#E7D4A2', leafInk: '#2B1E10', leafNote: '#6A4B22', leafRib: '#7A5A2E' };
+const LEAF = { heart: '#D63B58', gold: '#C9A45C', leaf1: '#F3E7C6', leaf2: '#E7D4A2', leafInk: '#2B1E10', leafNote: '#563B17', leafRib: '#7A5A2E' };
 
 export const Ivory: Colors = {
   bg: '#F6F2EA',
@@ -53,6 +55,7 @@ export const Ivory: Colors = {
   porulSoft: '#E2E6F2',
   inbamSoft: '#F4E1E5',
   ...LEAF,
+  heartInk: '#B32E48',
   isNight: false,
 };
 
@@ -76,9 +79,12 @@ export const Midnight: Colors = {
   porulSoft: '#1F2433',
   inbamSoft: '#33222A',
   ...LEAF,
-  // On Midnight the leaf is dimmed to 90%, as in the canvas.
+  heartInk: '#EC6E86',
+  // On Midnight the leaf is dimmed to 90%, as in the canvas (its filter dims the note with it). The note stays
+  // 5 to 1 or better down to the leaf's darkened foot.
   leaf1: '#DBD0B2',
   leaf2: '#D0BF92',
+  leafNote: '#4A3212',
   isNight: true,
 };
 

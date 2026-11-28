@@ -48,19 +48,24 @@ export default function JourneyScreen() {
       ) : null}
       <Rise i={0} style={{ marginTop: 16, borderRadius: 20, backgroundColor: c.surface, padding: 20, flexDirection: 'row', alignItems: 'center', ...raised(c) }}>
         <View style={{ flex: 1 }}>
-          <T v="display" style={{ fontSize: type.display.fontSize * 1.4, lineHeight: type.display.lineHeight * 1.3 }}>
-            {thread.days}
-          </T>
-          <T v="bodyM" color={c.ink2}>
-            {L.threadDays(thread.days)}
-          </T>
+          {/* The big number and the words under it are read as one line. */}
+          <View accessible accessibilityLabel={L.threadDays(thread.days)}>
+            <T v="display" style={{ fontSize: type.display.fontSize * 1.4, lineHeight: type.display.lineHeight * 1.3 }}>
+              {thread.days}
+            </T>
+            <T v="bodyM" color={c.ink2}>
+              {L.threadUnit(thread.days)}
+            </T>
+          </View>
           <T v="labelM" color={c.ink3}>
             {L.longest(thread.longest)}
           </T>
           <View style={{ flexDirection: 'row', gap: 6, marginTop: 10 }} accessible accessibilityLabel={L.week(thread.lastSeven)}>
-            {[6, 5, 4, 3, 2, 1, 0].map((i) => (
-              <View key={i} style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: written.has(addDays(t, -i)) ? c.heart : c.surface3 }} />
-            ))}
+            {/* A day not written is an open ring, so the week reads at night too, where a filled grey dot sank into the card. */}
+            {[6, 5, 4, 3, 2, 1, 0].map((i) => {
+              const on = written.has(addDays(t, -i));
+              return <View key={i} style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: on ? c.heart : 'transparent', borderWidth: on ? 0 : 1.5, borderColor: alpha(c.ink3, 0.6) }} />;
+            })}
           </View>
           <T v="small" color={c.ink3} style={{ marginTop: 8 }}>
             {L.restNote}

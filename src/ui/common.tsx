@@ -340,28 +340,12 @@ export function WisdomNote({ k, style }: { k: Kural; style?: StyleProp<ViewStyle
  * remembered, so the page you write opens on the same question.
  */
 export function LensQuestion({ k }: { k: Kural }) {
-  const { c, L, tamil } = useUI();
+  const { tamil } = useUI();
   const lens = useSettings().lastLens;
   const [question, fade] = useCrossfade(questionText(k, lens, tamil));
   return (
     <>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
-        {L.lens.map((name, i) => {
-          const on = lens === i;
-          return (
-            <Pressable
-              key={name}
-              onPress={() => setSettings({ lastLens: i })}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: on }}
-              style={{ borderRadius: R.sm, backgroundColor: on ? c.primarySoft : c.surface2, minHeight: 36, paddingHorizontal: 14, paddingVertical: 8 }}>
-              <T v="label" color={on ? c.onSoft : c.ink2}>
-                {name}
-              </T>
-            </Pressable>
-          );
-        })}
-      </View>
+      <LensChips value={lens} onChange={(i) => setSettings({ lastLens: i })} style={{ marginTop: 12 }} />
       <SmoothHeight>
         <Animated.View style={fade}>
           <T v="question" style={{ marginTop: 16 }}>
@@ -370,6 +354,41 @@ export function LensQuestion({ k }: { k: Kural }) {
         </Animated.View>
       </SmoothHeight>
     </>
+  );
+}
+
+/**
+ * Mind, Speech, Action: the same quiet tabs on Today and on the page you write, so the one choice looks like one
+ * thing in both places. The chosen one is soft, not filled, so the screen's one filled button stays the way on.
+ * 40dp tall with 4dp of slop, so each takes a 48dp touch.
+ */
+export function LensChips({ value, onChange, style }: { value: number; onChange: (i: number) => void; style?: StyleProp<ViewStyle> }) {
+  const { c, L } = useUI();
+  return (
+    <View style={[{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }, style]}>
+      {L.lens.map((name, i) => {
+        const on = value === i;
+        return (
+          <Pressable
+            key={name}
+            onPress={() => onChange(i)}
+            hitSlop={4}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: on }}
+            style={({ pressed }) => ({
+              borderRadius: R.sm,
+              backgroundColor: on ? c.primarySoft : pressed ? c.surface3 : c.surface2,
+              minHeight: 40,
+              paddingHorizontal: 16,
+              justifyContent: 'center',
+            })}>
+            <T v="label" color={on ? c.onSoft : c.ink2}>
+              {name}
+            </T>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }
 
