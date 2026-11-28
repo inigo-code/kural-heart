@@ -4,15 +4,14 @@ import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
+import { OTHER_HEART_APPS } from '@/lib/heartAppsList';
+import { reportProblem } from '@/lib/problemReport';
 import { Group, Icon, Page, Row, SectionLabel, T } from '@/ui/parts';
+import { toast } from '@/ui/toast';
 import { useUI } from '@/ui/ui';
 
 const ICON = require('../../assets/icon.png');
 const LOGO = require('../../assets/heart-apps.png');
-const APPS = [
-  { name: 'Prompt Heart', en: 'For the AI prompts that work', ta: 'பயன்தரும் AI கட்டளைகளுக்கு', url: 'https://heartapps.github.io/prompt-heart/', icon: require('../../assets/prompt-heart.png') },
-  { name: 'Watch Heart', en: 'A diary for films and shows', ta: 'திரைப்படங்களுக்கும் தொடர்களுக்கும் ஒரு நாட்குறிப்பு', url: 'https://heartapps.github.io/watch-heart/', icon: require('../../assets/watch-heart.png') },
-];
 
 export default function AboutScreen() {
   const { c, L, tr } = useUI();
@@ -43,7 +42,7 @@ export default function AboutScreen() {
             </T>
           </View>
         </View>
-        {APPS.map((a) => (
+        {OTHER_HEART_APPS.map((a) => (
           <Pressable
             key={a.name}
             onPress={() => Linking.openURL(a.url)}
@@ -53,7 +52,7 @@ export default function AboutScreen() {
             <View style={{ flex: 1 }}>
               <T v="label">{a.name}</T>
               <T v="labelM" color={c.ink3}>
-                {tr(a.en, a.ta)}
+                {tr(a.tagline, a.ta ?? a.tagline)}
               </T>
             </View>
             <Icon name="share" size={16} color={c.ink3} />
@@ -68,6 +67,11 @@ export default function AboutScreen() {
       <Group style={{ marginTop: 12 }}>
         <Row title={L.sSources} divider={false} onPress={() => router.replace('/sources')} />
         <Row title="inigo@tosstheworld.org" sub={tr('Write to Inigo', 'Inigo-வுக்கு எழுதுங்கள்')} onPress={() => Linking.openURL('mailto:inigo@tosstheworld.org?subject=Kural%20Heart')} />
+        <Row
+          title={tr('Report a problem', 'சிக்கலைத் தெரிவிக்க')}
+          sub={tr('Opens an email with the app version, phone model and recent errors. Nothing from your journal.', 'செயலிப் பதிப்பு, அலைபேசி மாடல், அண்மைப் பிழைகளுடன் ஒரு மின்னஞ்சல் திறக்கும். உங்கள் நாட்குறிப்பிலிருந்து எதுவும் இல்லை.')}
+          onPress={() => void reportProblem().then((opened) => opened || toast(tr('No email app found. Write to inigo@tosstheworld.org', 'மின்னஞ்சல் செயலி இல்லை. inigo@tosstheworld.org-க்கு எழுதுங்கள்')))}
+        />
       </Group>
     </Page>
   );

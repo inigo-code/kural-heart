@@ -13,6 +13,7 @@ import { loadJournal, allEntries } from '@/lib/journal';
 import { useLocked } from '@/lib/lock';
 import { purgeMedia } from '@/lib/photos';
 import { planReminders } from '@/lib/notify';
+import { startProblemLog } from '@/lib/problemReport';
 import { settings, useSettings } from '@/lib/settings';
 import { LockScreen, Onboarding, afterOnboarding } from '@/ui/gate';
 import { SplashOverlay } from '@/ui/splash';
@@ -20,6 +21,9 @@ import { ToastHost } from '@/ui/toast';
 import { UIProvider, useUI } from '@/ui/ui';
 import { UpdatePrompt } from '@/ui/updates';
 import { refreshWidget } from '@/widget/widgets';
+
+// Notes errors and crashes for "Report a problem" (About), from the first moment.
+startProblemLog();
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 

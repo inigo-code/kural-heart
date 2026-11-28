@@ -6,6 +6,7 @@ import * as SQLite from 'expo-sqlite';
 import { useSyncExternalStore } from 'react';
 
 import { fromUtf8, utf8 } from './bytes';
+import { noteError } from './problemLog';
 import { open, seal } from './crypto';
 import type { Day } from './dates';
 import { asPeriod } from './daily';
@@ -121,6 +122,7 @@ export async function loadJournal(): Promise<{ failed: number }> {
     const d = await database();
     rows = await d.getAllAsync<Row>('SELECT id, date, created, updated, kural, lens, period, body FROM entries');
   } catch (e) {
+    noteError(e, 'opening the journal');
     broken = true;
     publish();
     throw e;

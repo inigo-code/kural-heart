@@ -13,6 +13,7 @@
       "bundleIdentifier": "com.inigocode.kuralheart"
     },
     "android": {
+      "versionCode": 17,
       "package": "com.inigocode.kuralheart",
       "adaptiveIcon": {
         "backgroundColor": "#E5693F",
