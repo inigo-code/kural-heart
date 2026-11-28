@@ -23,8 +23,10 @@ what the app actually does. If the app changes (new data, a new library, ads), u
   one sequence (1.0.3 APK 4, its bundle 5; 1.0.4 APK 6, its bundle 7; 1.0.5 APK 8, its bundle 9; 1.0.6 APK 10, its bundle 11; 1.0.7 APK 12, its bundle 13; 1.0.8 APK 14, its bundle 15; 1.0.9 APK 16, its bundle 17). Before the next `eas build`, run
   `npx eas-cli build:version:set -p android` and set it to 17, so EAS carries on from here.
 - **Over-the-air updates:** Play builds listen on the `production` channel, GitHub APKs on `preview`. Publish every
-  `eas update` to both, after checking the runtime fingerprint (local builds have their own; see the Prompt Heart
-  notes). Every update needs a new What's new entry.
+  update to both with `node scripts/ota.mjs "message"`, never a plain `eas update`: builds made from the short copy have
+  the channel header in app.json, which is part of the runtime fingerprint, so a plain `eas update` publishes for a
+  runtime no phone has (1.0.9: APK `bf6cd64f…`, Play `e3ccf2a0…`, plain `2cffacbe…`). The script sets the header for each
+  channel while it publishes. Every update needs a new What's new entry.
 
 ## Step by step
 
@@ -87,7 +89,7 @@ to 100% from the same page.
 
 ### 8. Later updates
 
-- JavaScript-only changes: `eas update` to both channels (`production` and `preview`), with a new What's new entry.
+- JavaScript-only changes: `node scripts/ota.mjs "message"` (both channels, `preview` and `production`), with a new What's new entry.
 - Anything native (a new library, an app.json plugin change): a new bundle with a higher versionCode, uploaded to
   closed testing or straight to production. After EAS builds return (1 December), `npx eas-cli build -p android
   --profile production` makes the bundle; or build locally as this one was (`CLAUDE.md`, with
