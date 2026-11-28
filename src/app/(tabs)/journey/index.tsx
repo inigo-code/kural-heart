@@ -13,7 +13,7 @@ import type { Part } from '@/lib/pack';
 import { SEALS, sealProgress } from '@/lib/progress';
 import type { Seal } from '@/lib/progress';
 import { useSettings } from '@/lib/settings';
-import { Dialog, Rise, partColor } from '@/ui/common';
+import { Dialog, Rise, partColor, useScrollClamp } from '@/ui/common';
 import { ActionCard, raised, SectionLabel, T } from '@/ui/parts';
 import { useRouter } from 'expo-router';
 import { SealMedal } from '@/ui/seal';
@@ -28,6 +28,7 @@ export default function JourneyScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   useTabTop('journey', () => scroll.current?.scrollTo({ y: 0, animated: true }));
+  const clampProps = useScrollClamp(scroll);
   const { entries } = useJournal();
   const t = useToday();
   const thread = currentThread(t);
@@ -36,7 +37,7 @@ export default function JourneyScreen() {
   const chaptersWritten = useMemo(() => new Set(entries.map((e) => kural(e.kural).c)), [entries]);
   const since = s.startedOn ? `${parseDay(s.startedOn).getDate()} ${monthName(parseDay(s.startedOn).getMonth(), tamil)}` : null;
   return (
-    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} {...clampProps} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
       <T v="display" style={{ marginLeft: 4 }}>
         {L.journey}
       </T>
@@ -47,19 +48,24 @@ export default function JourneyScreen() {
       ) : null}
       <Rise i={0} style={{ marginTop: 16, borderRadius: 20, backgroundColor: c.surface, padding: 20, flexDirection: 'row', alignItems: 'center', ...raised(c) }}>
         <View style={{ flex: 1 }}>
-          <T v="display" style={{ fontSize: type.display.fontSize * 1.4, lineHeight: type.display.lineHeight * 1.3 }}>
-            {thread.days}
-          </T>
-          <T v="bodyM" color={c.ink2}>
-            {L.threadDays(thread.days)}
-          </T>
+          {/* The big number and the words under it are read as one line. */}
+          <View accessible accessibilityLabel={L.threadDays(thread.days)}>
+            <T v="display" style={{ fontSize: type.display.fontSize * 1.4, lineHeight: type.display.lineHeight * 1.3 }}>
+              {thread.days}
+            </T>
+            <T v="bodyM" color={c.ink2}>
+              {L.threadUnit(thread.days)}
+            </T>
+          </View>
           <T v="labelM" color={c.ink3}>
             {L.longest(thread.longest)}
           </T>
           <View style={{ flexDirection: 'row', gap: 6, marginTop: 10 }} accessible accessibilityLabel={L.week(thread.lastSeven)}>
-            {[6, 5, 4, 3, 2, 1, 0].map((i) => (
-              <View key={i} style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: written.has(addDays(t, -i)) ? c.heart : c.surface3 }} />
-            ))}
+            {/* A day not written is an open ring, so the week reads at night too, where a filled grey dot sank into the card. */}
+            {[6, 5, 4, 3, 2, 1, 0].map((i) => {
+              const on = written.has(addDays(t, -i));
+              return <View key={i} style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: on ? c.heart : 'transparent', borderWidth: on ? 0 : 1.5, borderColor: alpha(c.ink3, 0.6) }} />;
+            })}
           </View>
           <T v="small" color={c.ink3} style={{ marginTop: 8 }}>
             {L.restNote}

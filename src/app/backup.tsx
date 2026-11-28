@@ -304,7 +304,7 @@ export default function BackupScreen() {
           <Field value={pass} onChangeText={setPass} placeholder={L.passLabel} secret style={{ marginTop: 12 }} />
           <Field value={again} onChangeText={setAgain} placeholder={L.passAgain} secret style={{ marginTop: 10 }} />
           {problem ? (
-            <T v="labelM" color={c.heart} style={{ margin: 4 }}>
+            <T v="labelM" color={c.heartInk} style={{ margin: 4 }}>
               {problem}
             </T>
           ) : null}
@@ -369,7 +369,7 @@ export default function BackupScreen() {
                   icon="user"
                   onPress={() => !busy && switchAccount()}
                 />
-                <Row title={tr('Delete the copy in Drive', 'Drive-இல் உள்ள பிரதியை நீக்கு')} icon="trash" titleColor={c.heart} onPress={() => !busy && setConfirm('drive')} />
+                <Row title={tr('Delete the copy in Drive', 'Drive-இல் உள்ள பிரதியை நீக்கு')} icon="trash" titleColor={c.heartInk} onPress={() => !busy && setConfirm('drive')} />
               </>
             ) : null}
           </Group>
@@ -398,7 +398,7 @@ export default function BackupScreen() {
                     planNightly().catch(() => {});
                   }}
                 />
-                <Row title={tr('Delete the backup file in this folder', 'இந்தக் கோப்புறையில் உள்ள பிரதியை நீக்கு')} icon="trash" titleColor={c.heart} onPress={() => setConfirm('folder')} />
+                <Row title={tr('Delete the backup file in this folder', 'இந்தக் கோப்புறையில் உள்ள பிரதியை நீக்கு')} icon="trash" titleColor={c.heartInk} onPress={() => setConfirm('folder')} />
               </>
             ) : null}
           </Group>
@@ -457,7 +457,7 @@ export default function BackupScreen() {
           { label: L.cancel, onPress: () => setConfirm(null) },
           {
             label: L.delete,
-            color: c.heart,
+            color: c.heartInk,
             onPress: () => {
               const which = confirm;
               setConfirm(null);
@@ -520,7 +520,7 @@ export default function BackupScreen() {
         <Field value={next} onChangeText={setNext} placeholder={tr('New passphrase', 'புதிய கடவுச்சொற்றொடர்')} secret style={{ backgroundColor: c.surface2 }} />
         <Field value={nextAgain} onChangeText={setNextAgain} placeholder={L.passAgain} secret style={{ backgroundColor: c.surface2 }} />
         {nextProblem ? (
-          <T v="labelM" color={c.heart}>
+          <T v="labelM" color={c.heartInk}>
             {nextProblem}
           </T>
         ) : null}
@@ -588,7 +588,7 @@ export default function BackupScreen() {
           style={{ backgroundColor: c.surface2, borderWidth: passError ? 1.5 : 0, borderColor: c.heart }}
         />
         {passError ? (
-          <T v="labelM" color={c.heart}>
+          <T v="labelM" color={c.heartInk}>
             {passError}
           </T>
         ) : null}
@@ -647,7 +647,7 @@ export default function BackupScreen() {
           style={{ backgroundColor: c.surface2, borderWidth: passError ? 1.5 : 0, borderColor: c.heart }}
         />
         {passError ? (
-          <T v="labelM" color={c.heart}>
+          <T v="labelM" color={c.heartInk}>
             {passError}
           </T>
         ) : null}

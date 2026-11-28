@@ -13,7 +13,7 @@ import { useJournal } from '@/lib/journal';
 import { english, kural } from '@/lib/pack';
 import { useSettings } from '@/lib/settings';
 import { readAloud, stopReading, useSpeaker } from '@/lib/speak';
-import { ActionRow, Avatar, KuralLeaf, LensQuestion, LinkPills, MeaningUnder, Rise, SmoothHeight, WisdomNote, useCrossfade } from '@/ui/common';
+import { ActionRow, Avatar, KuralLeaf, LensQuestion, LinkPills, MeaningUnder, Rise, SmoothHeight, WisdomNote, useCrossfade, useScrollClamp } from '@/ui/common';
 import { ArchSky } from '@/ui/dayArt';
 import { SikkuThreshold } from '@/ui/kolam';
 import { ActionCard, Button, Icon, raised, T } from '@/ui/parts';
@@ -32,6 +32,7 @@ export default function TodayScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   useTabTop('index', () => scroll.current?.scrollTo({ y: 0, animated: true }));
+  const clampProps = useScrollClamp(scroll);
   const { entries } = useJournal();
   const speaker = useSpeaker();
   const day = useToday();
@@ -57,7 +58,7 @@ export default function TodayScreen() {
     stopReading();
   }, [k.n]);
   return (
-    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} {...clampProps} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 28 }}>
       {/* The date and your profile. The screen's one kolam is the threshold under Valluvar's arch, below. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 16, minHeight: 56 }}>
         <T v="label" color={c.ink2} style={{ flex: 1 }}>
@@ -121,14 +122,9 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
             { icon: 'share', label: L.share, onPress: () => router.push({ pathname: '/share/[n]', params: { n: String(k.n) } }) },
           ]}
         />
-        <LinkPills
-          style={{ marginTop: 20 }}
-          items={[
-            { icon: 'book', label: tr('Choose a couplet', 'குறள் தேர்வு'), onPress: () => router.navigate({ pathname: '/kural', params: { from: 'today' } }) },
-            { icon: 'heart', label: L.feel, onPress: () => router.push('/feeling') },
-          ]}
-        />
       </Rise>
+      {/* The question and the one filled button come straight after the couplet's own actions; the ways elsewhere
+          (another couplet by hand, a couplet for a feeling) wait under it. */}
       <Rise i={4} style={{ margin: 20, marginTop: 24, borderRadius: R.lg, backgroundColor: c.surface, padding: 20, ...raised(c) }}>
         <T v="label" color={c.ink3}>
           {L.todayQ}
@@ -141,8 +137,17 @@ ${s.name.split(' ')[0]}` : tamil ? p.greetTa : p.greetEn}</T>
           onPress={() => router.push({ pathname: '/write', params: mine ? { kural: String(k.n), id: mine.id } : { kural: String(k.n) } })}
         />
       </Rise>
+      <Rise i={5}>
+        <LinkPills
+          style={{ marginBottom: 20 }}
+          items={[
+            { icon: 'book', label: tr('Choose a couplet', 'குறள் தேர்வு'), onPress: () => router.navigate({ pathname: '/kural', params: { from: 'today' } }) },
+            { icon: 'heart', label: L.feel, onPress: () => router.push('/feeling') },
+          ]}
+        />
+      </Rise>
       {thread.days > 0 ? (
-        <Rise i={5}>
+        <Rise i={6}>
           <ActionCard
             icon="journey"
             title={L.threadDays(thread.days)}

@@ -22,7 +22,7 @@ import { setSettings, useSettings, wipeSettings } from '@/lib/settings';
 import { pronounce, scholarly } from '@/lib/translit';
 import type { Accent, Settings } from '@/lib/settings';
 import { english, kural } from '@/lib/pack';
-import { Avatar, Dialog, Field, MOODS, lastLabel } from '@/ui/common';
+import { Avatar, Dialog, Field, MOODS, lastLabel, useScrollClamp } from '@/ui/common';
 import { OptionSheet, VoiceSheet } from '@/ui/options';
 import { Button, Choice, Group, Icon, raised, Row, SectionLabel, SwitchRow, T, TextLink, timeLabel } from '@/ui/parts';
 import { ACCENT_SWATCH } from '@/ui/theme';
@@ -38,6 +38,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   useTabTop('settings', () => scroll.current?.scrollTo({ y: 0, animated: true }));
+  const clampProps = useScrollClamp(scroll);
   const { entries } = useJournal();
   const [wipe, setWipe] = useState(false);
   const [typed, setTyped] = useState('');
@@ -64,7 +65,7 @@ export default function SettingsScreen() {
   const themeLabel = s.theme === 'auto' ? L.themeAuto : s.theme === 'ivory' ? L.themeIvory : L.themeMidnight;
 
   return (
-    <ScrollView ref={scroll} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
+    <ScrollView ref={scroll} {...clampProps} contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 16, paddingBottom: 28 }}>
       <T v="display" style={{ marginLeft: 4 }}>
         {L.settings}
       </T>
@@ -270,7 +271,7 @@ export default function SettingsScreen() {
             } catch {}
           }}
         />
-        <Row title={L.sWipe} titleColor={c.heart} onPress={() => (setTyped(''), setWipe(true))} />
+        <Row title={L.sWipe} titleColor={c.heartInk} onPress={() => (setTyped(''), setWipe(true))} />
       </Group>
 
       <SectionLabel>{tr('Online', 'இணையம்')}</SectionLabel>
@@ -397,7 +398,7 @@ ${scholarly(sampleK.b)}`,
           { label: L.cancel, onPress: () => setWipe(false) },
           {
             label: L.wipeConfirm,
-            color: c.heart,
+            color: c.heartInk,
             disabled: typed.trim() !== L.wipeWord,
             onPress: async () => {
               setWipe(false);

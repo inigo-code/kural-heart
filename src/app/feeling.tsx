@@ -122,7 +122,7 @@ function HeavyDays({ onNotNow }: { onNotNow: () => void }) {
         <Icon name="shield" size={18} color={c.heart} />
         <T v="labelM" color={c.ink2} style={{ flex: 1 }}>
           {tr('In danger right now? Call ', 'இப்போது ஆபத்தில் இருக்கிறீர்களா? அழையுங்கள் ')}
-          <T v="label" color={c.heart}>
+          <T v="label" color={c.heartInk}>
             {country.emergency}
           </T>
         </T>
